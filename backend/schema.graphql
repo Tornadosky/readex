@@ -1,0 +1,201 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Users {
+  id: ID!
+  login: String!
+  email: String!
+  password: String!
+  phone: String
+  comments: [Comments!]!
+  bookmarks: [Bookmarks!]!
+  highlights: [Highlights!]!
+  collections: [Collections!]!
+  words: [Words!]!
+  tests: [Tests!]!
+  achievements: [Achievements!]!
+}
+
+type Books {
+  id: ID!
+  title: String!
+  author: String
+  document: String!
+  comments: [Comments!]!
+  bookmarks: [Bookmarks!]!
+  highlights: [Highlights!]!
+  collections: [Collections!]!
+}
+
+type Achievements {
+  id: ID!
+  name: String!
+  description: String!
+  users: [Users!]!
+}
+
+type Positions {
+  id: ID!
+  page: Int!
+  line: Int!
+  symbol: Int!
+  comments: [Comments!]!
+  bookmarks: [Bookmarks!]!
+  highlightsFrom: [Highlights!]!
+  highlightsTo: [Highlights!]!
+}
+
+type Collections {
+  id: ID!
+  title: String!
+  user: Users!
+  books: [Books!]!
+}
+
+type Comments {
+  id: ID!
+  book: Books!
+  user: Users!
+  position: Positions!
+  text: String!
+}
+
+type Bookmarks {
+  id: ID!
+  title: String!
+  position: Positions!
+  book: Books!
+  user: Users!
+}
+
+type Highlights {
+  id: ID!
+  book: Books!
+  user: Users!
+  from: Positions!
+  to: Positions!
+}
+
+type Words {
+  id: ID!
+  color: String!
+  word: String!
+  description: String
+  translation: String
+  user: Users!
+}
+
+type Tests {
+  id: ID!
+  title: String!
+  prompt: String!
+  language: String!
+  difficulty: String!
+  user: Users!
+  questions: [Questions!]!
+}
+
+type Questions {
+  id: ID!
+  test: Tests!
+  number: Int!
+  type: String!
+  answers: String
+  correct: String!
+  explanation: String
+}
+
+
+
+type Query {
+  Books: [Books]
+  Comments: [Comments]
+  Bookmarks: [Bookmarks]
+  Highlights: [Highlights]
+  Collections: [Collections]
+  Positions: [Positions]
+  Users: [Users]
+  Achievements: [Achievements]
+  Tests: [Tests]
+  Words: [Words]
+  Questions: [Questions]
+}
+
+type Mutation {
+  updateBook(id: Int
+    title: String
+    author: String
+    document: String
+  ): [Books]
+  updateUser(
+    id: ID
+    login: String
+    email: String
+    password: String
+    phone: String
+  ): Users
+  updateAchievement(
+    id: ID
+    name: String
+    description: String
+  ): Achievements
+  updatePosition(
+    id: ID
+    page: Int
+    line: Int
+    symbol: Int
+  ): Positions
+  updateCollection(
+    id: ID
+    title: String
+    user: ID
+  ): Collections
+  updateComment(
+    id: ID
+    book: ID
+    user: ID
+    position: ID
+    text: String
+  ): Comments
+  updateBookmark(
+    id: ID
+    title: String
+    position: ID
+    book: ID
+    user: ID
+  ): Bookmarks
+  updateHighlight(
+    id: ID
+    book: ID
+    user: ID
+    from: ID
+    to: ID
+  ): Highlights
+  updateWord(
+    id: ID
+    color: String
+    word: String
+    description: String
+    translation: String
+    user: ID
+  ): Words
+  updateTest(
+    id: ID
+    title: String
+    prompt: String
+    language: String
+    difficulty: String
+    user: ID
+  ): Tests
+  updateQuestion(
+    id: ID
+    test: ID
+    number: Int
+    type: String
+    answers: String
+    correct: String
+    explanation: String
+  ): Questions
+}

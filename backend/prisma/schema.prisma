@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Users {
+  id        Int @id @default(autoincrement())
+  login     String @unique
+  email     String @unique
+  password  String
+  phone     String?
+  comments  Comments[]
+  bookmarks Bookmarks[]
+  highlights Highlights[]
+  collections Collections[]
+  words     Words[]
+  tests     Tests[]
+  achievements AchievementsOnUsers[]
+}
+
+model Books {
+  id        Int @id @default(autoincrement())
+  title     String
+  author    String?
+  document  String
+  comments  Comments[]
+  bookmarks Bookmarks[]
+  highlights Highlights[]
+  collections BooksOnCollections[]
+}
+
+model Achievements {
+  id               Int @id @default(autoincrement())
+  name             String @unique
+  description      String
+  users            AchievementsOnUsers[]
+}
+
+model Positions {
+  id            Int @id @default(autoincrement())
+  page          Int
+  line          Int
+  symbol        Int
+  comments      Comments[]
+  bookmarks     Bookmarks[]
+  highlightsfrom Highlights[] @relation("positionsOnHighlightsFrom")
+  highlightsto Highlights[] @relation("positionsOnHighlightsTo")
+}
+
+model Collections {
+  id              Int @id @default(autoincrement())
+  title           String
+  user            Users @relation(fields: [userid], references: [id]) 
+  userid          Int
+  books           BooksOnCollections[]
+}
+
+model Comments {
+  id           Int @id @default(autoincrement())
+  book         Books @relation(fields: [bookid], references: [id])
+  bookid       Int
+  user         Users @relation(fields: [userid], references: [id])
+  userid       Int
+  position     Positions @relation(fields: [positionid], references: [id])
+  positionid   Int
+  text         String
+}
+
+model Bookmarks {
+  id            Int @id @default(autoincrement())
+  title         String
+  position      Positions @relation(fields: [positionid], references: [id])
+  positionid    Int
+  book          Books @relation(fields: [bookid], references: [id])
+  bookid        Int
+  user          Users @relation(fields: [userid], references: [id])
+  userid        Int
+}
+
+model Highlights {
+  id             Int @id @default(autoincrement())
+  book           Books @relation(fields: [bookid], references: [id])
+  bookid         Int
+  user           Users @relation(fields: [userid], references: [id])
+  userid         Int
+  from           Positions @relation("positionsOnHighlightsFrom", fields: [fromid], references: [id])
+  fromid         Int
+  to             Positions @relation("positionsOnHighlightsTo", fields: [toid], references: [id])
+  toid           Int
+}
+
+model Words {
+  id Int    @id @default(autoincrement())
+  color     String
+  word      String
+  description String
+  translation String
+  user      Users @relation(fields: [userid], references: [id])
+  userid    Int
+}
+
+model Tests {
+  id        Int @id @default(autoincrement())
+  title     String
+  prompt    String
+  language  String
+  difficulty String
+  user      Users @relation(fields: [userid], references: [id])
+  userid    Int
+  questions Questions[]
+}
+
+model Questions {
+  id            Int @id @default(autoincrement())
+  test          Tests @relation(fields: [testid], references: [id])
+  testid        Int
+  number        Int
+  type          String
+  answers       String?
+  correct       String
+  explanation   String?
+}
+
+model AchievementsOnUsers {
+  user                    Users @relation(fields: [userid], references: [id])
+  userid                  Int
+  achievement             Achievements @relation(fields: [achievementid], references: [id])
+  achievementid           Int
+
+  @@id([userid, achievementid])
+}
+
+model BooksOnCollections {
+  book                    Books @relation(fields: [bookid], references: [id])
+  bookid                  Int
+  collection             Collections @relation(fields: [collectionid], references: [id])
+  collectionid           Int
+
+  @@id([bookid, collectionid])
+}

@@ -18,7 +18,6 @@ import Logout from '@mui/icons-material/Logout';
 interface AccountMenuProps {
   username: string;
   setShowSettings: (show: boolean) => void;
-  client: any; // Specify a more precise type if possible
 }
 
 export const AccountMenu: React.FC<AccountMenuProps> = ({ username, setShowSettings }) => {

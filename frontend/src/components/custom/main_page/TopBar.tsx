@@ -10,10 +10,9 @@ interface TopBarProps {
     userData: UserData | null;
     handleCreateSection: () => void;
     setShowSettings: (showSettings: boolean) => void;
-    client: any;
 }
 
-  export const TopBar: FC<TopBarProps> = ({ userData, handleCreateSection, setShowSettings, client }) => {
+  export const TopBar: FC<TopBarProps> = ({ userData, handleCreateSection, setShowSettings }) => {
       return (
           <div className="topbar">
               <Logo />
@@ -21,7 +20,7 @@ interface TopBarProps {
                   <button className="create-section-button" onClick={handleCreateSection}>
                       {'Create new section'}
                   </button>
-                  <AccountMenu username={userData ? userData.username : ''} setShowSettings={setShowSettings} client={client} />
+                  <AccountMenu username={userData ? userData.username : ''} setShowSettings={setShowSettings} />
               </div>
           </div>
       );

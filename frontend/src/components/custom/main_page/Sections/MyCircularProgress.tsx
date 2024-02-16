@@ -9,7 +9,7 @@ interface MyCircularProgressProps {
   circularProgressProps?: React.ComponentProps<typeof CircularProgress>; 
 }
 
-export const MyCircularProgress: React.FC<MyCircularProgressProps> = ({
+const MyCircularProgress: React.FC<MyCircularProgressProps> = ({
   progress = 0, 
   determinate,
   circularProgressProps,
@@ -80,3 +80,5 @@ export const MyCircularProgress: React.FC<MyCircularProgressProps> = ({
     </Box>
   );
 };
+
+export default MyCircularProgress;

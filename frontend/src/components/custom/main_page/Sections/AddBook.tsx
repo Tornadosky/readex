@@ -4,7 +4,6 @@ import "./style.css";
 
 interface AddBookProps {
   onFileSelect: (file: any, newId: number, coverImage: string) => void;
-  client: any;
   sectionId: string | number;
   globalLoading: number;
   setGlobalLoading: (value: React.SetStateAction<number>) => void;
@@ -13,7 +12,6 @@ interface AddBookProps {
 
 export const AddBook: React.FC<AddBookProps> = ({
   onFileSelect,
-  client,
   sectionId,
   globalLoading,
   setGlobalLoading,
@@ -32,24 +30,25 @@ export const AddBook: React.FC<AddBookProps> = ({
 
           setGlobalLoading(prev => prev + 1);
           setLoading(true);
-          const response = await client.post("api/book/", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
+          // const response = await client.post("api/book/", formData, {
+          //   headers: {
+          //     "Content-Type": "multipart/form-data",
+          //   },
+          // });
 
-          if (response.data.error === 0) {
-            console.log("File uploaded successfully", response.data.cover_image);
-            onFileSelect(file, response.data.book_id, response.data.cover_image);
-          } else if (response.data.error === 2) {
-            setGlobalLoading(prev => Math.max(prev - 1, 0));
-            console.error("Limit exceeded: ", response.data.details);
-            alert("Limit exceeded");
-          } else {
-            setGlobalLoading(prev => Math.max(prev - 1, 0));
-            console.error("Failed to upload the file: ", response.data.details);
-            alert("Failed to upload the file");
-          }
+          // if (response.data.error === 0) {
+          //   console.log("File uploaded successfully", response.data.cover_image);
+          //   onFileSelect(file, response.data.book_id, response.data.cover_image);
+          // } else if (response.data.error === 2) {
+          //   setGlobalLoading(prev => Math.max(prev - 1, 0));
+          //   console.error("Limit exceeded: ", response.data.details);
+          //   alert("Limit exceeded");
+          // } else {
+          //   setGlobalLoading(prev => Math.max(prev - 1, 0));
+          //   console.error("Failed to upload the file: ", response.data.details);
+          //   alert("Failed to upload the file");
+          // }
+          console.log("File uploaded successfully");
         } catch (error) {
           setGlobalLoading(prev => Math.max(prev - 1, 0));
           console.error("Error during the API call", error);

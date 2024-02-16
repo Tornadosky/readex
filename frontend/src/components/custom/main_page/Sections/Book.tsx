@@ -2,7 +2,8 @@ import React, { useState, useRef } from "react";
 import { useDrag, useDrop } from 'react-dnd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CreateIcon from '@mui/icons-material/Create';
-import { useNavigate } from "react-router-dom";
+import book1Cover from '../../../../assets/book1_cover.png';
+//import { useNavigate } from "react-router-dom";
 
 import './style.css';
 
@@ -18,15 +19,14 @@ interface BookProps {
   sectionId: number;
   index: number;
   moveBookInsideSection: (sourceIndex: number, destinationIndex: number) => void;
-  client: any;
   handleDeleteBook: (bookId: number, bookName: string) => void;
 }
 
-export const Book: React.FC<BookProps> = ({ book, sectionId, index, moveBookInsideSection, client, handleDeleteBook }) => {
+export const Book: React.FC<BookProps> = ({ book, sectionId, index, moveBookInsideSection, handleDeleteBook }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(book.title.replace(/\.[^/.]+$/, ""));
   const inputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
     if (isEditing && event.key === 'Enter') {
@@ -62,14 +62,16 @@ export const Book: React.FC<BookProps> = ({ book, sectionId, index, moveBookInsi
 
   const handleSaveEdit = async () => {
     try {
-      const response = await client.post('api/book/change-title/', { book_id: book.id, title: editedName });
+      // const response = await client.post('api/book/change-title/', { book_id: book.id, title: editedName });
 
-      if (response.status === 200) {
-        setIsEditing(false);
-      } else {
-        console.error('Failed to rename the book');
-        alert('Failed to rename the book');
-      }
+      // if (response.status === 200) {
+      //   setIsEditing(false);
+      // } else {
+      //   console.error('Failed to rename the book');
+      //   alert('Failed to rename the book');
+      // }
+      setIsEditing(false);
+      console.log(`Change book title to ${editedName}`);
     } catch (error) {
       console.error('Error during the API call', error);
       alert('Error during the API call');
@@ -81,7 +83,7 @@ export const Book: React.FC<BookProps> = ({ book, sectionId, index, moveBookInsi
   };
   
   const handleBookClick = () => {
-    navigate('/books-reading');
+    //navigate('/books-reading');
   }
 
   const displayContent = (
@@ -93,7 +95,7 @@ export const Book: React.FC<BookProps> = ({ book, sectionId, index, moveBookInsi
         <DeleteIcon name="trashbin" style={{ cursor: 'pointer' }} onClick={handleDelete}/>
       </div>
       <div className={`vertical-rectangle ${!book.is_processed ? 'disabled-book' : ''}`} onClick={handleBookClick}>
-        <img className="book-cover" src={`${book.cover_image ? book.cover_image : require('../../images/book1_cover.png')}`} alt={book.title} />
+        <img className="book-cover" src={`${book.cover_image ? book.cover_image : book1Cover}`} alt={book.title} />
       </div>
       <div className={`name-text ${!book.is_processed ? 'disabled-book' : ''}`}>
         {isEditing ? (

@@ -3,7 +3,7 @@ import { Book } from "./Book";
 import { AddBook } from "./AddBook";
 import { EditableText } from "./EditableText";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { MyCircularProgress } from './MyCircularProgress';
+import MyCircularProgress from './MyCircularProgress';
 
 import { AlertDialog } from '../AlertDialog.jsx';
 
@@ -26,7 +26,6 @@ interface SectionProps {
   name: string;
   sectionId: number;
   handleDeleteSection: (sectionId: number, name: string) => void;
-  client: any;
   globalLoading: number;
   setGlobalLoading: React.Dispatch<React.SetStateAction<number>>;
 }
@@ -36,7 +35,6 @@ export const Section: React.FC<SectionProps> = ({
   name,
   sectionId,
   handleDeleteSection,
-  client,
   globalLoading,
   setGlobalLoading,
 }) => {
@@ -71,17 +69,18 @@ export const Section: React.FC<SectionProps> = ({
 
   const handleSectionNameChange = async (newName: string) => {
     try {
-      const response = await client.post('api/section/change-section/', {
-        section_id: sectionId,
-        section_name: newName,
-      });
+      // const response = await client.post('api/section/change-section/', {
+      //   section_id: sectionId,
+      //   section_name: newName,
+      // });
 
-      if (response.status === 200) {
-        // Handle the successful update
-      } else {
-        console.error('Failed to update section name');
-        alert('Failed to update section name');
-      }
+      // if (response.status === 200) {
+      //   // Handle the successful update
+      // } else {
+      //   console.error('Failed to update section name');
+      //   alert('Failed to update section name');
+      // }
+      console.log(`Change section name to ${newName}`);
     } catch (error) {
       console.error('Error during the API call', error);
       alert('Error during the API call');
@@ -90,22 +89,23 @@ export const Section: React.FC<SectionProps> = ({
 
   const moveBookInsideSection = async (sourceIndex: number, destinationIndex: number) => {
     try {
-      const response = await client.post('api/book/change-index/', { section_id: sectionId, source_index: sourceIndex, destination_index: destinationIndex });
+      // const response = await client.post('api/book/change-index/', { section_id: sectionId, source_index: sourceIndex, destination_index: destinationIndex });
 
-      if (response.status === 200) {
-        console.log(sourceIndex, destinationIndex)
-        const updatedBooks = [...books];
+      // if (response.status === 200) {
+      //   console.log(sourceIndex, destinationIndex)
+      //   const updatedBooks = [...books];
 
-        [updatedBooks[sourceIndex], updatedBooks[destinationIndex]] = [updatedBooks[destinationIndex], updatedBooks[sourceIndex],];
-        [updatedBooks[sourceIndex].index, updatedBooks[destinationIndex].index] = [updatedBooks[destinationIndex].index, updatedBooks[sourceIndex].index,];
+      //   [updatedBooks[sourceIndex], updatedBooks[destinationIndex]] = [updatedBooks[destinationIndex], updatedBooks[sourceIndex],];
+      //   [updatedBooks[sourceIndex].index, updatedBooks[destinationIndex].index] = [updatedBooks[destinationIndex].index, updatedBooks[sourceIndex].index,];
 
-        console.log('swap', updatedBooks);
+      //   console.log('swap', updatedBooks);
 
-        setBooks(updatedBooks);
-      } else {
-        console.error('Failed to move the book');
-        alert('Failed to move the book');
-      }
+      //   setBooks(updatedBooks);
+      // } else {
+      //   console.error('Failed to move the book');
+      //   alert('Failed to move the book');
+      // }
+      console.log(`Move book from ${sourceIndex} to ${destinationIndex}`);
     } catch (error) {
       console.error('Error during the API call', error);
       alert('Error during the API call');
@@ -127,14 +127,15 @@ export const Section: React.FC<SectionProps> = ({
 
     if (confirmed) {
       try {
-        const response = await client.post('api/book/delete/', { book_id: id });
+        // const response = await client.post('api/book/delete/', { book_id: id });
         
-        if (response.status === 200) {
-          removeBook(id);
-        } else {
-          console.error('Failed to delete the book');
-          alert('Failed to delete the book');
-        }
+        // if (response.status === 200) {
+        //   removeBook(id);
+        // } else {
+        //   console.error('Failed to delete the book');
+        //   alert('Failed to delete the book');
+        // }
+        console.log(`Delete book ${id}`);
       } catch (error) {
         console.error('Error during the API call', error);
         alert('Error during the API call');
@@ -164,7 +165,6 @@ export const Section: React.FC<SectionProps> = ({
                 index={book.index}
                 moveBookInsideSection={moveBookInsideSection}
                 handleDeleteBook={handleBookActionConfirmation}
-                client={client}
               />
               <VerticalLine />
             </React.Fragment>
@@ -186,7 +186,6 @@ export const Section: React.FC<SectionProps> = ({
         }
         <AddBook
           onFileSelect={addNewBook}
-          client={client}
           sectionId={sectionId}
           globalLoading={globalLoading}
           setGlobalLoading={setGlobalLoading}

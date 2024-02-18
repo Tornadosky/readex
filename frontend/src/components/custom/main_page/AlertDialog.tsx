@@ -61,13 +61,13 @@ export const AlertDialog: React.FC<AlertDialogProps> = ({
             onClose={handleCancel}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
-            PaperProps={{ sx: { bgcolor: "var(--collection-1-blocks)", borderRadius: '10px' } }}
+            PaperProps={{ sx: { bgcolor: "background.paper", borderRadius: '10px' } }}
         >
-          <DialogTitle sx={{ color: 'background.paper' }} id="alert-dialog-title">
+          <DialogTitle sx={{ color: 'black' }} id="alert-dialog-title">
           {title}
           </DialogTitle>
           <DialogContent>
-              <DialogContentText sx={{ color: 'background.paper' }} id="alert-dialog-description">
+              <DialogContentText sx={{ color: 'black' }} id="alert-dialog-description">
                   {description}
               </DialogContentText>
           </DialogContent>

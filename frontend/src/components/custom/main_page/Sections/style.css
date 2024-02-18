@@ -11,21 +11,21 @@
 }
 
 .vertical-container:hover {
-    background-color: var(--collection-1-block2);
+    background-color: rgb(138, 123, 123);
     transition: all 0.3s ease;
 }
 
 .vertical-container:hover .vertical-rectangle {
-    border: 1px solid var(--collection-1-font-2);
+    border: 1px solid white;
 }
 
 .vertical-container.add-book:hover {
-    background-color: var(--collection-1-block1);
+    background-color: whitesmoke;
     transition: all 0.3s ease;
 }
 
 .vertical-rectangle.add-book-rectangle:hover {
-    background-color: var(--collection-1-block2);
+    background-color: rgb(107, 91, 91);
     transition: all 0.3s ease;
 }
 
@@ -37,7 +37,7 @@
     border-radius: 1px;
     min-width: 2px;
     width: 2px;
-    background-color: var(--collection-1-block2);
+    background-color: black;
     margin: 18px 5px;
     height: 240px;
 }
@@ -45,7 +45,7 @@
 .vertical-rectangle {
     width: 140px;
     height: 200px;
-    background-color: var(--collection-1-blocks-no-a);
+    background-color: rgb(112, 103, 89);
     border-radius: 12px;
     display: flex;
     justify-content: center;
@@ -74,25 +74,25 @@
 }
 
 .section-icon:hover {
-    border: 1px solid var(--collection-1-font-2);
+    border: 1px solid black;
     background-color: rgb(156, 118, 118);
 }
 
 .trashbin-icon {
-    background-color: rgba(var(--collection-1-blocks-no-a), 0.36);
+    background-color: rgba(black, 0.36);
     border-radius: 5px;
     margin-right: 10px;
 }
 
 input[type=text] {
-    color: var(--collection-1-font-2);
-    font-family: var(--main-font-font-family, "Inter-Regular", Helvetica);
-    font-size: var(--main-font-font-size, 22px);
-    font-style: var(--main-font-font-style, normal);
-    font-weight: var(--main-font-font-weight, 400);
-    letter-spacing: var(--main-font-letter-spacing, 0px);
-    line-height: var(--main-font-line-height, normal);
-    background-color: var(--collection-1-bg);
+    color: black;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0px;
+    line-height: normal;
+    background-color: white;
     border: none;
 }
 
@@ -111,7 +111,7 @@ input[type=text] {
 .custom-rectangle {
     position: flex;
     min-height: 150px;
-    background-color: rgba(var(--collection-1-blocks-no-a), 0.96);
+    background-color: rgba(black, 0.96);
     border-radius: 10px; 
     flex-direction: row;
     align-items: flex-start;
@@ -128,21 +128,19 @@ input[type=text] {
 }
   
 .name-text {
-    color: var(--collection-1-font-2);
-    font-family: var(--smaller-font-font-family);
-    font-size: var(--smaller-font-font-size);
-    font-style: var(--smaller-font-font-style);
-    font-weight: var(--smaller-font-font-weight);
-    letter-spacing: var(--smaller-font-letter-spacing);
-    line-height: var(--smaller-font-line-height);
+    color: black;
+    font-family: "Inter-Regular", Helvetica;
+    font-weight: 400;
+    letter-spacing: normal;
+    line-height: normal;
     margin-top: 10px;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .name-text input {
     width: 150px;
     padding: 5px;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .add-book {
@@ -151,7 +149,7 @@ input[type=text] {
 }
 
 .vertical-container.loading:hover {
-    background-color: var(--collection-1-blocks-no-a);
+    background-color: red;
 }
 
 .loading-center {
@@ -173,7 +171,7 @@ input[type=text] {
     text-align: center;
     margin-top: 10px;
     font-size: 14px; 
-    color: var(--collection-1-font-1);
+    color: black;
 }
 
 .vertical-rectangle.disabled-book,
@@ -195,6 +193,6 @@ input[type=text] {
 }
 
 .plus-icon {
-    fill: var(--collection-1-font-1);
+    fill: green;
     height: 60px;
 }

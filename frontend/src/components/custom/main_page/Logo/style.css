@@ -13,13 +13,13 @@
 }
 
 .logo-main .logo-text-main {
-    color: var(--collection-1-font-1);
-    font-family: var(--very-big-font-font-family);
-    font-size: 27px;
-    font-style: var(--very-big-font-font-style);
-    font-weight: var(--very-big-font-font-weight);
-    letter-spacing: var(--very-big-font-letter-spacing);
-    line-height: var(--very-big-font-line-height);
+    color: black;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 25px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: -1px;
+    line-height: normal;
     margin-top: 5px;
 }
 

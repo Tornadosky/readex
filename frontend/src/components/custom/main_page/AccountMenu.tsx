@@ -53,7 +53,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({ username, setShowSetti
           aria-expanded={open ? 'true' : undefined}
         >
           <Avatar sx={{ width: 32, height: 32, mr: 1 }}>{username.charAt(0)}</Avatar>
-          <Typography variant="body1" style={{ color: 'var(--collection-1-font-1)' }}>{username}</Typography>
+          <Typography variant="body1" style={{ color: 'black' }}>{username}</Typography>
         </IconButton>
       </Box>
       <Menu
@@ -68,7 +68,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({ username, setShowSetti
             overflow: 'visible',
             filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
             mt: 1.5,
-            bgcolor: 'var(--collection-1-blocks)',
+            bgcolor: 'grey.50',
             borderRadius: 3,
             '& .MuiAvatar-root': {
               width: 32,
@@ -84,7 +84,7 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({ username, setShowSetti
               right: 14,
               width: 10,
               height: 10,
-              bgcolor: 'var(--collection-1-blocks)',
+              bgcolor: 'grey.50',
               transform: 'translateY(-50%) rotate(45deg)',
               zIndex: 0,
             },
@@ -93,15 +93,15 @@ export const AccountMenu: React.FC<AccountMenuProps> = ({ username, setShowSetti
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleClickSettings} sx={{ color: "var(--collection-1-font-2)", m: '3px'}}>
+        <MenuItem onClick={handleClickSettings} sx={{ color: "black", m: '3px'}}>
           <ListItemIcon>
-            <Settings fontSize="small" sx={{ color: "var(--collection-1-font-2)"}}/>
+            <Settings fontSize="small" sx={{ color: "gray.50"}}/>
           </ListItemIcon>
           Settings
         </MenuItem>
-        <MenuItem onClick={handleLogout} sx={{ color: "var(--collection-1-font-2)", m: '3px'}}>
+        <MenuItem onClick={handleLogout} sx={{ color: "black", m: '3px'}}>
           <ListItemIcon>
-            <Logout fontSize="small" sx={{ color: "var(--collection-1-font-2)"}}/>
+            <Logout fontSize="small" sx={{ color: "gray.50"}}/>
           </ListItemIcon>
           Logout
         </MenuItem>

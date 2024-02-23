@@ -7,9 +7,9 @@ import {
   Highlight,
   Popup,
   AreaHighlight,
-} from "react-pdf-highlighter";
+} from "./react-pdf-highlighter";
 
-import type { IHighlight, NewHighlight } from "react-pdf-highlighter";
+import type { IHighlight, NewHighlight } from "./react-pdf-highlighter";
 
 import { testHighlights as _testHighlights } from "./test-highlights";
 import { Spinner } from "./Spinner";

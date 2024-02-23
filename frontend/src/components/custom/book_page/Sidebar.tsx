@@ -17,8 +17,8 @@ export function Sidebar({
 }: Props) {
   return (
     <div className="sidebar" style={{ width: "25vw" }}>
-      <div className="description" style={{ padding: "1rem" }}>
-        <h2 style={{ marginBottom: "1rem" }}>
+      <div className="description p-4">
+        <h2 className="mb-4">
           Notes
         </h2>
 
@@ -61,11 +61,11 @@ export function Sidebar({
           </li>
         ))}
       </ul>
-      <div style={{ padding: "1rem" }}>
+      <div className="p-4">
         <button onClick={toggleDocument}>Toggle PDF document</button>
       </div>
       {highlights.length > 0 ? (
-        <div style={{ padding: "1rem" }}>
+        <div className="p-4">
           <button onClick={resetHighlights}>Reset highlights</button>
         </div>
       ) : null}

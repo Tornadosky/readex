@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useRef, useEffect } from 'react';
 
 interface Props {
   onMoveAway: () => void;
@@ -7,56 +7,43 @@ interface Props {
   children: JSX.Element;
 }
 
-class MouseMonitor extends Component<Props> {
-  container: HTMLDivElement | null = null;
-  unsubscribe = () => {};
+// Used to track mouse movement and trigger a callback (onMoveAway) when the mouse moves away from the target.
+const MouseMonitor: React.FC<Props> = ({ onMoveAway, paddingX, paddingY, children }) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  onMouseMove = (event: MouseEvent) => {
-    if (!this.container) {
-      return;
-    }
+  useEffect(() => {
+    const onMouseMove = (event: MouseEvent) => {
+      const container = containerRef.current;
+      if (!container) {
+        return;
+      }
 
-    const { onMoveAway, paddingX, paddingY } = this.props;
+      const { clientX, clientY } = event;
+      const { left, top, width, height } = container.getBoundingClientRect();
 
-    const { clientX, clientY } = event;
+      const inBoundsX = clientX > left - paddingX && clientX < left + width + paddingX;
+      const inBoundsY = clientY > top - paddingY && clientY < top + height + paddingY;
+      const isNear = inBoundsX && inBoundsY;
 
-    // TODO: see if possible to optimize
-    const { left, top, width, height } = this.container.getBoundingClientRect();
+      if (!isNear) {
+        onMoveAway();
+      }
+      
+    };
 
-    const inBoundsX =
-      clientX > left - paddingX && clientX < left + width + paddingX;
-    const inBoundsY =
-      clientY > top - paddingY && clientY < top + height + paddingY;
+    const doc = containerRef.current?.ownerDocument || document;
+    doc.addEventListener('mousemove', onMouseMove);
 
-    const isNear = inBoundsX && inBoundsY;
+    // Cleanup function
+    return () => {
+      doc.removeEventListener('mousemove', onMouseMove);
+    };
+  }, [onMoveAway, paddingX, paddingY]); // Dependencies
 
-    if (!isNear) {
-      onMoveAway();
-    }
-  };
-
-  attachRef = (ref: HTMLDivElement | null) => {
-    this.container = ref;
-    this.unsubscribe();
-
-    if (ref) {
-      const { ownerDocument: doc } = ref;
-      doc.addEventListener("mousemove", this.onMouseMove);
-      this.unsubscribe = () => {
-        doc.removeEventListener("mousemove", this.onMouseMove);
-      };
-    }
-  };
-
-  render() {
-    // eslint-disable-next-line
-    const { onMoveAway, paddingX, paddingY, children, ...restProps } =
-      this.props;
-
-    return (
-      <div ref={this.attachRef}>{React.cloneElement(children, restProps)}</div>
-    );
-  }
-}
+  // Spread props to children should be handled carefully; React.cloneElement is not always needed.
+  // If you want to pass additional props to the single React child, you can still use React.cloneElement.
+  // Ensure that you correctly merge props if the child might already have the same props you're setting.
+  return <div ref={containerRef}>{React.cloneElement(children)}</div>;
+};
 
 export default MouseMonitor;

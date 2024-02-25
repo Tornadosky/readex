@@ -62,3 +62,15 @@ body {
   blockquote:after {
     content: close-quote;
   }
+
+  .submenu-header {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    font-family: IBM Plex Sans,sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    justify-content: space-between;
+    min-height: 48px;
+    height: 57px;
+  }

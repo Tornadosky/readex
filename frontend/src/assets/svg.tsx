@@ -172,3 +172,27 @@ export const HomeIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
     </svg>
 );
+
+export const LogoIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+    <svg 
+        className="w-8 h-8 fill-current" 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 20 20" 
+        fill="currentColor"
+        {...props}
+    >
+        <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z" />
+    </svg>
+);
+
+export const NotesIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+    <svg 
+        className="w-7 h-7 fill-current"  
+        viewBox="0 0 29 28" 
+        fill="currentColor" 
+        xmlns="http://www.w3.org/2000/svg"
+        {...props}
+    >
+        <path d="M8.625 11.375H13.875V13.125H8.625V11.375Z" fill="currentColor"></path><path d="M20.875 14.875H8.625V16.625H20.875V14.875Z" fill="currentColor"></path><path d="M19.125 18.375V20.125H8.625V18.375H19.125Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M5.125 5.25C5.125 3.80025 6.30025 2.625 7.75 2.625H17.7374L24.375 9.26256V22.75C24.375 24.1997 23.1997 25.375 21.75 25.375H7.75C6.30025 25.375 5.125 24.1997 5.125 22.75V5.25ZM7.75 4.375C7.26675 4.375 6.875 4.76675 6.875 5.25V22.75C6.875 23.2332 7.26675 23.625 7.75 23.625H21.75C22.2332 23.625 22.625 23.2332 22.625 22.75V10.5H19.125C17.6753 10.5 16.5 9.32475 16.5 7.875V4.375H7.75ZM18.25 5.61244V7.875C18.25 8.35825 18.6418 8.75 19.125 8.75H21.3876L18.25 5.61244Z" fill="currentColor"></path>
+    </svg>
+);

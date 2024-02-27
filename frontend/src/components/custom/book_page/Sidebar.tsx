@@ -5,6 +5,7 @@ import BooksList from './BooksList';
 import type { IHighlight } from "./react-pdf-highlighter";
 
 import { HomeIcon, LogoIcon, NotesIcon } from '@/assets/svg';
+import { CloseOutlined } from '@ant-design/icons';
 
 interface Props {
   highlights: Array<IHighlight>;
@@ -18,9 +19,21 @@ export function Sidebar({
   resetHighlights,
 }: Props) {
   const [view, setView] = useState('Home');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const handleViewChange = (newView: string) => () => {
-    setView(newView);
+    if (view === newView && isSidebarOpen) {
+      // If the new view is the same as the current view and the sidebar is open, toggle it
+      setIsSidebarOpen(false);
+    } else {
+      // Otherwise, change the view and ensure the sidebar is open
+      setView(newView);
+      setIsSidebarOpen(true);
+    }
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   const testBooks = [
@@ -56,33 +69,36 @@ export function Sidebar({
           <HomeIcon />
         </a>
       </div>
-      <div className="sidebar" style={{ width: "20vw" }}>
-        <div className="submenu-header focus-visible:none border-b" style={{ backgroundColor: '#f3f3f6'}}>
-          <span className="ellipsis flex items-center gap-1 mx-3">
-            {view}
-          </span>
-        </div>
-
-        {view === 'Notes' ? (
-          <HighlightsList 
-            highlights={highlights}
-            resetHighlights={resetHighlights}
-            toggleDocument={toggleDocument}
-          />
-        ) : view === "Books" ? (
-          <BooksList 
-            books={testBooks}
-          />
-        ) : view === "Tests" ? (
-          <div> 
-            Tests
+      {isSidebarOpen && (
+        <div className="sidebar" style={{ width: "20vw" }}>
+          <div className="submenu-header focus-visible:none border-b" style={{ backgroundColor: '#f3f3f6'}}>
+            <span className="ellipsis flex items-center gap-1 mx-3">
+              {view}
+            </span>
+            <CloseOutlined onClick={toggleSidebar} className="cursor-pointer mx-4 text-gray-400 hover:text-gray-500 rounded" />
           </div>
-        ) : (
-          <BooksList 
-            books={testBooks}
-          />
-        )}
-      </div>
+
+          {view === 'Notes' ? (
+            <HighlightsList 
+              highlights={highlights}
+              resetHighlights={resetHighlights}
+              toggleDocument={toggleDocument}
+            />
+          ) : view === "Books" ? (
+            <BooksList 
+              books={testBooks}
+            />
+          ) : view === "Tests" ? (
+            <div> 
+              Tests
+            </div>
+          ) : (
+            <BooksList 
+              books={testBooks}
+            />
+          )}
+        </div>
+      )}
     </>
   );
 }

@@ -74,3 +74,14 @@ body {
     min-height: 48px;
     height: 57px;
   }
+
+  .input-pages {
+    text-align: center;
+    background: grey;
+    padding: 0 7px;
+    border-radius: 4px;
+    color: rgba(0,0,0,.88);
+    font-size: 12px;
+    transition: all .2s;
+    width: 50px;
+  }

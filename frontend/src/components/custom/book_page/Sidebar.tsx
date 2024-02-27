@@ -27,17 +27,17 @@ export function Sidebar({
     {
       id: '1',
       title: 'GRE Official Guide',
-      url: '/smirnovivanphm1/pdfs/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/view',
+      url: '/pdfs/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/view',
     },
     {
       id: '2',
       title: 'TOEFL Preparation Book',
-      url: '/smirnovivanphm1/pdfs/54f1c2bd-ec4e-4f2e-a10e-2f639e8d8f47/view',
+      url: '/pdfs/54f1c2bd-ec4e-4f2e-a10e-2f639e8d8f47/view',
     },
     {
       id: '3',
       title: 'GMAT Exam Guide',
-      url: '/smirnovivanphm1/pdfs/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/view',
+      url: '/pdfs/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/view',
     },
   ];
 

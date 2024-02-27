@@ -80,6 +80,9 @@ interface Props<T_HT> {
     transformSelection: () => void
   ) => JSX.Element | null;
   enableAreaSelection: (event: MouseEvent) => boolean;
+  getPageCount: (pageCount: number) => void;
+  getCurrentPage: (currentPage: number) => void;
+  destinationPage?: number;
 }
 
 const EMPTY_ID = "empty-id";
@@ -140,6 +143,7 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
       const { ownerDocument: doc } = ref;
       eventBus.on("textlayerrendered", this.onTextLayerRendered);
       eventBus.on("pagesinit", this.onDocumentReady);
+      eventBus.on("pagechanging", this.onPageChange);
       doc.addEventListener("selectionchange", this.onSelectionChange);
       doc.addEventListener("keydown", this.handleKeyDown);
       doc.defaultView?.addEventListener("resize", this.debouncedScaleValue);
@@ -148,6 +152,7 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
       this.unsubscribe = () => {
         eventBus.off("pagesinit", this.onDocumentReady);
         eventBus.off("textlayerrendered", this.onTextLayerRendered);
+        eventBus.off("pagechanging", this.onPageChange);
         doc.removeEventListener("selectionchange", this.onSelectionChange);
         doc.removeEventListener("keydown", this.handleKeyDown);
         doc.defaultView?.removeEventListener(
@@ -166,6 +171,11 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
     }
     if (prevProps.highlights !== this.props.highlights) {
       this.renderHighlightLayers();
+    }
+
+    const page = this.props.destinationPage;
+    if (page && prevProps.destinationPage !== page) {
+      this.goToPage(page);
     }
   }
 
@@ -207,6 +217,14 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
       textLayer.div,
       "PdfHighlighter__highlight-layer"
     );
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.viewer.pagesCount) {
+      console.log(`Cannot go to page ${page}.`);
+      return;
+    }
+    this.viewer.currentPageNumber = page;
   }
 
   groupHighlightsByPage(highlights: Array<T_HT>): {
@@ -413,7 +431,11 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
     this.handleScaleValue();
 
     scrollRef(this.scrollTo);
+
+    this.props.getPageCount(this.viewer.pagesCount);
   };
+
+  onPageChange = () => this.props.getCurrentPage(this.viewer.currentPageNumber);
 
   onSelectionChange = () => {
     const container = this.containerNode;

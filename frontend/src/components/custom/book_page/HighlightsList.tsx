@@ -11,6 +11,17 @@ const updateHash = (highlight: IHighlight) => {
 };
 
 export default function highlightsList({ highlights, resetHighlights, toggleDocument}: HighlightsListProps)  {
+  const changeAlpha = (color: string, newAlpha: number) => {
+    const rgb = color.match(/rgb\((\d+), (\d+), (\d+)\)/);
+    const rgba = color.match(/rgba?\((\d+), (\d+), (\d+)(?:, (\d+(?:\.\d+)?))?\)/);
+    if (rgb) {
+      return `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${newAlpha})`;
+    } else if (rgba) {
+      return `rgba(${rgba[1]}, ${rgba[2]}, ${rgba[3]}, ${newAlpha})`;
+    }
+    return color; // Return original if not RGB/RGBA
+  };
+
   return (
     <>
       <p className="ellipsis flex items-center gap-1 m-3">
@@ -25,6 +36,7 @@ export default function highlightsList({ highlights, resetHighlights, toggleDocu
           <li
             key={index}
             className="sidebar__highlight"
+            style={{ backgroundColor: changeAlpha(highlight.color, 0.3) }}
             onClick={() => {
               updateHash(highlight);
             }}

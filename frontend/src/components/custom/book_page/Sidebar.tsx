@@ -77,26 +77,28 @@ export function Sidebar({
             </span>
             <CloseOutlined onClick={toggleSidebar} className="cursor-pointer mx-4 text-gray-400 hover:text-gray-500 rounded" />
           </div>
-
-          {view === 'Notes' ? (
-            <HighlightsList 
-              highlights={highlights}
-              resetHighlights={resetHighlights}
-              toggleDocument={toggleDocument}
-            />
-          ) : view === "Books" ? (
-            <BooksList 
-              books={testBooks}
-            />
-          ) : view === "Tests" ? (
-            <div> 
-              Tests
-            </div>
-          ) : (
-            <BooksList 
-              books={testBooks}
-            />
-          )}
+          
+          <div style={{ maxHeight: 'calc(100vh - 57px)', overflowY: 'auto' }}>
+            {view === 'Notes' ? (
+              <HighlightsList 
+                highlights={highlights}
+                resetHighlights={resetHighlights}
+                toggleDocument={toggleDocument}
+              />
+            ) : view === "Books" ? (
+              <BooksList 
+                books={testBooks}
+              />
+            ) : view === "Tests" ? (
+              <div> 
+                Tests
+              </div>
+            ) : (
+              <BooksList 
+                books={testBooks}
+              />
+            )}
+          </div>
         </div>
       )}
     </>

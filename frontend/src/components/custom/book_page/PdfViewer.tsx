@@ -1,5 +1,9 @@
 import React, { Component } from "react";
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
+import ColorPickerWithPresets from './ColorPickerWithPresets';
+
+import type { ColorPickerProps, GetProp } from 'antd';
+type Color = GetProp<ColorPickerProps, 'value'>;
 
 import {
   PdfLoader,
@@ -65,6 +69,7 @@ class App extends Component<{}, State> {
     pageCount: 0,
     currentPage: 1,
     inputPage: "1",
+    color: "rgba(255, 226, 143, 1)",
   };
 
   resetHighlights = () => {
@@ -115,12 +120,12 @@ class App extends Component<{}, State> {
   }
 
   addHighlight(highlight: NewHighlight) {
-    const { highlights } = this.state;
+    const { highlights, color } = this.state;
 
     console.log("Saving highlight", highlight);
 
     this.setState({
-      highlights: [{ ...highlight, id: getNextId() }, ...highlights],
+      highlights: [{ ...highlight, id: getNextId(), color: color }, ...highlights],
     });
   }
 
@@ -146,6 +151,11 @@ class App extends Component<{}, State> {
       }),
     });
   }
+
+  handleColorChange = (newColor: Color) => {
+    this.setState({ color: newColor.toRgbString() });
+    console.log("Color change", newColor.toRgbString());
+  };
 
   handlePageInput = (e: any) => {
     const inputVal = e.target.value;
@@ -176,6 +186,17 @@ class App extends Component<{}, State> {
             resetHighlights={this.resetHighlights}
             toggleDocument={this.toggleDocument}
           />
+          <div className="floating-color-picker" style={{
+            position: "absolute",
+            top: "10%", 
+            left: "25%",
+            opacity: 0.5,
+            transition: "opacity 0.3s",
+            zIndex: 1000
+          }} onMouseOver={(e) => e.currentTarget.style.opacity = "1"} onMouseOut={(e) => e.currentTarget.style.opacity = "0.5"}>
+            <ColorPickerWithPresets defaultValue={this.state.color} onChange={this.handleColorChange} />
+          </div>
+
           <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
             {/* TODO: Replace with Topbar */}
             <div
@@ -266,7 +287,7 @@ class App extends Component<{}, State> {
                       <Tip
                         onOpen={transformSelection}
                         onConfirm={(comment) => {
-                          this.addHighlight({ content, position, comment });
+                          this.addHighlight({ content, position, comment, color: this.state.color});
 
                           hideTipAndSelection();
                         }}
@@ -290,6 +311,7 @@ class App extends Component<{}, State> {
                           isScrolledTo={isScrolledTo}
                           position={highlight.position}
                           comment={highlight.comment}
+                          color={highlight.color}
                         />
                       ) : (
                         <AreaHighlight
@@ -302,6 +324,7 @@ class App extends Component<{}, State> {
                               { image: screenshot(boundingRect) }
                             );
                           }}
+                          color={highlight.color}
                         />
                       );
 

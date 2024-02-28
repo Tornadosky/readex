@@ -10,13 +10,22 @@ import type { LTWHP, ViewportHighlight } from "../types";
 interface Props {
   highlight: ViewportHighlight;
   onChange: (rect: LTWHP) => void;
+  onDelete: () => void;
   isScrolledTo: boolean;
   color: string;
 }
 
 export class AreaHighlight extends Component<Props> {
+  timeoutRef: NodeJS.Timeout | null = null;
+
   render() {
-    const { highlight, onChange, isScrolledTo, color, ...otherProps } = this.props;
+    const { highlight, onChange, onDelete, isScrolledTo, color, ...otherProps } = this.props;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Delete') {
+        onDelete();
+      }
+    };
 
     return (
       <div
@@ -32,6 +41,17 @@ export class AreaHighlight extends Component<Props> {
           style={
             isScrolledTo ? { backgroundColor:  '#ff4141' } : { backgroundColor: color }
           }
+          onMouseDown={(event) => {
+            // Clear existing timeout to ensure not setting up multiple listeners
+            if (this.timeoutRef) {
+              clearTimeout(this.timeoutRef);
+            }
+            document.addEventListener('keydown', onKeyDown);
+            // Set another timeout to remove the listener after 3 seconds
+            setTimeout(() => {
+              document.removeEventListener('keydown', onKeyDown);
+            }, 3000);
+          }}
           onDragStop={(_, data) => {
             const boundingRect: LTWHP = {
               ...highlight.position.boundingRect,

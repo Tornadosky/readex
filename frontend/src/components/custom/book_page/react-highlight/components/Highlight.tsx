@@ -12,6 +12,7 @@ interface Props {
   onClick?: () => void;
   onMouseOver?: () => void;
   onMouseOut?: () => void;
+  onDelete: () => void;
   comment: {
     emoji: string;
     text: string;
@@ -21,22 +22,42 @@ interface Props {
 }
 
 export class Highlight extends Component<Props> {
+  timeoutRef: NodeJS.Timeout | null = null;
+
   render() {
     const {
       position,
       onClick,
       onMouseOver,
       onMouseOut,
+      onDelete,
       comment,
       color,
       isScrolledTo,
     } = this.props;
+    
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Delete') {
+        onDelete();
+      }
+    };
 
     const { rects, boundingRect } = position;
 
     return (
       <div
         className={`Highlight ${isScrolledTo ? "Highlight--scrolledTo" : ""}`}
+        onMouseDown={(event) => {
+          // Clear existing timeout to ensure not setting up multiple listeners
+          if (this.timeoutRef) {
+            clearTimeout(this.timeoutRef);
+          }
+          document.addEventListener('keydown', onKeyDown);
+          // Set another timeout to remove the listener after 3 seconds
+          setTimeout(() => {
+            document.removeEventListener('keydown', onKeyDown);
+          }, 3000);
+        }}
       >
         {comment ? (
           <div

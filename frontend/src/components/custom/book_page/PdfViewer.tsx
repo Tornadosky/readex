@@ -152,6 +152,16 @@ class App extends Component<{}, State> {
     });
   }
 
+  deleteHighlight(highlightId: string) {
+    const { highlights } = this.state;
+
+    this.setState({
+      highlights: highlights.filter(
+        ({ id }) => id !== highlightId
+      ),
+    });
+  }
+
   handleColorChange = (newColor: Color) => {
     this.setState({ color: newColor.toRgbString() });
     console.log("Color change", newColor.toRgbString());
@@ -312,6 +322,10 @@ class App extends Component<{}, State> {
                           position={highlight.position}
                           comment={highlight.comment}
                           color={highlight.color}
+                          onDelete={() => {
+                            this.deleteHighlight(highlight.id);
+                            hideTip();
+                          }}
                         />
                       ) : (
                         <AreaHighlight
@@ -324,6 +338,10 @@ class App extends Component<{}, State> {
                               { image: screenshot(boundingRect) }
                             );
                           }}
+                          onDelete={() => {
+                            this.deleteHighlight(highlight.id);
+                            hideTip();
+                          }}
                           color={highlight.color}
                         />
                       );
@@ -331,9 +349,9 @@ class App extends Component<{}, State> {
                       return (
                         <Popup
                           popupContent={<HighlightPopup {...highlight} />}
-                          onMouseOver={(popupContent) =>
+                          onMouseOver={(popupContent) => {
                             setTip(highlight, (highlight) => popupContent)
-                          }
+                          }}
                           onMouseOut={hideTip}
                           key={index}
                           children={component}

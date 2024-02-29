@@ -18,7 +18,13 @@ body {
       rgb(249, 248, 246)
     );
   }
-  
+
+  @media (max-width: 800px) {
+    .sidebar, .small-sidebar {
+      display: none;
+    }
+  }
+
   .sidebar__highlights {
     list-style: "none";
     padding: 0;
@@ -84,4 +90,13 @@ body {
     font-size: 12px;
     transition: all .2s;
     width: 50px;
+  }
+
+  .floating-color-picker {
+    position: absolute;
+    top: 10%;
+    left: 25%;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+    z-index: 1000;
   }

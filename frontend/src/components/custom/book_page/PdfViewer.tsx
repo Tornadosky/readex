@@ -1,9 +1,9 @@
-import React, { Component } from "react";
-import { UpOutlined, DownOutlined } from '@ant-design/icons';
+import { Component } from "react";
 import ColorPickerWithPresets from './ColorPickerWithPresets';
+import Topbar from "./Topbar";
 
-import type { ColorPickerProps, GetProp } from 'antd';
-type Color = GetProp<ColorPickerProps, 'value'>;
+// import type { ColorPickerProps, GetProp } from 'antd';
+// type Color = GetProp<ColorPickerProps, 'value'>;
 
 import {
   PdfLoader,
@@ -30,6 +30,7 @@ interface State {
   pageCount: number;
   currentPage: number;
   inputPage: string;
+  color: string;
 }
 
 const getNextId = () => String(Math.random()).slice(2);
@@ -88,7 +89,7 @@ class App extends Component<{}, State> {
     });
   };
 
-  scrollViewerTo = (highlight: any) => {};
+  scrollViewerTo = (highlight: IHighlight) => {};
 
   scrollToHighlightFromHash = () => {
     const highlight = this.getHighlightById(parseIdFromHash());
@@ -162,7 +163,7 @@ class App extends Component<{}, State> {
     });
   }
 
-  handleColorChange = (newColor: Color) => {
+  handleColorChange = (newColor: any) => {
     this.setState({ color: newColor.toRgbString() });
     console.log("Color change", newColor.toRgbString());
   };
@@ -171,10 +172,9 @@ class App extends Component<{}, State> {
     const inputVal = e.target.value;
     // Update inputPage state to reflect user input
     this.setState({ inputPage: inputVal.replace(/[^0-9]/g, '') }); // This also ensures only numbers are entered
-  }
+  };
 
-  
-  submitPageInput = (e: any) => {
+  submitPageInput = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       let page = parseInt(this.state.inputPage, 10);
       // Check if the input is not a number or out of range, and default to the current page
@@ -183,6 +183,18 @@ class App extends Component<{}, State> {
       }
       this.setState({ destinationPage: page, currentPage: page, inputPage: page.toString() });
     }
+  };
+
+  handleIncreasePage = () => {
+    this.setState(() => ({
+      destinationPage: this.state.currentPage < this.state.pageCount ? this.state.currentPage + 1 : this.state.currentPage,
+    }))
+  };
+
+  handleDecreasePage = () => {
+    this.setState(() => ({
+      destinationPage: this.state.currentPage > 1 ? this.state.currentPage - 1 : 1,
+    }))
   }
 
   render() {
@@ -196,77 +208,24 @@ class App extends Component<{}, State> {
             resetHighlights={this.resetHighlights}
             toggleDocument={this.toggleDocument}
           />
-          <div className="floating-color-picker" style={{
-            position: "absolute",
-            top: "10%", 
-            left: "25%",
-            opacity: 0.5,
-            transition: "opacity 0.3s",
-            zIndex: 1000
-          }} onMouseOver={(e) => e.currentTarget.style.opacity = "1"} onMouseOut={(e) => e.currentTarget.style.opacity = "0.5"}>
+          <div 
+            className="floating-color-picker" 
+            onMouseOver={(e) => e.currentTarget.style.opacity = "1"} 
+            onMouseOut={(e) => e.currentTarget.style.opacity = "0.5"}
+          >
             <ColorPickerWithPresets defaultValue={this.state.color} onChange={this.handleColorChange} />
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-            {/* TODO: Replace with Topbar */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                backgroundColor: "#f5f5f5",
-                padding: "10px 20px",
-                border: "1px solid #ddd",
-                height: "57px",
-              }}
-            >
-              <h1 style={{ margin: 0 }}>Book name.pdf</h1>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                }}
-              >
-                <button 
-                  type="button" 
-                  className="w-8 h-8 text-white bg-zinc-400 hover:bg-zinc-600 focus:outline-none font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center"
-                  onClick={() =>
-                    this.setState(({ currentPage }) => ({
-                      destinationPage: currentPage > 1 ? currentPage - 1 : 1,
-                    }))
-                  }
-                >
-                  <UpOutlined />
-                </button> 
-                <div style={{ margin: '0px 8px', display: 'flex', flexShrink: '0', alignItems: "center" }}>
-                  <span>
-                    <input
-                      type="text"
-                      data-testid="page-navigation__current-page-input"
-                      aria-label="Enter a page number"
-                      className="input-pages text-black bg-white border-none font-normal text-[22px] leading-normal"
-                      placeholder=""
-                      value={this.state.inputPage}
-                      onChange={this.handlePageInput}
-                      onKeyDown={this.submitPageInput}
-                    />
-                  </span>
-                  <span style={{ margin: "0px 3px" }}>/</span>
-                  {this.state.pageCount}
-                </div>
-                <button 
-                  type="button" 
-                  className="w-8 h-8 text-white bg-zinc-400 hover:bg-zinc-600 focus:outline-none font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center"
-                  onClick={() =>
-                    this.setState(({ currentPage }) => ({
-                      destinationPage: currentPage < this.state.pageCount ? currentPage + 1 : currentPage,
-                    }))
-                  }
-                >
-                  <DownOutlined />
-                </button>               
-              </div>
-            </div>
+          <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>          
+            <Topbar
+              name="Book name.pdf"
+              inputPage={this.state.inputPage}
+              pageCount={this.state.pageCount}
+              handleDecrease={this.handleDecreasePage}
+              handleIncrease={this.handleIncreasePage}
+              handlePageInput={this.handlePageInput}
+              submitPageInput={this.submitPageInput}
+            />
             
             <div style={{ flex: 1, position: "relative" }}>
               <PdfLoader url={url} beforeLoad={<Spinner />}>

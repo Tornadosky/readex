@@ -6,11 +6,16 @@ interface SidebarIconProps {
   name: string;
   icon: React.ElementType;
   onClick: () => void;
+  active: boolean;
 }
 
-const SidebarIcon: React.FC<SidebarIconProps> = ({ name, icon: Icon, onClick }) => {
+const SidebarIcon: React.FC<SidebarIconProps> = ({ name, icon: Icon, onClick, active }) => {
   return (
-    <button className="flex flex-col items-center justify-center w-16 h-16 mt-2 rounded text-zinc-600 hover:bg-gray-300" onClick={onClick}>
+    <button
+      className="flex flex-col items-center justify-center w-16 h-16 mt-2 rounded text-zinc-600 hover:bg-gray-300"
+      onClick={onClick}
+      style={{ color: `${active ? 'green' : ''}` }}
+    >
       <Icon />
       {name}
     </button>

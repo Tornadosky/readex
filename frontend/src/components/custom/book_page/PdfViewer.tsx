@@ -31,6 +31,7 @@ interface State {
   currentPage: number;
   inputPage: string;
   color: string;
+  bookName: string;
 }
 
 const getNextId = () => String(Math.random()).slice(2);
@@ -71,6 +72,7 @@ class App extends Component<{}, State> {
     currentPage: 1,
     inputPage: "1",
     color: "rgba(255, 226, 143, 1)",
+    bookName: "Book name",
   };
 
   resetHighlights = () => {
@@ -197,6 +199,10 @@ class App extends Component<{}, State> {
     }))
   }
 
+  handleBookNameChange = (newBookName: string) => {
+    this.setState({ bookName: newBookName });
+  }
+
   render() {
     const { url, highlights } = this.state;
 
@@ -218,13 +224,14 @@ class App extends Component<{}, State> {
 
           <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>          
             <Topbar
-              name="Book name.pdf"
+              name="Book name"
               inputPage={this.state.inputPage}
               pageCount={this.state.pageCount}
               handleDecrease={this.handleDecreasePage}
               handleIncrease={this.handleIncreasePage}
               handlePageInput={this.handlePageInput}
               submitPageInput={this.submitPageInput}
+              handleBookNameChange={this.handleBookNameChange}
             />
             
             <div style={{ flex: 1, position: "relative" }}>

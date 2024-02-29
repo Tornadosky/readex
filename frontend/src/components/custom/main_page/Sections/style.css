@@ -84,7 +84,9 @@
     margin-right: 10px;
 }
 
-input[type=text] {
+/* Careful! Without good selector, applied to all inputs with type 'text' */
+.section-name-container input[type=text]
+.name-text input[type=text] {
     color: black;
     font-family: "Inter-Regular", Helvetica;
     font-size: 22px;

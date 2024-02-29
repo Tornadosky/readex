@@ -244,7 +244,7 @@ class App extends Component<{}, State> {
                       type="text"
                       data-testid="page-navigation__current-page-input"
                       aria-label="Enter a page number"
-                      className="input-pages"
+                      className="input-pages text-black bg-white border-none font-normal text-[22px] leading-normal"
                       placeholder=""
                       value={this.state.inputPage}
                       onChange={this.handlePageInput}

@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import type { IHighlight } from "./react-pdf-highlighter";
 
 interface HighlightsListProps {
@@ -10,7 +11,12 @@ const updateHash = (highlight: IHighlight) => {
   document.location.hash = `highlight-${highlight.id}`;
 };
 
-export default function highlightsList({ highlights, resetHighlights, toggleDocument}: HighlightsListProps)  {
+export default function highlightsList({ highlights, resetHighlights, toggleDocument }: HighlightsListProps)  {
+  const [filterColor, setFilterColor] = useState('');
+  const [filterPageNumber, setFilterPageNumber] = useState('');
+  const [filterType, setFilterType] = useState('');
+  const [filteredHighlights, setFilteredHighlights] = useState<IHighlight[]>(highlights);
+
   const changeAlpha = (color: string, newAlpha: number) => {
     const rgb = color.match(/rgb\((\d+), (\d+), (\d+)\)/);
     const rgba = color.match(/rgba?\((\d+), (\d+), (\d+)(?:, (\d+(?:\.\d+)?))?\)/);
@@ -22,6 +28,34 @@ export default function highlightsList({ highlights, resetHighlights, toggleDocu
     return color; // Return original if not RGB/RGBA
   };
 
+  useEffect(() => {
+    const applyFilters = () => {
+      const filtered = highlights.filter((highlight) => {
+        // Filter by color
+        if (filterColor && highlight.color !== filterColor) {
+          return false;
+        }
+        // Filter by page number
+        if (filterPageNumber && highlight.position.pageNumber !== parseInt(filterPageNumber, 10)) {
+          return false;
+        }
+        // Filter by highlight type
+        if (filterType) {
+          const hasImage = !!highlight.content?.image;
+          const isTypeMatch = (filterType === 'text' && !hasImage) || (filterType === 'image' && hasImage);
+          if (!isTypeMatch) {
+            return false;
+          }
+        }
+        return true;
+      });
+      
+      setFilteredHighlights(filtered);
+    };
+  
+    applyFilters();
+  }, [highlights, filterColor, filterPageNumber, filterType]);
+
   return (
     <>
       <p className="ellipsis flex items-center gap-1 m-3">
@@ -30,9 +64,40 @@ export default function highlightsList({ highlights, resetHighlights, toggleDocu
           drag.
         </small>
       </p>
+
+      <div className="m-4">
+        <div>
+          <label>Color:</label>
+          <input
+            type="text"
+            className='m-2 p-1 rounded'
+            value={filterColor}
+            onChange={(e) => setFilterColor(e.target.value)}
+            placeholder="rgb(255, 226, 143)"
+          />
+        </div>
+        <div>
+          <label>Page Number:</label>
+          <input
+            type="number"
+            className='m-2 p-1 w-16 rounded'
+            value={filterPageNumber}
+            onChange={(e) => setFilterPageNumber(e.target.value)}
+            placeholder="Page"
+          />
+        </div>
+        <div>
+          <label>Highlight Type:</label>
+          <select className='m-2 p-1 rounded' value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+            <option value="">All</option>
+            <option value="text">Text</option>
+            <option value="image">Image</option>
+          </select>
+        </div>
+      </div>
       
       <ul className="sidebar__highlights">
-        {highlights.map((highlight, index) => (
+        {filteredHighlights.map((highlight, index) => (
           <li
             key={index}
             className="sidebar__highlight"

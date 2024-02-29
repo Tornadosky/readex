@@ -10,7 +10,7 @@ interface ColorPickerWithPresetsProps {
 
 const ColorPickerWithPresets: React.FC<ColorPickerWithPresetsProps> = ({ defaultValue, onChange }) => {
   const presets = {
-    primary: ["rgba(255, 226, 143, 1)", "#40a9ff", "#69c0ff", "#91d5ff", "#bae7ff", "#e6f7ff", "#f0f5ff", "#f5f5f5"],
+    primary: ["rgb(255, 226, 143)", "#40a9ff", "#69c0ff", "#91d5ff", "#bae7ff", "#e6f7ff", "#f0f5ff", "#f5f5f5"],
   };
 
   const genPresets = () => {

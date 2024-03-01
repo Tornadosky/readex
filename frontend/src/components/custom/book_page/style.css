@@ -95,7 +95,7 @@ body {
   .floating-color-picker {
     position: absolute;
     top: 10%;
-    left: 25%;
+    right: 10%;
     opacity: 0.5;
     transition: opacity 0.3s;
     z-index: 1000;

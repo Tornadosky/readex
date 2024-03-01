@@ -53,7 +53,7 @@ const Topbar = ({
                             onChange={handleChangeBookName}
                             onBlur={handleSubmitBookNameChange}
                             onKeyDown={(e) => e.key === 'Enter' && handleSubmitBookNameChange()}
-                            className="bg-transparent border rounded p-1 focus:outline-none"
+                            className="bg-transparent border-b border-blue-400 p-1 focus:outline-none"
                             autoFocus
                         />
                     </>

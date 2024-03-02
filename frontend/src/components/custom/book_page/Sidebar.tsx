@@ -60,7 +60,7 @@ export function Sidebar({
       />
 
       {isSidebarOpen && (
-        <div className="sidebar" style={{ width: "20vw" }}>
+        <div className="sidebar border-r" style={{ width: "20vw" }}>
           <div className="submenu-header focus-visible:none border-b" style={{ backgroundColor: '#f3f3f6'}}>
             <span className="ellipsis flex items-center gap-1 mx-3">
               {view}
@@ -80,9 +80,14 @@ export function Sidebar({
                 books={testBooks}
               />
             ) : view === "Tests" ? (
-              <div> 
-                Tests
-              </div>
+              <>
+                <div className='m-2'> 
+                  Tests
+                </div>
+                <a className='m-2 p-1 bg-slate-200 rounded' href='/tests/asd/edit'>
+                  Create new test
+                </a>
+              </>
             ) : (
               <BooksList 
                 books={testBooks}

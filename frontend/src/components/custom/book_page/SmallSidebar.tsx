@@ -1,4 +1,4 @@
-import { HomeIcon, LogoIcon, NotesIcon } from '@/assets/svg';
+import { HomeIcon, LogoIcon, NotesIcon, PDFIcon, TestIcon } from '@/assets/svg';
 import SidebarIcon from './SidebarIcon'; 
 
 interface SmallSidebarProps {
@@ -14,11 +14,11 @@ const SmallSidebar = ({ handleViewChange, view } : SmallSidebarProps) => {
                     <LogoIcon />
                 </a>
                 <div className="flex flex-col items-center mt-3 border-t border-gray-300">
-                    <SidebarIcon name={'Home'} active={view === "Home"} icon={HomeIcon} onClick={handleViewChange('Home')} />
+                    <SidebarIcon name={'Books'} active={view === "Books"} icon={PDFIcon} onClick={handleViewChange('Books')} />
                     <SidebarIcon name={'Notes'} active={view === "Notes"} icon={NotesIcon} onClick={handleViewChange('Notes')} />
-                    <SidebarIcon name={'Tests'} active={view === "Tests"} icon={NotesIcon} onClick={handleViewChange('Tests')} />
+                    <SidebarIcon name={'Tests'} active={view === "Tests"} icon={TestIcon} onClick={handleViewChange('Tests')} />
                 </div>
-                <a className="flex items-center justify-center w-16 h-16 mt-auto bg-gray-200 hover:bg-gray-300" href="#">
+                <a className="flex items-center justify-center w-16 h-16 mt-auto bg-gray-200 hover:bg-gray-300" href="/home">
                     <HomeIcon />
                 </a>
             </div>

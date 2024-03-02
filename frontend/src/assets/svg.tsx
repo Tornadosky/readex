@@ -129,24 +129,6 @@ export const LogoSVG: React.FC<SVGProps<SVGSVGElement>> = (props) => (
     </svg>
 );
 
-export const PlusIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
-    <svg 
-        className = "svg-container" 
-        version="1.1" id="Layer_1" 
-        xmlns="http://www.w3.org/2000/svg"  
-        x="0px" 
-        y="0px"
-	    viewBox="0 0 185 38" 
-        enableBackground='new 0 0 185 38'
-        {...props}
-    >
-        <path className="svg plus" d="M92.5,7c-0.6,0-1.1,0.2-1.5,0.6s-0.6,0.9-0.6,1.5v8.3h-8.3c-0.6,0-1.1,0.2-1.5,0.6c-0.4,0.4-0.6,0.9-0.6,1.5
-            s0.2,1.1,0.6,1.5c0.4,0.4,0.9,0.6,1.5,0.6h8.3v8.3c0,0.6,0.2,1.1,0.6,1.5c0.4,0.4,0.9,0.6,1.5,0.6s1.1-0.2,1.5-0.6
-            c0.4-0.4,0.6-0.9,0.6-1.5v-8.3h8.3c0.6,0,1.1-0.2,1.5-0.6c0.4-0.4,0.6-0.9,0.6-1.5s-0.2-1.1-0.6-1.5c-0.4-0.4-0.9-0.6-1.5-0.6h-8.3
-            V9.1c0-0.6-0.2-1.1-0.6-1.5S93.1,7,92.5,7z"/>
-    </svg>
-);
-
 export const NotFoundIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
     <svg 
         width="252" 
@@ -253,5 +235,57 @@ export const TestIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
         {...props}
     >
         <path d="M0 0h24v24H0V0z" fill="none"></path><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"></path>
+    </svg>
+);
+
+export const VerticalDotsIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+    <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 20 20" 
+        fill="currentColor" 
+        aria-hidden="true" 
+        className="w-5 h-5 text-slate-400 my-3"
+        {...props}
+    >
+        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+    </svg>
+);
+
+export const EducationIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+    <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 20 20" 
+        fill="currentColor" 
+        aria-hidden="true" 
+        className="h-5 w-5 text-white"
+        {...props}
+    >
+        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"></path>
+    </svg>
+);
+
+export const EmptyFolderIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+    <svg 
+        className="mx-auto h-12 w-12 text-gray-400" 
+        fill="none" 
+        viewBox="0 0 24 24" 
+        stroke="currentColor" 
+        aria-hidden="true"
+        {...props}
+    >
+        <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+    </svg>
+);
+
+export const PlusIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+    <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 20 20" 
+        fill="currentColor" 
+        aria-hidden="true" 
+        className="-ml-0.5 mr-2 h-4 w-4"
+        {...props}
+    >
+        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
     </svg>
 );

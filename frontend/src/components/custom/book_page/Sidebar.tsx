@@ -1,6 +1,7 @@
 import { useState } from 'react'; 
 import HighlightsList from './HighlightsList'; 
 import BooksList from './BooksList';
+import TestsList from './TestsList';
 import type { IHighlight } from "./react-pdf-highlighter";
 import { CloseOutlined } from '@ant-design/icons';
 import SmallSidebar from './SmallSidebar';
@@ -52,6 +53,24 @@ export function Sidebar({
     },
   ];
 
+  const testTests = [
+    {
+      id: '1',
+      title: 'GRE Official Guide',
+      url: '/pdfs/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/view',
+    },
+    {
+      id: '2',
+      title: 'TOEFL Preparation Book',
+      url: '/pdfs/54f1c2bd-ec4e-4f2e-a10e-2f639e8d8f47/view',
+    },
+    {
+      id: '3',
+      title: 'GMAT Exam Guide',
+      url: '/pdfs/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/view',
+    },
+  ];
+
   return (
     <>
       <SmallSidebar
@@ -80,14 +99,9 @@ export function Sidebar({
                 books={testBooks}
               />
             ) : view === "Tests" ? (
-              <>
-                <div className='m-2'> 
-                  Tests
-                </div>
-                <a className='m-2 p-1 bg-slate-200 rounded' href='/tests/asd/edit'>
-                  Create new test
-                </a>
-              </>
+              <TestsList 
+                tests={testTests}
+              />
             ) : (
               <BooksList 
                 books={testBooks}

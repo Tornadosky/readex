@@ -27,14 +27,14 @@ const TestsList: React.FC<TestsListProps> = ({ tests }) => {
                         {testsList.map((test, index) => (
                             <li key={test.id || index} className="flex shadow-sm rounded-md hover:shadow-gray-300 transition duration-200 ease-in-out hover:!shadow-md w-full">
                                 {/* Adjusted structure for valid HTML and accessibility */}
-                                <div className="flex flex-shrink-0 rounded-l-md overflow-hidden">
+                                <a className="flex flex-shrink-0 rounded-l-md overflow-hidden" href='http://localhost:5173/tests/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/edit'>
                                     <div className="!bg-green-500 flex items-center justify-center w-16 text-white text-sm font-medium">
                                         <div className="flex flex-col justify-center items-center">
                                             <EducationIcon aria-label="Quiz Icon" />
                                             <div className="mt-1 text-white !text-xs">Quiz</div>
                                         </div>
                                     </div>
-                                </div>
+                                </a>
                                 {/* Consider using NavLink from react-router-dom if navigation is intended */}
                                 <div className="flex-1 flex items-center justify-between border-t border-r border-b border-gray-200 bg-white rounded-r-md truncate">
                                     <div className="flex-1 overflow-hidden group">
@@ -57,7 +57,7 @@ const TestsList: React.FC<TestsListProps> = ({ tests }) => {
                     <button 
                         type="button" 
                         className="mt-2 inline-flex items-center px-3 border shadow-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 h-[42px] sm:h-[38px] text-sm border-transparent bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => handleAddTest({ id: '1', title: 'New quiz', url: '/quizzes/1' })}
+                        onClick={() => handleAddTest({ id: '1', title: 'New quiz', url: '/tests/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/edit' })}
                     >
                         <PlusIcon />
                         <span className="max-w-full overflow-hidden">New quiz</span>
@@ -70,7 +70,7 @@ const TestsList: React.FC<TestsListProps> = ({ tests }) => {
                     <button 
                         type="button" 
                         className="mt-2 inline-flex items-center px-3 border shadow-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 h-[42px] sm:h-[38px] text-sm border-transparent bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => handleAddTest({ id: '1', title: 'New quiz', url: '/quizzes/1' })}
+                        onClick={() => handleAddTest({ id: '1', title: 'New quiz', url: '/tests/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/edit' })}
                     >
                         <PlusIcon />
                         <span className="max-w-full overflow-hidden">New quiz</span>

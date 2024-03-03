@@ -289,3 +289,55 @@ export const PlusIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
     </svg>
 );
+
+export const LikeIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+    <svg 
+        width='22px'
+        height='22px'
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 24 24" 
+        fill="currentColor"
+        {...props}
+    >
+        <path d="M0 0h24v24H0V0z" fill="none" opacity=".87"></path><path d="M21 8h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2c0-1.1-.9-2-2-2zm0 4l-3 7H9V9l4.34-4.34L12.23 10H21v2zM1 9h4v12H1z"></path>
+    </svg> 
+);
+
+export const DislikeIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+    <svg 
+        width='22px'
+        height='22px'
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 24 24" 
+        fill="currentColor"
+        {...props}
+    >
+        <path d="M0 0h24v24H0V0z" fill="none" opacity=".87"></path><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.58-6.59c.37-.36.59-.86.59-1.41V5c0-1.1-.9-2-2-2zm0 12l-4.34 4.34L11.77 14H3v-2l3-7h9v10zm4-12h4v12h-4z"></path>
+    </svg> 
+);
+
+export const TrashIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+    <svg 
+        width='22px'
+        height='22px' 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 24 24" 
+        fill="currentColor"
+        {...props}
+    >
+        <path d="M0 0h24v24H0V0z" fill="none"></path><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"></path>
+    </svg>
+);
+
+export const PencilIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+    <svg 
+        width='22px'
+        height='22px'
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 24 24" 
+        fill="currentColor"
+        {...props}
+    >
+        <path d="M0 0h24v24H0z" fill="none"></path><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+    </svg> 
+);

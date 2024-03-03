@@ -4,7 +4,7 @@ import './style.css';
 
 import type { IHighlight } from "./react-pdf-highlighter";
 import { testHighlights as _testHighlights } from "./test-highlights";
-import QuizParameters from './QuizParameters';
+import QuizEditor from './QuizEditor';
 const testHighlights: Record<string, Array<IHighlight>> = _testHighlights;
 
 const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
@@ -41,8 +41,8 @@ const TestPage = () => {
             toggleDocument={toggleDocument}
         />
         
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <QuizParameters />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+          <QuizEditor />
         </div>
       </div>
     </div>

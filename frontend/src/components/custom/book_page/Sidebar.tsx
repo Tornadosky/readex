@@ -17,7 +17,7 @@ export function Sidebar({
   toggleDocument,
   resetHighlights,
 }: Props) {
-  const [view, setView] = useState('Home');
+  const [view, setView] = useState('Books');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const handleViewChange = (newView: string) => () => {
@@ -57,17 +57,17 @@ export function Sidebar({
     {
       id: '1',
       title: 'GRE Official Guide',
-      url: '/pdfs/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/view',
+      url: '/tests/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/edit',
     },
     {
       id: '2',
       title: 'TOEFL Preparation Book',
-      url: '/pdfs/54f1c2bd-ec4e-4f2e-a10e-2f639e8d8f47/view',
+      url: '/tests/54f1c2bd-ec4e-4f2e-a10e-2f639e8d8f47/edit',
     },
     {
       id: '3',
       title: 'GMAT Exam Guide',
-      url: '/pdfs/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/view',
+      url: '/tests/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/edit',
     },
   ];
 

@@ -8,6 +8,16 @@ import { AlertDialog } from './AlertDialog';
 import MyCircularProgress from './Sections/MyCircularProgress.tsx';
 import './style.css'
 import { MyAlert } from "./MyAlert";
+import { Sidebar } from "../book_page/Sidebar.tsx";
+// TODO: Delete this and implement inside Sidebar
+import type { IHighlight } from "../book_page/react-pdf-highlighter";
+import { testHighlights as _testHighlights } from "../book_page/test-highlights";
+const testHighlights: Record<string, Array<IHighlight>> = _testHighlights;
+const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
+const SECONDARY_PDF_URL = "https://arxiv.org/pdf/1604.02480.pdf";
+const searchParams = new URLSearchParams(document.location.search);
+const initialUrl = searchParams.get("url") || PRIMARY_PDF_URL;
+// End of TODO
 
 interface MainPageProps {
   userData: any;
@@ -40,6 +50,24 @@ const MainPage: React.FC<MainPageProps> = ({ userData }) => {
     id: -1,
     name: "",
   });
+
+  // TODO: Delete this and implement inside Sidebar
+  const [highlights, setHighlights] = useState<IHighlight[]>(testHighlights[initialUrl]
+    ? [...testHighlights[initialUrl]]
+    : [],);
+  const [url, setUrl] = useState(initialUrl);
+
+  const resetHighlights = () => {
+    setHighlights([]);
+  };
+
+  const toggleDocument = () => {
+    const newUrl = url === PRIMARY_PDF_URL ? SECONDARY_PDF_URL : PRIMARY_PDF_URL;
+
+    setUrl(newUrl);
+    setHighlights(testHighlights[newUrl] ? [...testHighlights[newUrl]] : []);
+  };
+  // End of TODO
 
   useEffect(() => {
     const fetchData = async () => {
@@ -143,23 +171,30 @@ const MainPage: React.FC<MainPageProps> = ({ userData }) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="flex flex-col min-w-full bg-bgColor min-h-full">
-        <MyAlert open={openAlert} setOpen={setOpenAlert} severity={"error"} message={alertMessage} />
-        <TopBar userData={userData} handleCreateSection={handleCreateSection} setShowSettings={setShowSettings} />
-        <AlertDialog open={open} handleClose={handleClose} actionConfirmation={actionConfirmation} type={"Section"} />
-        <Divider variant="middle" className="main-divider" />
-        <div ref={sectionsContainerRef}> 
-          {sections.map((section) => (
-            <Section 
-              key={section.id}
-              sectionId={section.id}
-              booksList={section.books}
-              name={section.section_name}
-              handleDeleteSection={handleActionConfirmation}
-              globalLoading={globalLoading}
-              setGlobalLoading={setGlobalLoading}
-            />
-          ))}
+      <div style={{ display: 'flex', height: '100%' }}>
+        <Sidebar 
+          highlights={highlights}
+          resetHighlights={resetHighlights}
+          toggleDocument={toggleDocument}
+        />
+        <div className="flex flex-col w-full bg-bgColor min-h-full">
+          <MyAlert open={openAlert} setOpen={setOpenAlert} severity={"error"} message={alertMessage} />
+          <TopBar userData={userData} handleCreateSection={handleCreateSection} setShowSettings={setShowSettings} />
+          <AlertDialog open={open} handleClose={handleClose} actionConfirmation={actionConfirmation} type={"Section"} />
+          <Divider variant="middle" className="main-divider" />
+          <div ref={sectionsContainerRef}> 
+            {sections.map((section) => (
+              <Section 
+                key={section.id}
+                sectionId={section.id}
+                booksList={section.books}
+                name={section.section_name}
+                handleDeleteSection={handleActionConfirmation}
+                globalLoading={globalLoading}
+                setGlobalLoading={setGlobalLoading}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </DndProvider>

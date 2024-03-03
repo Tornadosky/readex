@@ -5,17 +5,16 @@ import './style.css';
 import type { IHighlight } from "./react-pdf-highlighter";
 import { testHighlights as _testHighlights } from "./test-highlights";
 import QuizEditor from './QuizEditor';
+// TODO: Delete this and implement inside Sidebar
 const testHighlights: Record<string, Array<IHighlight>> = _testHighlights;
-
 const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
 const SECONDARY_PDF_URL = "https://arxiv.org/pdf/1604.02480.pdf";
-
 const searchParams = new URLSearchParams(document.location.search);
-
 const initialUrl = searchParams.get("url") || PRIMARY_PDF_URL;
-
+// End of TODO
 
 const TestPage = () => {
+  // TODO: Delete this and implement inside Sidebar
   const [highlights, setHighlights] = useState<IHighlight[]>(testHighlights[initialUrl]
     ? [...testHighlights[initialUrl]]
     : [],);
@@ -31,6 +30,7 @@ const TestPage = () => {
     setUrl(newUrl);
     setHighlights(testHighlights[newUrl] ? [...testHighlights[newUrl]] : []);
   };
+  // End of TODO
 
   return (
     <div className="App" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>

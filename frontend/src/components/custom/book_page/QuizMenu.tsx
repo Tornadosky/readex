@@ -28,23 +28,23 @@ const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage }) 
                 {activePage === 'Text' && <div>Text Content</div>}
                 {activePage === 'URL' && (
                 <div>
-                    <div x-show="inputOption === 'url'" className="mb-4">
-                    <label className="block font-bold text-gray-800">
-                        URL
-                    </label>
-                    <div className="flex mt-1 rounded-md shadow-sm">
-                        <input
-                        type="text"
-                        name="url"
-                        id="url"
-                        x-model="formData.url"
-                        placeholder="E.g. https://en.wikipedia.org/wiki/Physics"
-                        className="flex-1 block w-full min-w-0 border border-gray-300 rounded-md text-gray-800 focus:border-indigo-500 focus:ring-indigo-500 mt-1 p-2"
-                        />
-                    </div>
-                    <div className="mt-2 text-sm">
-                        The URL must be publicly accessible and not behind a login.
-                    </div>
+                    <div className="mb-4">
+                        <label className="block font-bold text-gray-800">
+                            URL
+                        </label>
+                        <div className="flex mt-1 rounded-md shadow-sm">
+                            <input
+                            type="text"
+                            name="url"
+                            id="url"
+                            x-model="formData.url"
+                            placeholder="E.g. https://en.wikipedia.org/wiki/Physics"
+                            className="flex-1 block w-full min-w-0 border border-gray-300 rounded-md text-gray-800 focus:border-indigo-500 focus:ring-indigo-500 mt-1 p-2"
+                            />
+                        </div>
+                        <div className="mt-2 text-sm">
+                            The URL must be publicly accessible and not behind a login.
+                        </div>
                     </div>
                 
                     <div className="grid grid-cols-2 gap-4">

@@ -59,17 +59,17 @@ const BooksList: React.FC<BooksListProps> = ({ books }) => {
       {
         label: 'Download',
         key: '1',
-        icon: <DownloadOutlined />,
+        icon: <DownloadOutlined style={{ fontSize: "1rem" }} />,
       },
       {
         label: 'Rename',
         key: '2',
-        icon: <EditOutlined />,
+        icon: <EditOutlined style={{ fontSize: "1rem" }} />,
       },
       {
         label: 'Delete',
         key: '3',
-        icon: <DeleteOutlined />,
+        icon: <DeleteOutlined style={{ fontSize: "1rem" }} />,
         danger: true,
       },
     ];

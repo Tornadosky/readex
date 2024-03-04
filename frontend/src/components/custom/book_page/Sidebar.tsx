@@ -149,6 +149,7 @@ export function Sidebar({
           </div>
         </div>
       )}
+      
       <Transition appear show={isModalOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={() => {setIsModalOpen(false)}}>
           <Transition.Child

@@ -166,8 +166,9 @@ class App extends Component<{}, State> {
   }
 
   handleColorChange = (newColor: any) => {
-    this.setState({ color: newColor.toRgbString() });
-    console.log("Color change", newColor.toRgbString());
+    const rgbColor = newColor.toRgbString();
+    this.setState({ color: rgbColor });
+    console.log("Color change", rgbColor);
   };
 
   handlePageInput = (e: any) => {

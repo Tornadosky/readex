@@ -33,7 +33,7 @@ export class AreaHighlight extends Component<Props> {
           isScrolledTo ? "AreaHighlight--scrolledTo" : ""
         }`}
         style={
-          isScrolledTo ? { backgroundColor:  '#ff4141' } : { backgroundColor: color }
+          isScrolledTo ? { backgroundColor: '#ff4141' } : { backgroundColor: color }
         }
       >
         <Rnd

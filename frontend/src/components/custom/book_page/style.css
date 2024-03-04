@@ -39,6 +39,10 @@ body {
   .highlight__image {
     overflow: auto;
     max-width: 300px;
+    /* border: 1px dashed; */
+  }
+
+  .highlight__image > img {
     border: 1px dashed;
   }
   

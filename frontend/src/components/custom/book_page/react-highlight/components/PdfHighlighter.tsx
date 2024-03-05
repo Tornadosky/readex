@@ -93,9 +93,9 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
   Props<T_HT>,
   State<T_HT>
 > {
-  static defaultProps = {
-    pdfScaleValue: "auto",
-  };
+  // static defaultProps = {
+  //   pdfScaleValue: "auto",
+  // };
 
   state: State<T_HT> = {
     ghostHighlight: null,
@@ -167,17 +167,26 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
   };
 
   componentDidUpdate(prevProps: Props<T_HT>) {
+    // Check if pdfDocument prop has changed
     if (prevProps.pdfDocument !== this.props.pdfDocument) {
       this.init();
       return;
     }
+
+    // Check if highlights prop has changed
     if (prevProps.highlights !== this.props.highlights) {
       this.renderHighlightLayers();
     }
 
+    // Check if destinationPage prop has changed
     const page = this.props.destinationPage;
     if (page && prevProps.destinationPage !== page) {
       this.goToPage(page);
+    }
+
+    // Check if pdfScaleValue prop has changed
+    if (prevProps.pdfScaleValue !== this.props.pdfScaleValue) {
+      this.handleScaleValue(); // Apply the new scale value
     }
   }
 

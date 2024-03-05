@@ -32,6 +32,7 @@ interface State {
   inputPage: string;
   color: string;
   bookName: string;
+  scaleValue: string;
 }
 
 const getNextId = () => String(Math.random()).slice(2);
@@ -73,6 +74,7 @@ class App extends Component<{}, State> {
     inputPage: "1",
     color: "rgba(255, 226, 143, 1)",
     bookName: "Book name",
+    scaleValue: "auto",
   };
 
   resetHighlights = () => {
@@ -204,6 +206,20 @@ class App extends Component<{}, State> {
     this.setState({ bookName: newBookName });
   }
 
+  handleScaleChange = (newScale: string) => {
+    if (newScale === "Default"){
+      newScale = "auto";
+    } else if (newScale === "Width Fit") {
+      newScale = "page-width";
+    } else if (newScale === "Page Fit") {
+      newScale = "page-fit";
+    } else {
+      newScale = "auto";
+    }
+    console.log("Scale change", newScale);
+    this.setState({ scaleValue: newScale });
+  }
+
   render() {
     const { url, highlights } = this.state;
 
@@ -233,17 +249,19 @@ class App extends Component<{}, State> {
               handlePageInput={this.handlePageInput}
               submitPageInput={this.submitPageInput}
               handleBookNameChange={this.handleBookNameChange}
+              handleScaleChange={this.handleScaleChange}
             />
             
             <div style={{ flex: 1, position: "relative" }}>
               <PdfLoader url={url} beforeLoad={<Spinner />}>
                 {(pdfDocument) => (
                   <PdfHighlighter
+                    //key={this.state.scaleValue} // force re-render when scale changes
                     pdfDocument={pdfDocument}
                     enableAreaSelection={(event) => event.altKey}
                     onScrollChange={resetHash}
                     color={this.state.color}
-                    // pdfScaleValue="page-width"
+                    pdfScaleValue={this.state.scaleValue}
                     scrollRef={(scrollTo) => {
                       this.scrollViewerTo = scrollTo;
                       this.scrollToHighlightFromHash();

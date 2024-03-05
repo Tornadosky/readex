@@ -16,7 +16,7 @@
 .Highlight__part {
   cursor: pointer;
   position: absolute;
-  background: rgba(255, 226, 143, 1); /* doesn't have effect */
+  background: rgba(255, 226, 143, 1);
   transition: background 0.3s;
 }
 

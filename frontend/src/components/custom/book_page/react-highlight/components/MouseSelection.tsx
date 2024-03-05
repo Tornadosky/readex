@@ -26,6 +26,7 @@ interface Props {
   onDragEnd: () => void;
   shouldStart: (event: MouseEvent) => boolean;
   onChange: (isVisible: boolean) => void;
+  color: string;
 }
 
 class MouseSelection extends Component<Props, State> {
@@ -201,7 +202,10 @@ class MouseSelection extends Component<Props, State> {
         {start && end ? (
           <div
             className="MouseSelection"
-            style={this.getBoundingRect(start, end)}
+            style={{
+              ...this.getBoundingRect(start, end),
+              backgroundColor: this.props.color,
+            }}
           />
         ) : null}
       </div>

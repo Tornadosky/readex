@@ -41,7 +41,8 @@ export type T_ViewportHighlight<T_HT> = { position: Position } & T_HT;
 interface State<T_HT> {
   ghostHighlight: {
     position: ScaledPosition;
-    content?: { text?: string; image?: string };
+    content?: { text?: string; image?: string; };
+    color?: string;
   } | null;
   isCollapsed: boolean;
   range: Range | null;
@@ -83,6 +84,7 @@ interface Props<T_HT> {
   getPageCount: (pageCount: number) => void;
   getCurrentPage: (currentPage: number) => void;
   destinationPage?: number;
+  color: string;
 }
 
 const EMPTY_ID = "empty-id";
@@ -583,6 +585,7 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
           {this.renderTip()}
           {typeof enableAreaSelection === "function" ? (
             <MouseSelection
+              color={this.props.color}
               onDragStart={() => this.toggleTextSelection(true)}
               onDragEnd={() => this.toggleTextSelection(false)}
               onChange={(isVisible) =>
@@ -634,6 +637,7 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
                           ghostHighlight: {
                             position: scaledPosition,
                             content: { image },
+                            color: this.props.color,
                           },
                         },
                         () => {

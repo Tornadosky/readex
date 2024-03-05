@@ -65,24 +65,29 @@ export class Highlight extends Component<Props> {
             style={{
               left: 20,
               top: boundingRect.top,
+              fontSize: rects[0].height,
             }}
           >
             {comment.emoji}
           </div>
         ) : null}
         <div className="Highlight__parts">
-          {rects.map((rect, index) => (
-            <div
-              onMouseOver={onMouseOver}
-              onMouseOut={onMouseOut}
-              onClick={onClick}
-              key={index}
-              className={`Highlight__part`}
-              style={
-                isScrolledTo ? rect : { ...rect, backgroundColor: color }
-              }
-            />
-          ))}
+          {rects.map((rect, index) => {
+            //console.log('color', color);
+
+            return (
+              <div
+                onMouseOver={onMouseOver}
+                onMouseOut={onMouseOut}
+                onClick={onClick}
+                key={index}
+                className="Highlight__part"
+                style={
+                  isScrolledTo ? rect : { ...rect, backgroundColor: color }
+                }
+              />
+            );
+          })}
         </div>
       </div>
     );

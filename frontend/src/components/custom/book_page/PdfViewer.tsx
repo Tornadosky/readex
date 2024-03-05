@@ -242,10 +242,10 @@ class App extends Component<{}, State> {
                     pdfDocument={pdfDocument}
                     enableAreaSelection={(event) => event.altKey}
                     onScrollChange={resetHash}
+                    color={this.state.color}
                     // pdfScaleValue="page-width"
                     scrollRef={(scrollTo) => {
                       this.scrollViewerTo = scrollTo;
-
                       this.scrollToHighlightFromHash();
                     }}
                     destinationPage={this.state.destinationPage}
@@ -260,16 +260,18 @@ class App extends Component<{}, State> {
                       content,
                       hideTipAndSelection,
                       transformSelection
-                    ) => (
-                      <Tip
-                        onOpen={transformSelection}
-                        onConfirm={(comment) => {
-                          this.addHighlight({ content, position, comment, color: this.state.color});
+                    ) => {
+                      console.log("Selection is finished", { position, content });
+                      return (
+                        <Tip
+                          onOpen={transformSelection}
+                          onConfirm={(comment) => {
+                            this.addHighlight({ content, position, comment, color: this.state.color});
 
-                          hideTipAndSelection();
-                        }}
-                      />
-                    )}
+                            hideTipAndSelection();
+                          }}
+                        />
+                    )}}
                     highlightTransform={(
                       highlight,
                       index,
@@ -282,6 +284,8 @@ class App extends Component<{}, State> {
                       const isTextHighlight = !Boolean(
                         highlight.content && highlight.content.image
                       );
+
+                      //isTextHighlight && console.log("isTextHighlight", highlight.color);
 
                       const component = isTextHighlight ? (
                         <Highlight

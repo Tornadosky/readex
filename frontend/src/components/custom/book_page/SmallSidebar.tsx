@@ -12,7 +12,13 @@ const SmallSidebar = ({ handleViewChange, view } : SmallSidebarProps) => {
     const [theme, setTheme] = useState('light' as 'light' | 'dark');
 
     const toggleTheme = () => {
-        setTheme(theme === 'light' ? 'dark' : 'light');
+        if (theme === 'light') {
+            setTheme('dark');
+            document.body.classList.add('dark');
+        } else {
+            setTheme('light');
+            document.body.classList.remove('dark');
+        }
     }
 
     return (

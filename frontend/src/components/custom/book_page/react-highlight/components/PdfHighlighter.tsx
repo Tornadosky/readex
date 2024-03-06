@@ -206,11 +206,13 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
         l10n: NullL10n,
       });
 
+    console.log("Init", pdfDocument);
+
     this.linkService.setDocument(pdfDocument);
     this.linkService.setViewer(this.viewer);
     this.viewer.setDocument(pdfDocument);
     // debug
-    (window as any).PdfViewer = this;
+    //(window as any).PdfViewer = this;
   }
 
   componentWillUnmount() {
@@ -443,6 +445,8 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
 
     scrollRef(this.scrollTo);
 
+    console.log("Document ready", this.viewer.pagesCount, "pages");
+
     this.props.getPageCount(this.viewer.pagesCount);
   };
 
@@ -575,6 +579,7 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
   handleScaleValue = () => {
     if (this.viewer) {
       this.viewer.currentScaleValue = this.props.pdfScaleValue; //"page-width";
+      // this.viewer.currentScale = 1.8;
     }
   };
 

@@ -28,12 +28,13 @@ export class PdfLoader extends Component<Props, State> {
   };
 
   static defaultProps = {
-    workerSrc: "https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js",
+    workerSrc: "https://unpkg.com/pdfjs-dist@3.8.162/build/pdf.worker.min.js",
   };
 
   documentRef = React.createRef<HTMLElement>();
 
   componentDidMount() {
+    console.log("URL changed, reloading PDF 1");
     this.load();
   }
 
@@ -46,6 +47,7 @@ export class PdfLoader extends Component<Props, State> {
 
   componentDidUpdate({ url }: Props) {
     if (this.props.url !== url) {
+      console.log("URL changed, reloading PDF 2");
       this.load();
     }
   }
@@ -72,6 +74,8 @@ export class PdfLoader extends Component<Props, State> {
       GlobalWorkerOptions.workerSrc = workerSrc;
     }
 
+    console.log("Load", url);
+    
     Promise.resolve()
       .then(() => discardedDocument && discardedDocument.destroy())
       .then(() => {
@@ -108,6 +112,7 @@ export class PdfLoader extends Component<Props, State> {
 
   renderError() {
     const { errorMessage } = this.props;
+    console.log("Error: " + this.state.error);
     if (errorMessage) {
       return React.cloneElement(errorMessage, { error: this.state.error });
     }

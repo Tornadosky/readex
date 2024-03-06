@@ -12,6 +12,7 @@ const updateHash = (highlight: IHighlight) => {
 };
 
 export default function highlightsList({ highlights, resetHighlights, toggleDocument }: HighlightsListProps)  {
+  const [sortCriteria, setSortCriteria] = useState('');
   const [filterColor, setFilterColor] = useState('');
   const [filterPageNumber, setFilterPageNumber] = useState('');
   const [filterType, setFilterType] = useState('');
@@ -29,32 +30,36 @@ export default function highlightsList({ highlights, resetHighlights, toggleDocu
   };
 
   useEffect(() => {
-    const applyFilters = () => {
-      const filtered = highlights.filter((highlight) => {
-        // Filter by color
-        if (filterColor && highlight.color !== filterColor) {
-          return false;
-        }
-        // Filter by page number
-        if (filterPageNumber && highlight.position.pageNumber !== parseInt(filterPageNumber, 10)) {
-          return false;
-        }
-        // Filter by highlight type
-        if (filterType) {
-          const hasImage = !!highlight.content?.image;
-          const isTypeMatch = (filterType === 'text' && !hasImage) || (filterType === 'image' && hasImage);
-          if (!isTypeMatch) {
-            return false;
-          }
-        }
-        return true;
-      });
-      
-      setFilteredHighlights(filtered);
-    };
+    let processedHighlights = [...highlights];
   
-    applyFilters();
-  }, [highlights, filterColor, filterPageNumber, filterType]);
+    // Filter
+    processedHighlights = processedHighlights.filter((highlight) => {
+      // Filter by color
+      if (filterColor && highlight.color !== filterColor) {
+        return false;
+      }
+      // Filter by page number
+      if (filterPageNumber && highlight.position.pageNumber !== parseInt(filterPageNumber, 10)) {
+        return false;
+      }
+      // Filter by highlight type
+      if (filterType) {
+        const hasImage = !!highlight.content?.image;
+        const isTypeMatch = (filterType === 'text' && !hasImage) || (filterType === 'image' && hasImage);
+        return isTypeMatch;
+      }
+      return true;
+    });
+  
+    // Sort
+    if (sortCriteria === 'page-number') {
+      processedHighlights.sort((a, b) => a.position.pageNumber - b.position.pageNumber);
+    } else if (sortCriteria === 'text-length') {
+      processedHighlights.sort((a, b) => (a.content.text?.length || 0) - (b.content.text?.length || 0));
+    }
+  
+    setFilteredHighlights(processedHighlights);
+  }, [highlights, filterColor, filterPageNumber, filterType, sortCriteria]);
 
   return (
     <>
@@ -92,6 +97,14 @@ export default function highlightsList({ highlights, resetHighlights, toggleDocu
             <option value="">All</option>
             <option value="text">Text</option>
             <option value="image">Image</option>
+          </select>
+        </div>
+        <div>
+          <label>Sort:</label>
+          <select className='m-2 p-1 rounded' value={sortCriteria} onChange={(e) => setSortCriteria(e.target.value)}>
+            <option value="">None</option>
+            <option value="page-number">Page Number</option>
+            <option value="text-length">Text Length</option>
           </select>
         </div>
       </div>

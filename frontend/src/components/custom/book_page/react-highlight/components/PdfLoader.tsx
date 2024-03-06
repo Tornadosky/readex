@@ -6,8 +6,7 @@ import type { PDFDocumentProxy } from "pdfjs-dist";
 interface Props {
   /** See `GlobalWorkerOptionsType`. */
   workerSrc: string;
-
-  url: string;
+  url?: string;
   beforeLoad: JSX.Element;
   errorMessage?: JSX.Element;
   children: (pdfDocument: PDFDocumentProxy) => JSX.Element;
@@ -34,7 +33,7 @@ export class PdfLoader extends Component<Props, State> {
   documentRef = React.createRef<HTMLElement>();
 
   componentDidMount() {
-    console.log("URL changed, reloading PDF 1");
+    console.log("URL Mounted");
     this.load();
   }
 
@@ -47,7 +46,7 @@ export class PdfLoader extends Component<Props, State> {
 
   componentDidUpdate({ url }: Props) {
     if (this.props.url !== url) {
-      console.log("URL changed, reloading PDF 2");
+      console.log("URL updated");
       this.load();
     }
   }
@@ -66,28 +65,26 @@ export class PdfLoader extends Component<Props, State> {
 
   load() {
     const { ownerDocument = document } = this.documentRef.current || {};
-    const { url, cMapUrl, cMapPacked, workerSrc } = this.props;
+    const { workerSrc } = this.props;
     const { pdfDocument: discardedDocument } = this.state;
     this.setState({ pdfDocument: null, error: null });
 
     if (typeof workerSrc === "string") {
       GlobalWorkerOptions.workerSrc = workerSrc;
     }
-
-    console.log("Load", url);
     
     Promise.resolve()
       .then(() => discardedDocument && discardedDocument.destroy())
       .then(() => {
-        if (!url) {
-          return;
-        }
+        
+        const { url, ...otherProps } = this.props;
+        console.log("Load", url);
+        if (!url) return;
 
         return getDocument({
-          ...this.props,
+          url: url ?? undefined,
           ownerDocument,
-          cMapUrl,
-          cMapPacked,
+          ...otherProps,
         }).promise.then((pdfDocument) => {
           this.setState({ pdfDocument });
         });

@@ -253,10 +253,10 @@ class App extends Component<{}, State> {
             />
             
             <div style={{ flex: 1, position: "relative" }}>
-              <PdfLoader url={url} beforeLoad={<Spinner />}>
+              <PdfLoader key={url} url={url} beforeLoad={<Spinner />}>
                 {(pdfDocument) => (
                   <PdfHighlighter
-                    // key={this.state.scaleValue} // force re-render when scale changes
+                    key={this.state.scaleValue} // force re-render when scale changes
                     pdfDocument={pdfDocument}
                     enableAreaSelection={(event) => event.altKey}
                     onScrollChange={resetHash}

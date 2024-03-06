@@ -4,7 +4,6 @@ import type { MenuProps } from 'antd';
 import { Dropdown } from 'antd';
 import { DeleteOutlined, EditOutlined, DownloadOutlined } from '@ant-design/icons';
 
-
 interface IBook {
   id: string;
   title: string;

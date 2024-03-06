@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { VerticalDotsIcon, EducationIcon, EmptyFolderIcon, PlusIcon } from '@/assets/svg';
+import type { MenuProps } from 'antd';
+import { Dropdown } from 'antd';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 interface ITest {
     id: string;
     title: string;
     url: string;
+    difficulty: string;
+    lastUpdated: string;
+    lastResult: number | null;
 }
 
 interface TestsListProps {
@@ -13,9 +20,64 @@ interface TestsListProps {
 
 const TestsList: React.FC<TestsListProps> = ({ tests }) => {
     const [testsList, setTestsList] = useState<Array<ITest>>(tests);
+    const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
+
+    const navigate = useNavigate()
 
     const handleAddTest = (test: ITest) => {
         setTestsList(currentTests => [...currentTests, test]);
+    };
+
+    const AddQuizButton: React.FC = () => {
+        return (
+            <button 
+                type="button" 
+                className="mt-4 inline-flex items-center px-3 border shadow-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 h-[42px] sm:h-[38px] text-sm border-transparent bg-green-600 hover:bg-green-700 text-white"
+                onClick={() => handleAddTest({ id: testsList.length.toString() + Math.floor(Math.random() * 1000).toString(), title: 'New Quiz', url: 'http://localhost:5173/tests/new', difficulty: 'easy', lastUpdated: '2021-09-01', lastResult: 0 })}
+            >
+                <PlusIcon />
+                <span className="max-w-full overflow-hidden">New quiz</span>
+            </button>
+        );
+    }
+
+    const handleDotsClick = (testId: string) => (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault(); // Prevents the default action (navigation)
+        event.stopPropagation(); // Stops the click event from propagating to the parent <a> tag
+        setSelectedTestId(testId); // Set the selected test ID
+    };
+  
+    const handleMenuClick: MenuProps['onClick'] = (e) => {
+        console.log('click', e);
+        if (e.key === '2' && selectedTestId) { // If "Delete" is clicked
+            setTestsList(currentTests => currentTests.filter(test => test.id !== selectedTestId));
+            setSelectedTestId(null);
+        } 
+        if (e.key === '1' && selectedTestId) { // If "Edit" is clicked
+            const testToEdit = testsList.find(test => test.id === selectedTestId);
+            if (testToEdit) {
+                navigate(`/tests/${selectedTestId}/edit`);
+            }
+        }
+    };
+
+    const items: MenuProps['items'] = [
+        {
+            label: 'Edit',
+            key: '1',
+            icon: <EditOutlined style={{ fontSize: "1rem" }} />,
+        },
+        {
+            label: 'Delete',
+            key: '2',
+            icon: <DeleteOutlined style={{ fontSize: "1rem" }} />,
+            danger: true,
+        },
+    ];
+
+    const menuProps = {
+        items,
+        onClick: handleMenuClick,
     };
 
     return (
@@ -27,54 +89,50 @@ const TestsList: React.FC<TestsListProps> = ({ tests }) => {
                         {testsList.map((test, index) => (
                             <li key={test.id || index} className="flex shadow-sm rounded-md hover:shadow-gray-300 transition duration-200 ease-in-out hover:!shadow-md w-full">
                                 {/* Adjusted structure for valid HTML and accessibility */}
-                                <a className="flex flex-shrink-0 rounded-l-md overflow-hidden" href='http://localhost:5173/tests/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/edit'>
-                                    <div className="!bg-green-500 flex items-center justify-center w-16 text-white text-sm font-medium">
+                                <a className="flex flex-shrink-0 rounded-l-md overflow-hidden" href={`http://localhost:5173/tests/${test.id}/edit`}>
+                                    <div className={`flex items-center justify-center w-16 text-white text-sm font-medium ${test.lastResult ? (test.lastResult >= 80 ? '!bg-green-500' : test.lastResult >= 50 ? '!bg-yellow-500' : '!bg-red-500') : '!bg-zinc-500'}`}>
                                         <div className="flex flex-col justify-center items-center">
+                                            {/* Ensure EducationIcon is properly imported or defined */}
                                             <EducationIcon aria-label="Quiz Icon" />
                                             <div className="mt-1 text-white !text-xs">Quiz</div>
                                         </div>
                                     </div>
                                 </a>
-                                {/* Consider using NavLink from react-router-dom if navigation is intended */}
                                 <div className="flex-1 flex items-center justify-between border-t border-r border-b border-gray-200 bg-white rounded-r-md truncate">
                                     <div className="flex-1 overflow-hidden group">
                                         <div className="px-4 text-sm truncate py-4 space-y-2 pb-3">
                                             <div className="text-gray-700 font-medium hover:text-gray-600 truncate text-left">{test.title}</div>
-                                            <span className="text-gray-500 flex justify-start py-1 px-2 -ml-2 rounded-md items-center border border-transparent transition-all duration-200">
-                                                <span className="text-gray-400 font-light">No responses</span>
-                                            </span>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-gray-500">Difficulty: {test.difficulty}</span>
+                                                {/* <span className="text-gray-500">Last Updated: {test.lastUpdated}</span> */}
+                                                <span className={`px-2 ml-2 inline-flex text-xs leading-5 font-semibold rounded-full ${test.lastResult ? (test.lastResult >= 80 ? 'bg-green-100 text-green-800' : test.lastResult >= 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') : '!bg-zinc-200'}`}>
+                                                    Result: {test.lastResult ? test.lastResult : "NA"}%
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="flex-shrink-0 pr-2">
-                                        <button aria-label="Open options" className="w-8 inline-flex items-center justify-center text-gray-400 rounded-full bg-transparent hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
-                                            <VerticalDotsIcon />
-                                        </button>
+                                        <Dropdown menu={menuProps} trigger={['click']}>
+                                            <button 
+                                                aria-label="Open options" 
+                                                className="w-4 inline-flex items-center justify-center text-gray-400 rounded-full bg-transparent hover:text-gray-600 focus:outline-none cursor-pointer"
+                                                onClick={handleDotsClick(test.id)}
+                                            >
+                                                <VerticalDotsIcon />
+                                            </button>
+                                        </Dropdown>
                                     </div>
                                 </div>
                             </li>
                         ))}
                     </ul>
-                    <button 
-                        type="button" 
-                        className="mt-2 inline-flex items-center px-3 border shadow-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 h-[42px] sm:h-[38px] text-sm border-transparent bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => handleAddTest({ id: '1', title: 'New quiz', url: '/tests/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/edit' })}
-                    >
-                        <PlusIcon />
-                        <span className="max-w-full overflow-hidden">New quiz</span>
-                    </button>
+                    <AddQuizButton />
                 </div>
             ) : (
                 <div className="flex flex-col justify-center items-center mt-10">
                     <EmptyFolderIcon />
                     <h2 className="text-gray-500 justify-center flex items-center tracking-wide mt-4 font-normal">No quizzes in workspace yet</h2>
-                    <button 
-                        type="button" 
-                        className="mt-2 inline-flex items-center px-3 border shadow-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 h-[42px] sm:h-[38px] text-sm border-transparent bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => handleAddTest({ id: '1', title: 'New quiz', url: '/tests/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/edit' })}
-                    >
-                        <PlusIcon />
-                        <span className="max-w-full overflow-hidden">New quiz</span>
-                    </button>
+                    <AddQuizButton />
                 </div>
             )}
         </div>

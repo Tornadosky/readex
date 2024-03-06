@@ -93,18 +93,28 @@ export function Sidebar({
       id: '1',
       title: 'GRE Official Guide',
       url: '/tests/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/edit',
+      difficulty: 'Hard',
+      lastUpdated: '2023-09-01',
+      lastResult: 85,
     },
     {
       id: '2',
       title: 'TOEFL Preparation Book',
       url: '/tests/54f1c2bd-ec4e-4f2e-a10e-2f639e8d8f47/edit',
+      difficulty: 'Medium',
+      lastUpdated: '2023-08-15',
+      lastResult: 60,
     },
     {
       id: '3',
       title: 'GMAT Exam Guide',
       url: '/tests/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/edit',
+      difficulty: 'Very Hard',
+      lastUpdated: '2023-10-05',
+      lastResult: 45,
     },
   ];
+  
 
   return (
     <>

@@ -16,7 +16,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/landing-page" element={<div>Landing Page Content Here</div>} />
         <Route path="/home" element={<MainPage userData={""} />} />
         <Route path="/pdfs/:pdfName/view" element={<PdfViewer />} />
-        <Route path="/tests/:testName/edit" element={<TestPage />} />
+        <Route path="/tests/:testName/edit" element={<TestPage isSolving={false} />} />
+        <Route path="/tests/:testName/play" element={<TestPage isSolving={true} />} />
         {/* Fallback route for 404 Not Found */}
         <Route path="*" element={<Page404 />} />
       </Routes>

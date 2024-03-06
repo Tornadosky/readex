@@ -1,11 +1,27 @@
-import { useState } from 'react';
+import React from 'react';
 import QuestionCard from './QuestionCard';
-import { SuccessIcon } from '@/assets/svg';
-import QuizMenu from './QuizMenu';
 
-const QuizEditor = () => {
-  const [activePage, setActivePage] = useState('Uploads');
-  const [questions, setQuestions] = useState([
+interface Answer {
+  id: string;
+  text: string;
+}
+
+interface Question {
+  id: string;
+  question: string;
+  answers: Answer[];
+  loading: boolean;
+}
+
+interface QuizInfo {
+  testName: string;
+  numberOfQuestions: number;
+  difficulty: string;
+  lastEdited: string;
+}
+
+const QuizSolver: React.FC = () => {
+  const questions: Question[] = [
     {
       id: '1',
       question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
@@ -83,85 +99,49 @@ const QuizEditor = () => {
       ],
       loading: false,
     }
-  ]);
+  ];
 
-  const handleSetActivePage = (page: string) => {
-    setActivePage(page);
+  // Example quiz info
+  const quizInfo: QuizInfo = {
+    testName: 'Neural Network Basics',
+    numberOfQuestions: questions.length,
+    difficulty: 'Intermediate',
+    lastEdited: 'Mar 5, 2024, 10:29:29 AM',
   };
 
-  // Render the component UI
   return (
-    <div className="flex py-4">
-      <div className='p-4 ml-4 bg-gray-50 shadow-md rounded-md hover:shadow-gray-300 transition duration-200 ease-in-out' style={{ width: '50%'}}>
-        <QuizMenu
-          activePage={activePage} 
-          handleSetActivePage={handleSetActivePage}
-        />
-      </div>
-      {/* Question Cards */}
-      <div className='flex flex-col justify-center items-center mx-8 overflow-y-auto' style={{ width: "50%" }}>
-        {questions.map((question, index) => (
-          <QuestionCard 
-            key={question.id}
-            answers={question.answers} 
-            question={question.question}
-            question_number={index+1}
-            loading={question.loading}
-            solving={false}
-          />
-        ))}
-        {/* Empty state */}
-        {questions.length === 0 && (
-          <div className="bg-white rounded-lg px-6 py-6 shadow-sm">
-            <h1 className="font-semibold leading-7 text-lg">
-                Get Started
-            </h1>
-            <div className="mt-6 grid grid-cols-12">
-                <div className="col-span-2 sm:col-span-1">
-                  <span className="p-1 inline-block">
-                    <SuccessIcon />
-                  </span>
-                </div>
-                <div className="col-span-10 sm:col-span-11  ">
-                  <p className="font-semibold">
-                      1. Create a quiz
-                  </p>
-                  <p className="mt-1">
-                      Paste copied text, input a topic, provide a URL or YouTube video link, upload a file, or directly type in a question to get started.
-                  </p>
-                </div>
-                <div className="col-span-2 sm:col-span-1 mt-4">
-                  <span className="p-1 inline-block">
-                    <SuccessIcon />
-                  </span>
-                </div>
-                <div className="col-span-10 sm:col-span-11  mt-4">
-                  <p className="font-semibold">
-                      2. Play, assign and embed
-                  </p>
-                  <p className="mt-1">
-                      Once your quiz is ready, you can play it, assign it with others, or embed it on your website.
-                  </p>
-                </div>
-                <div className="col-span-2 sm:col-span-1 mt-4">
-                  <span className="p-1 inline-block">
-                    <SuccessIcon />
-                  </span>
-                </div>
-                <div className="col-span-10 sm:col-span-11  mt-4">
-                  <p className="font-semibold">
-                      3. Analyze results
-                  </p>
-                  <p className="mt-1">
-                      You can results for all assigned quizzes in Reports
-                  </p>
+    <>
+        {/* Top Bar */}
+        <div className='bg-gray-100 p-4 text-center flex justify-between items-center' style={{ width: "100%", height: "57px", borderBottom: "1px solid #e8e8e8"}}>
+            <div className='flex flex-row justify-start items-center'>
+                <h2 className='text-xl font-bold flex-shrink-0'>
+                    {quizInfo.testName}
+                </h2>
+                <div className="text-[12px] text-gray-600 ml-3 underline flex items-center whitespace-nowrap mt-1">
+                    <span className="mr-2">Updated</span><span>{quizInfo.lastEdited}</span>
                 </div>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
+            <p className='flex-shrink-0'>{quizInfo.numberOfQuestions} Questions | Difficulty: {quizInfo.difficulty}</p>
+        </div>
+        <div style={{ overflowY: 'auto', flex: 1 }}>
+            {/* Questions */}
+            <div className='flex justify-center items-center my-8' >
+                <div className='w-3/5'>
+                    {questions.map((question, index) => (
+                        <QuestionCard 
+                            key={question.id}
+                            answers={question.answers} 
+                            question={question.question}
+                            question_number={index+1}
+                            loading={question.loading}
+                            solving={true}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
+    </>
   );
 };
 
-export default QuizEditor;
+export default QuizSolver;

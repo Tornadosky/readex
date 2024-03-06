@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Skeleton } from 'antd';
 import { DislikeIcon, LikeIcon, PencilIcon, TrashIcon } from '@/assets/svg';
 
@@ -12,9 +12,10 @@ interface QuestionCardProps {
   question: string;
   question_number: number;
   loading: boolean;
+  solving: boolean;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ answers, question, question_number, loading }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({ answers, question, question_number, loading, solving }) => {
   return (
     <div className='bg-white border mt-4 border-gray-200 rounded-xl w-full'>      
       <div className='p-4'>
@@ -45,28 +46,30 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ answers, question, question
             ))}
           </div>
           {/* Bottom Icons */}
-          <div className='flex justify-start space-x-1 text-gray-500 border-t border-gray-200'>
-            <div className="flex space-x-2 grow px-4 pt-3 rtl:space-x-reverse">
-              <span className="text-gray-500 hover:text-gray-800 cursor-pointer">
-                <LikeIcon />
-              </span>
-              <span className="text-gray-500 hover:text-gray-800 cursor-pointer">
-                <DislikeIcon />
-              </span>
-            </div>
-            <div className="flex justify-end px-4 pt-3 space-x-2 rtl:space-x-reverse grow">
-              <div>
-                <span className="text-gray-500 hover:text-gray-800 cursor-pointer inline mb-0.5">
-                  <PencilIcon />
+          {!solving && (
+            <div className='flex justify-start space-x-1 text-gray-500 border-t border-gray-200'>
+              <div className="flex space-x-2 grow px-4 pt-3 rtl:space-x-reverse">
+                <span className="text-gray-500 hover:text-gray-800 cursor-pointer">
+                  <LikeIcon />
+                </span>
+                <span className="text-gray-500 hover:text-gray-800 cursor-pointer">
+                  <DislikeIcon />
                 </span>
               </div>
-              <div className="text-gray-500 hover:text-red-600 cursor-pointer inline mb-0.5">
-                <span>
-                  <TrashIcon />
-                </span>
+              <div className="flex justify-end px-4 pt-3 space-x-2 rtl:space-x-reverse grow">
+                <div>
+                  <span className="text-gray-500 hover:text-gray-800 cursor-pointer inline mb-0.5">
+                    <PencilIcon />
+                  </span>
+                </div>
+                <div className="text-gray-500 hover:text-red-600 cursor-pointer inline mb-0.5">
+                  <span>
+                    <TrashIcon />
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </Skeleton>
       </div>
     </div>

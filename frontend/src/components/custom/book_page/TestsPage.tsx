@@ -5,6 +5,7 @@ import './style.css';
 import type { IHighlight } from "./react-pdf-highlighter";
 import { testHighlights as _testHighlights } from "./test-highlights";
 import QuizEditor from './QuizEditor';
+import QuizSolver from './QuizSolver';
 // TODO: Delete this and implement inside Sidebar
 const testHighlights: Record<string, Array<IHighlight>> = _testHighlights;
 const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
@@ -13,7 +14,11 @@ const searchParams = new URLSearchParams(document.location.search);
 const initialUrl = searchParams.get("url") || PRIMARY_PDF_URL;
 // End of TODO
 
-const TestPage = () => {
+interface TestPageProps {
+  isSolving: boolean;
+}
+
+const TestPage: React.FC<TestPageProps> = ({ isSolving }) => {
   // TODO: Delete this and implement inside Sidebar
   const [highlights, setHighlights] = useState<IHighlight[]>(testHighlights[initialUrl]
     ? [...testHighlights[initialUrl]]
@@ -42,7 +47,12 @@ const TestPage = () => {
         />
         
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
-          <QuizEditor />
+          {isSolving ? (
+              <QuizSolver />
+            ) :
+            (
+              <QuizEditor />
+          )}
         </div>
       </div>
     </div>

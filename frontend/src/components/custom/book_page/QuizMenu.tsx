@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Selector from './Selector';
+import { LoadingIcon } from '@/assets/svg';
+
 interface QuizMenuProps {
     activePage: string;
     handleSetActivePage: (page: string) => void;
+    generating: boolean;
+    onSubmit: (submissionData: any) => void;
 }
 
-const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage }) => {
+const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage, generating, onSubmit }) => {
+    const [selectedQuestionType, setSelectedQuestionType] = useState("Multiple Choice");
+    const [selectedLanguage, setSelectedLanguage] = useState("English");
+    const [selectedDifficulty, setSelectedDifficulty] = useState("Easy");
+    const [selectedQuestionsNumber, setSelectedQuestionsNumber] = useState(5);
+
+    const handleSubmit = () => {
+        const submissionData = {
+            questionType: selectedQuestionType,
+            language: selectedLanguage,
+            difficulty: selectedDifficulty,
+            questionsNumber: selectedQuestionsNumber,
+        };
+        onSubmit(submissionData);
+    };
 
     return (
         <>
@@ -48,43 +67,75 @@ const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage }) 
                     </div>
                 
                     <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block font-bold text-gray-800">
-                        Question type
-                        </label>
-                        <div className="mt-1 rounded-md shadow-sm">
-                        <select
-                            id="question_type"
-                            name="question_type"
-                            className="mt-1 block w-full py-2 pl-3 pr-10 text-base text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                        >
-                            <option value="multiple_choice">Multiple Choice</option>
-                            <option value="true_false">True or False</option>
-                            <option value="short_answer">Short Answer</option>
-                            <option value="fill_in_the_blank">Fill in the Blank</option>
-                            <option value="matching">Matching</option>
-                        </select>
+                        <div>
+                            <label className="block font-bold text-gray-800">
+                            Question type
+                            </label>
+                            <div className="mt-1 rounded-md shadow-sm">
+                                <Selector 
+                                    options={['Multiple Choice', 'True or False', 'Short Answer', 'Fill in the Blank', 'Matching']}
+                                    selected={selectedQuestionType}
+                                    setSelected={setSelectedQuestionType}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block font-bold text-gray-800">
+                                Language
+                            </label>
+                            <div className="mt-1 rounded-md shadow-sm">
+                                <Selector 
+                                    options={['English', 'Spanish', 'French', 'German', 'Italian', 'Russian']}
+                                    selected={selectedLanguage}
+                                    setSelected={setSelectedLanguage}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block font-bold text-gray-800">
+                                Difficulty
+                            </label>
+                            <div className="mt-1 rounded-md shadow-sm">
+                                <Selector 
+                                    options={['Easy', 'Medium', 'Hard']}
+                                    selected={selectedDifficulty}
+                                    setSelected={setSelectedDifficulty}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block font-bold text-gray-800">
+                                Questions
+                            </label>
+                            <div className="mt-1 rounded-md shadow-sm">
+                                <Selector
+                                    options={['5', '10', '15', '20', '25']}
+                                    selected={selectedQuestionsNumber.toString()}
+                                    setSelected={(value) => setSelectedQuestionsNumber(parseInt(value))}
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div>
-                        {/* Duplicate of the first select for demonstration, ensure to change IDs/names as necessary */}
-                        <label className="block font-bold text-gray-800">
-                        Question type
-                        </label>
-                        <div className="mt-1 rounded-md shadow-sm">
-                        <select
-                            id="question_type2"
-                            name="question_type2" 
-                            className="mt-1 block w-full py-2 pl-3 pr-10 text-base text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                        >
-                            <option value="multiple_choice">Multiple Choice</option>
-                            <option value="true_false">True or False</option>
-                            <option value="short_answer">Short Answer</option>
-                            <option value="fill_in_the_blank">Fill in the Blank</option>
-                            <option value="matching">Matching</option>
-                        </select>
-                        </div>
-                    </div>
+
+                    <div className="mt-4">
+                        {generating ? (
+                            <button 
+                                disabled 
+                                type="button" 
+                                className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex justify-center items-center"
+                            >
+                                <LoadingIcon />
+                                Loading...
+                            </button>
+                        ) : (
+                            <button 
+                                type="button" 
+                                className="w-full text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex justify-center items-center"
+                                onClick={handleSubmit}
+                            >
+                                Generate
+                            </button>
+                        )}
                     </div>
                 </div>
                 )}

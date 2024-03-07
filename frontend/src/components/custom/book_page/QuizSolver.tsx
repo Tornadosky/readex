@@ -130,6 +130,7 @@ const QuizSolver: React.FC = () => {
                     {questions.map((question, index) => (
                         <QuestionCard 
                             key={question.id}
+                            id={question.id}
                             answers={question.answers} 
                             question={question.question}
                             question_number={index+1}

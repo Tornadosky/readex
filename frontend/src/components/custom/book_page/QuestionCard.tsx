@@ -8,14 +8,16 @@ interface Answer {
 }
 
 interface QuestionCardProps {
+  id: string;
   answers: Answer[];
   question: string;
   question_number: number;
   loading: boolean;
   solving: boolean;
+  handleDeleteQuestion?: (id: string) => void;
 }
 
-const QuestionCard: React.FC<QuestionCardProps> = ({ answers, question, question_number, loading, solving }) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({ id, answers, question, question_number, loading, solving, handleDeleteQuestion }) => {
   return (
     <div className='bg-white border mt-4 border-gray-200 rounded-xl w-full'>      
       <div className='p-4'>
@@ -46,7 +48,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ answers, question, question
             ))}
           </div>
           {/* Bottom Icons */}
-          {!solving && (
+          {!solving && handleDeleteQuestion && (
             <div className='flex justify-start space-x-1 text-gray-500 border-t border-gray-200'>
               <div className="flex space-x-2 grow px-4 pt-3 rtl:space-x-reverse">
                 <span className="text-gray-500 hover:text-gray-800 cursor-pointer">
@@ -63,7 +65,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ answers, question, question
                   </span>
                 </div>
                 <div className="text-gray-500 hover:text-red-600 cursor-pointer inline mb-0.5">
-                  <span>
+                  <span onClick={() => handleDeleteQuestion(id)}>
                     <TrashIcon />
                   </span>
                 </div>

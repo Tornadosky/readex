@@ -8,7 +8,7 @@ const QuizEditor = () => {
   const [questions, setQuestions] = useState([
     {
       id: '1',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
+      question: 'Represent in the context of the neural network?',
       answers: [
         { id: '1', text: "The input and output of the activation function" },
         { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
@@ -39,63 +39,78 @@ const QuizEditor = () => {
       ],
       loading: false,
     },
-    {
-      id: '4',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '5',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '6',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '7',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    }
   ]);
+  const [generating, setGenerating] = useState<boolean>(false);
+
+  const handleBackendRequest = async (submissionData: any) => {
+    setGenerating(true);
+
+    console.log('Performing backend request with:', submissionData);
+
+    const newQuestions = [
+      {
+        id: Math.random().toString(36).substr(2, 9),
+        question: 'Represent in the context of the neural network?',
+        answers: [
+          { id: '1', text: "The input and output of the activation function" },
+          { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
+          { id: '3', text: "The input and output of the activation function" },
+          { id: '4', text: "The input and output of the activation function" }
+        ],
+        loading: true,
+      },
+      {
+        id: Math.random().toString(36).substr(2, 9),
+        question: 'Represent in the context of the neural network?',
+        answers: [
+          { id: '1', text: "The input and output of the activation function" },
+          { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
+          { id: '3', text: "The input and output of the activation function" },
+          { id: '4', text: "The input and output of the activation function" }
+        ],
+        loading: true,
+      }
+    ]
+
+    setQuestions((prevQuestions) => [
+      ...prevQuestions,
+      ...newQuestions
+    ]);
+  
+    setTimeout(() => {
+      console.log('Backend request completed');
+      // Update the loading state of the new questions
+      setQuestions((prevQuestions) => {
+        return prevQuestions.map((question) => {
+          if (question.loading) {
+            return {
+              ...question,
+              loading: false
+            }
+          }
+          return question;
+        });
+      });
+      setGenerating(false);
+    }, 2000);
+  };
 
   const handleSetActivePage = (page: string) => {
     setActivePage(page);
   };
 
-  // Render the component UI
+  const handleDeleteQuestion = (questionId: string) => {
+    setQuestions(questions.filter((question) => question.id !== questionId));
+  };
+
   return (
     <div className="flex py-4">
       <div className='p-4 ml-4 bg-gray-50 shadow-md rounded-md hover:shadow-gray-300 transition duration-200 ease-in-out' style={{ width: '50%'}}>
         <QuizMenu
           activePage={activePage} 
           handleSetActivePage={handleSetActivePage}
+          generating={generating} 
+          onSubmit={handleBackendRequest}
         />
       </div>
       {/* Question Cards */}
@@ -103,10 +118,12 @@ const QuizEditor = () => {
         {questions.map((question, index) => (
           <QuestionCard 
             key={question.id}
+            id={question.id}
             answers={question.answers} 
             question={question.question}
             question_number={index+1}
             loading={question.loading}
+            handleDeleteQuestion={handleDeleteQuestion}
             solving={false}
           />
         ))}

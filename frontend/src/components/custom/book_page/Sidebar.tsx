@@ -5,10 +5,10 @@ import TestsList from './TestsList';
 import type { IHighlight } from "./react-pdf-highlighter";
 import { CloseOutlined, PlusOutlined, InboxOutlined } from '@ant-design/icons';
 import SmallSidebar from './SmallSidebar';
-import { Dialog, Transition, Listbox } from '@headlessui/react';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { Dialog, Transition } from '@headlessui/react';
 import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';
+import Selector from './Selector';
 
 const sections = [
   { id: 1, name: 'Artificial Intelligence' },
@@ -93,6 +93,7 @@ export function Sidebar({
       id: '1',
       title: 'GRE Official Guide',
       url: '/tests/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/edit',
+      questionCount: 10,
       difficulty: 'Hard',
       lastUpdated: '2023-09-01',
       lastResult: 85,
@@ -101,6 +102,7 @@ export function Sidebar({
       id: '2',
       title: 'TOEFL Preparation Book',
       url: '/tests/54f1c2bd-ec4e-4f2e-a10e-2f639e8d8f47/edit',
+      questionCount: 5,
       difficulty: 'Medium',
       lastUpdated: '2023-08-15',
       lastResult: 60,
@@ -109,6 +111,7 @@ export function Sidebar({
       id: '3',
       title: 'GMAT Exam Guide',
       url: '/tests/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/edit',
+      questionCount: 15,
       difficulty: 'Very Hard',
       lastUpdated: '2023-10-05',
       lastResult: 45,
@@ -190,52 +193,11 @@ export function Sidebar({
                     <label className="block font-bold mb-2 text-gray-800">
                       Section
                     </label>
-                    <Listbox value={selectedSection} onChange={setSelectedSection}>
-                      <div className="relative mt-1 border border-slate-300 rounded">
-                        <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-                          <span className="block truncate">{selectedSection.name}</span>
-                          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                            <ChevronUpDownIcon
-                              className="h-5 w-5 text-gray-400"
-                              aria-hidden="true"
-                            />
-                          </span>
-                        </Listbox.Button>
-                        <Transition
-                            as={Fragment}
-                            leave="transition ease-in duration-100"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                          >
-                          <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 border border-slate-300 ring-black/5 focus:outline-none sm:text-sm">
-                            {sections.map((section) => (
-                              <Listbox.Option
-                                key={section.id}
-                                className={({ active }) =>
-                                  `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                                    active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
-                                  }`
-                                }
-                                value={section}
-                              >
-                                <span
-                                  className={`block truncate ${
-                                    selectedSection.name === section.name ? 'font-medium' : 'font-normal'
-                                  }`}
-                                >
-                                  {section.name}
-                                </span>
-                                {selectedSection.name === section.name ? (
-                                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
-                                    <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                                  </span>
-                                ) : null}
-                              </Listbox.Option>
-                            ))}
-                          </Listbox.Options>
-                        </Transition>
-                      </div>
-                    </Listbox>
+                    <Selector 
+                      options={sections.map((section) => section.name)}
+                      selected={selectedSection.name}
+                      setSelected={(value) => setSelectedSection(sections.find((section) => section.name === value) || sections[0])}
+                    />
                   </div>
 
                   <div className="border-b mt-5 mb-3 w-full" style={{ borderColor: '#d1d5db' }}></div>

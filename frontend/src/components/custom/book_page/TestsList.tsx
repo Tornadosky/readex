@@ -9,6 +9,7 @@ interface ITest {
     id: string;
     title: string;
     url: string;
+    questionCount: number;
     difficulty: string;
     lastUpdated: string;
     lastResult: number | null;
@@ -33,7 +34,7 @@ const TestsList: React.FC<TestsListProps> = ({ tests }) => {
             <button 
                 type="button" 
                 className="mt-4 inline-flex items-center px-3 border shadow-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 h-[42px] sm:h-[38px] text-sm border-transparent bg-green-600 hover:bg-green-700 text-white"
-                onClick={() => handleAddTest({ id: testsList.length.toString() + Math.floor(Math.random() * 1000).toString(), title: 'New Quiz', url: 'http://localhost:5173/tests/new', difficulty: 'easy', lastUpdated: '2021-09-01', lastResult: 0 })}
+                onClick={() => handleAddTest({ id: testsList.length.toString() + Math.floor(Math.random() * 1000).toString(), title: 'New Quiz', url: 'http://localhost:5173/tests/new', questionCount: 0, difficulty: 'easy', lastUpdated: '2021-09-01', lastResult: 0 })}
             >
                 <PlusIcon />
                 <span className="max-w-full overflow-hidden">New quiz</span>
@@ -88,20 +89,26 @@ const TestsList: React.FC<TestsListProps> = ({ tests }) => {
                     <ul role="list" className="mt-3 gap-4 md:gap-6 flex flex-col">
                         {testsList.map((test, index) => (
                             <li key={test.id || index} className="flex shadow-sm rounded-md hover:shadow-gray-300 transition duration-200 ease-in-out hover:!shadow-md w-full">
-                                {/* Adjusted structure for valid HTML and accessibility */}
-                                <a className="flex flex-shrink-0 rounded-l-md overflow-hidden" href={`http://localhost:5173/tests/${test.id}/edit`}>
+                                <div 
+                                    className="flex flex-shrink-0 rounded-l-md overflow-hidden cursor-pointer"
+                                    onClick={() => navigate(`/tests/${test.id}/play`)}
+                                >
                                     <div className={`flex items-center justify-center w-16 text-white text-sm font-medium ${test.lastResult ? (test.lastResult >= 80 ? '!bg-green-500' : test.lastResult >= 50 ? '!bg-yellow-500' : '!bg-red-500') : '!bg-zinc-500'}`}>
                                         <div className="flex flex-col justify-center items-center">
-                                            {/* Ensure EducationIcon is properly imported or defined */}
                                             <EducationIcon aria-label="Quiz Icon" />
                                             <div className="mt-1 text-white !text-xs">Quiz</div>
                                         </div>
                                     </div>
-                                </a>
+                                </div>
                                 <div className="flex-1 flex items-center justify-between border-t border-r border-b border-gray-200 bg-white rounded-r-md truncate">
                                     <div className="flex-1 overflow-hidden group">
                                         <div className="px-4 text-sm truncate py-4 space-y-2 pb-3">
-                                            <div className="text-gray-700 font-medium hover:text-gray-600 truncate text-left">{test.title}</div>
+                                            <div className="text-gray-700 font-medium hover:text-gray-600 truncate text-left">
+                                                {test.title}
+                                                <span className={`ml-4 inline-flex text-xs text-gray-700 leading-5 font-semibold`}>
+                                                    {test.questionCount.toString()} {test.questionCount === 1 ? 'question' : 'questions'}
+                                                </span>
+                                            </div>
                                             <div className="flex items-center justify-between">
                                                 <span className="text-gray-500">Difficulty: {test.difficulty}</span>
                                                 {/* <span className="text-gray-500">Last Updated: {test.lastUpdated}</span> */}

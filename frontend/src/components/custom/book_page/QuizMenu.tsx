@@ -76,6 +76,7 @@ const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage, ge
                                     options={['Multiple Choice', 'True or False', 'Short Answer', 'Fill in the Blank', 'Matching']}
                                     selected={selectedQuestionType}
                                     setSelected={setSelectedQuestionType}
+                                    disabled={false}
                                 />
                             </div>
                         </div>
@@ -88,6 +89,7 @@ const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage, ge
                                     options={['English', 'Spanish', 'French', 'German', 'Italian', 'Russian']}
                                     selected={selectedLanguage}
                                     setSelected={setSelectedLanguage}
+                                    disabled={false}
                                 />
                             </div>
                         </div>
@@ -100,6 +102,7 @@ const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage, ge
                                     options={['Easy', 'Medium', 'Hard']}
                                     selected={selectedDifficulty}
                                     setSelected={setSelectedDifficulty}
+                                    disabled={false}
                                 />
                             </div>
                         </div>
@@ -112,6 +115,7 @@ const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage, ge
                                     options={['5', '10', '15', '20', '25']}
                                     selected={selectedQuestionsNumber.toString()}
                                     setSelected={(value) => setSelectedQuestionsNumber(parseInt(value))}
+                                    disabled={false}
                                 />
                             </div>
                         </div>

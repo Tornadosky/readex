@@ -11,11 +11,11 @@ interface IBook {
 }
 
 interface BooksListProps {
-  books: Array<IBook>;
+  booksList: Array<IBook>;
+  setBooksList: (value: any) => void;
 }
 
-const BooksList: React.FC<BooksListProps> = ({ books }) => {
-    const [booksList, setBooksList] = useState<Array<IBook>>(books);
+const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
     const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
     const [editingBookId, setEditingBookId] = useState<string | null>(null);
     const [editingTitle, setEditingTitle] = useState("");
@@ -29,7 +29,7 @@ const BooksList: React.FC<BooksListProps> = ({ books }) => {
     const handleMenuClick: MenuProps['onClick'] = (e) => {
       console.log('click', e);
       if (e.key === '3' && selectedBookId) { // If "Delete" is clicked
-        setBooksList(currentBooks => currentBooks.filter(book => book.id !== selectedBookId));
+        setBooksList((currentBooks: any) => currentBooks.filter((book: any) => book.id !== selectedBookId));
         setSelectedBookId(null);
       } 
       if (e.key === '2' && selectedBookId) { // If "Rename" is clicked

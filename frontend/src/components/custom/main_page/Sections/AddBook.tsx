@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useState, useRef } from "react";
 import { PlusIcon } from '../../../../assets/svg';
 import "./style.css";
 
@@ -17,6 +17,7 @@ export const AddBook: React.FC<AddBookProps> = ({
   setGlobalLoading,
   setLoading,
 }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const fileInputRef = useRef<any>(null);
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {

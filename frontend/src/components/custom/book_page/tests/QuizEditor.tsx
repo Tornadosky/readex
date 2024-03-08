@@ -105,7 +105,7 @@ const QuizEditor = () => {
 
   return (
     <div className="flex py-4">
-      <div className='p-4 ml-4 bg-gray-50 shadow-md rounded-md hover:shadow-gray-300 transition duration-200 ease-in-out' style={{ width: '50%'}}>
+      <div className='p-4 ml-4 bg-gray-50 shadow-md rounded-md hover:shadow-gray-300 transition duration-200 ease-in-out' style={{ width: '50%', minHeight: '95vh' }}>
         <QuizMenu
           activePage={activePage} 
           handleSetActivePage={handleSetActivePage}

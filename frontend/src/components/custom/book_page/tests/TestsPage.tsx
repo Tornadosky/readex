@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Sidebar } from './Sidebar'; 
-import './style.css';
+import { Sidebar } from '../Sidebar'; 
+import '../style.css';
 
-import type { IHighlight } from "./react-pdf-highlighter";
-import { testHighlights as _testHighlights } from "./test-highlights";
+import type { IHighlight } from "../react-pdf-highlighter";
+import { testHighlights as _testHighlights } from "../test-highlights";
 import QuizEditor from './QuizEditor';
 import QuizSolver from './QuizSolver';
 // TODO: Delete this and implement inside Sidebar
@@ -41,9 +41,9 @@ const TestPage: React.FC<TestPageProps> = ({ isSolving }) => {
     <div className="App" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <div style={{ display: 'flex', height: '100%' }}>
         <Sidebar 
-            highlights={highlights}
-            resetHighlights={resetHighlights}
-            toggleDocument={toggleDocument}
+          highlights={highlights}
+          resetHighlights={resetHighlights}
+          toggleDocument={toggleDocument}
         />
         
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>

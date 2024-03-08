@@ -1,7 +1,7 @@
 import { useState } from 'react'; 
 import HighlightsList from './HighlightsList'; 
 import BooksList from './BooksList';
-import TestsList from './TestsList';
+import TestsList from './tests/TestsList';
 import type { IHighlight } from "./react-pdf-highlighter";
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import SmallSidebar from './SmallSidebar';

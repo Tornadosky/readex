@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Selector from './Selector';
+import Selector from '../Selector';
 import { LoadingIcon } from '@/assets/svg';
 
 interface QuizMenuProps {

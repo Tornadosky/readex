@@ -23,20 +23,20 @@ const SmallSidebar = ({ handleViewChange, view } : SmallSidebarProps) => {
 
     return (
         <div className="small-sidebar">
-            <div className="flex flex-col items-center w-16 h-full overflow-hidden text-gray-700 bg-gray-100 rounded border-r">
+            <div className="flex flex-col items-center w-16 h-full overflow-hidden text-gray-700 bg-gray-100 border-r dark:bg-slate-800 dark:text-gray-200">
                 <a className="flex items-center justify-center mt-3" href="#">
                     <LogoIcon />
                 </a>
-                <div className="flex flex-col items-center mt-3 border-t border-gray-300">
+                <div className="flex flex-col items-center mt-3 border-t border-gray-300 dark:border-gray-600">
                     <SidebarIcon name={'Books'} active={view === "Books"} icon={PDFIcon} onClick={handleViewChange('Books')} />
                     <SidebarIcon name={'Notes'} active={view === "Notes"} icon={NotesIcon} onClick={handleViewChange('Notes')} />
                     <SidebarIcon name={'Tests'} active={view === "Tests"} icon={TestIcon} onClick={handleViewChange('Tests')} />
                 </div>
                 <div className="mt-auto">
-                    <a className="flex items-center justify-center w-16 h-16" onClick={toggleTheme}>
+                    <a className="flex items-center justify-center w-16 h-16 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700" onClick={toggleTheme}>
                         {theme === 'light' ? (<SunOutlined style={{fontSize: "1.4rem"}} />) : (<MoonOutlined style={{fontSize: "1.4rem"}} />)}
                     </a>
-                    <a className="flex items-center justify-center w-16 h-16 bg-gray-200 hover:bg-gray-300" href="/home">
+                    <a className="flex items-center justify-center w-16 h-16 bg-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 dark:bg-slate-900" href="/home">
                         <HomeIcon />
                     </a>
                 </div>

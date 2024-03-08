@@ -64,7 +64,7 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
         setTimeout(() => {
             message.success('File uploaded and section updated successfully');
             setBooksList((prevBooksList: any) => {
-                return [...prevBooksList, { id: Math.random().toString(36).substring(2, 4), title: uploadedFile, url: 'https://example.com/' }];
+                return [...prevBooksList, { id: Math.random().toString(36).substring(2, 4), title: uploadedFile.replace('.pdf', ''), url: 'https://example.com/' }];
             });
             setUploading(false);
             setIsModalOpen(false);
@@ -108,8 +108,8 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                             <Selector 
                                 options={sections.map((section) => section.name)}
                                 selected={selectedSection.name}
-                                setSelected={(value) => setSelectedSection(sections.find((section) => section.name === value) || sections[0])}
                                 disabled={disabled}
+                                setSelected={(value) => setSelectedSection(sections.find((section) => section.name === value) || sections[0])}
                             />
                         </div>
 

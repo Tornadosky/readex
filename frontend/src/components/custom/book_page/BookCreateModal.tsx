@@ -15,10 +15,10 @@ interface Props {
     setSelectedSection: (value: any) => void;
     sections: Array<any>;
     disabled: boolean;
-    setBooksList: (value: any) => void;
+    onSubmit: (file: string) => void; // change to file type
 }
 
-const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selectedSection, setSelectedSection, sections, disabled , setBooksList }) => {
+const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selectedSection, setSelectedSection, sections, disabled , onSubmit }) => {
     const [uploadedFile, setUploadedFile] = useState('');
     const [uploading, setUploading] = useState(false);
 
@@ -35,7 +35,6 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
         },
         onChange(info) {
           const { status } = info.file;
-          console.log("asdfadf", status);
           if (status !== 'uploading') {
             console.log(info.file, info.fileList);
           }
@@ -63,17 +62,21 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
         // Mock backend call delay
         setTimeout(() => {
             message.success('File uploaded and section updated successfully');
-            setBooksList((prevBooksList: any) => {
-                return [...prevBooksList, { id: Math.random().toString(36).substring(2, 4), title: uploadedFile.replace('.pdf', ''), url: 'https://example.com/' }];
-            });
+            onSubmit(uploadedFile);
             setUploading(false);
+            setUploadedFile('');
             setIsModalOpen(false);
         }, 2000);
     };
 
+    const handleClosed = () => {
+        setUploadedFile('');
+        setIsModalOpen(false);
+    }
+
     return (
         <Transition appear show={isModalOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={() => {setIsModalOpen(false)}}>
+            <Dialog as="div" className="relative z-10" onClose={handleClosed}>
             <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -99,7 +102,7 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                 >
                     <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all" style={{ minWidth: "70vh" }}>
                         <div className='absolute top-2 right-4 '>
-                            <CloseOutlined onClick={() => {setIsModalOpen(false)}} className="cursor-pointer text-gray-400 hover:text-gray-500 rounded" />
+                            <CloseOutlined onClick={handleClosed} className="cursor-pointer text-gray-400 hover:text-gray-500 rounded" />
                         </div>
                         <div>
                             <label className="block font-bold mb-2 text-gray-800">

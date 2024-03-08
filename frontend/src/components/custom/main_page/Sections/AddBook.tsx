@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { PlusIcon } from '../../../../assets/svg';
 import "./style.css";
+import BookCreateModal from "../../book_page/BookCreateModal";
 
 interface AddBookProps {
   onFileSelect: (file: any, newId: number, coverImage: string) => void;
@@ -63,10 +64,11 @@ export const AddBook: React.FC<AddBookProps> = ({
     };
   
     const handleAddBook = () => {
-      if (!(globalLoading > 0) && fileInputRef.current) {
-        fileInputRef.current.value = null;
-        fileInputRef.current.click();
-      }
+      // if (!(globalLoading > 0) && fileInputRef.current) {
+      //   fileInputRef.current.value = null;
+      //   fileInputRef.current.click();
+      // }
+      setIsModalOpen(true);
     };
 
     return (
@@ -80,6 +82,19 @@ export const AddBook: React.FC<AddBookProps> = ({
           onChange={handleFileChange}
           style={{ display: "none" }}
           accept=".pdf"
+        />
+
+        <BookCreateModal
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          selectedSection={{name: 'Artificial Intelligence'}}
+          setSelectedSection={() => {}}
+          sections={[]}
+          disabled={true}
+          onSubmit={(filename) => {
+            console.log("Uploading", filename, "to section", "Artificial Intelligence");
+            setLoading(true);
+          }}
         />
       </div>
     );

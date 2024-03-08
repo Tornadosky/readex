@@ -152,7 +152,16 @@ export function Sidebar({
         setSelectedSection={setSelectedSection}
         sections={sections}
         disabled={false}
-        setBooksList={setBooksList}
+        onSubmit={(filename) => {
+          setBooksList((prevBooks) => [
+            ...prevBooks,
+            {
+              id: Math.random().toString(36).substring(2, 4),
+              title: filename.replace('.pdf', ''),
+              url: '/pdfs/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/view',
+            }
+          ]);
+        }}
       />
     </>
   );

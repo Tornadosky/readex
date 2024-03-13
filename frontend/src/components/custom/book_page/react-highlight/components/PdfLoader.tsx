@@ -33,20 +33,21 @@ export class PdfLoader extends Component<Props, State> {
   documentRef = React.createRef<HTMLElement>();
 
   componentDidMount() {
-    console.log("URL Mounted");
+    console.log("Loader Mounted");
     this.load();
   }
 
   componentWillUnmount() {
     const { pdfDocument: discardedDocument } = this.state;
     if (discardedDocument) {
+      console.log("Loader Unmounted");
       discardedDocument.destroy();
     }
   }
 
   componentDidUpdate({ url }: Props) {
     if (this.props.url !== url) {
-      console.log("URL updated");
+      console.log("Loader updated");
       this.load();
     }
   }

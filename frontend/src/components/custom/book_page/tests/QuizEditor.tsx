@@ -48,6 +48,17 @@ const QuizEditor = () => {
       ],
       loading: false,
     },
+    {
+      id: '4',
+      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
+      answers: [
+        { id: '1', text: "The input and output of the activation function" },
+        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
+        { id: '3', text: "The input and output of the activation function" },
+        { id: '4', text: "The input and output of the activation function" }
+      ],
+      loading: false,
+    },
   ]);
   const [generating, setGenerating] = useState<boolean>(false);
 

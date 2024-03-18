@@ -3,8 +3,17 @@ import QuestionCard from './QuestionCard';
 import { SuccessIcon } from '@/assets/svg';
 import QuizMenu from './QuizMenu';
 
+interface Question {
+  id: string;
+  question: string;
+  option_1: string;
+  option_2: string;
+  option_3: string;
+  option_4: string;
+}
+
 const QuizEditor = () => {
-  const [activePage, setActivePage] = useState('Uploads');
+  const [activePage, setActivePage] = useState('URL');
   const [questions, setQuestions] = useState([
     {
       id: '1',
@@ -76,23 +85,39 @@ const QuizEditor = () => {
       ...prevQuestions,
       ...newQuestions
     ]);
-  
-    setTimeout(() => {
-      console.log('Backend request completed');
-      // Update the loading state of the new questions
-      setQuestions((prevQuestions) => {
-        return prevQuestions.map((question) => {
-          if (question.loading) {
-            return {
-              ...question,
-              loading: false
-            }
-          }
-          return question;
-        });
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/generate-questions/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData),
       });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const newQuestions = await response.json();
+  
+      setQuestions((prevQuestions) => [
+        ...prevQuestions,
+        ...newQuestions.map((question: Question) => ({
+            id: Math.random().toString(36).substr(2, 9),
+            question: question.question,
+            answers: [{id: Math.random().toString(36).substr(2, 9), text: question.option_1.replace(/\s?[a-d]\)\s?/, '')},
+              {id: Math.random().toString(36).substr(2, 9), text: question.option_2.replace(/\s?[a-d]\)\s?/, '')},
+              {id: Math.random().toString(36).substr(2, 9), text: question.option_3.replace(/\s?[a-d]\)\s?/, '')},
+              {id: Math.random().toString(36).substr(2, 9), text: question.option_4.replace(/\s?[a-d]\)\s?/, '')}],
+            loading: false }))
+      ]);
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+    } finally {
       setGenerating(false);
-    }, 2000);
+      setQuestions(prevQuestions => prevQuestions.filter(question => !question.loading));
+    }
   };
 
   const handleSetActivePage = (page: string) => {

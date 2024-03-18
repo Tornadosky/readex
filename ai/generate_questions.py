@@ -59,13 +59,13 @@ def generate_and_parse_questions(text, question_number=2, difficulty="hard"):
     output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
     format_instructions = output_parser.get_format_instructions()
 
-    chat_model = ChatOpenAI(temperature=0, model_name = 'gpt-3.5-turbo')
+    chat_model = ChatOpenAI(temperature=0.2, model_name = 'gpt-3.5-turbo')
     #chat_model = ChatOpenAI(temperature=0.3, model_name = 'gpt-4')
 
     
     template = """
         You are a teacher preparing questions for a quiz. Given the following document, please generate {question_number} multiple-choice questions (MCQs) of {difficulty} difficulty with 4 options and a corresponding answer letter based on the document.
-        These questions should be detailed and solely based on the information provided in the document.
+        These questions should be detailed and solely based on the information provided in the document. Answer option should be located under random option (a, b, c, or d).
         \n{format_instructions}\n{user_prompt}.
     """
 
@@ -83,5 +83,5 @@ def generate_and_parse_questions(text, question_number=2, difficulty="hard"):
     parsed_questions = parse_json_like(user_query_output.content)
     return parsed_questions
 
-print(generate_and_parse_questions(text))
+#print(generate_and_parse_questions(text))
 

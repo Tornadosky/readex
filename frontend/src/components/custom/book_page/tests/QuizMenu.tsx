@@ -17,10 +17,11 @@ const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage, ge
 
     const handleSubmit = () => {
         const submissionData = {
-            questionType: selectedQuestionType,
+            question_type: selectedQuestionType,
             language: selectedLanguage,
             difficulty: selectedDifficulty,
-            questionsNumber: selectedQuestionsNumber,
+            question_number: 2,//selectedQuestionsNumber,
+            text: "Adoption of 3D printing has reached critical mass as those who have yet to integrate additive manufacturing somewhere in their supply chain are now part of an ever-shrinking minority. Where 3D printing was only suitable for prototyping and one-off manufacturing in the early stages, it is now rapidly transforming into a production technology. Most of the current demand for 3D printing is industrial in nature. Acumen Research and Consulting forecasts the global 3D printing market to reach $41 billion by 2026. As it evolves, 3D printing technology is destined to transform almost every major industry and change the way we live, work, and play in the future."
         };
         onSubmit(submissionData);
     };
@@ -47,29 +48,41 @@ const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage, ge
                 {activePage === 'Text' && <div>Text Content</div>}
                 {activePage === 'URL' && (
                 <div>
-                    <div className="mb-4">
-                        <label className="block font-bold text-gray-800">
-                            URL
-                        </label>
-                        <div className="flex mt-1 rounded-md shadow-sm">
-                            <input
-                            type="text"
-                            name="url"
-                            id="url"
-                            x-model="formData.url"
-                            placeholder="E.g. https://en.wikipedia.org/wiki/Physics"
-                            className="flex-1 block w-full min-w-0 border border-gray-300 rounded-md text-gray-800 focus:border-indigo-500 focus:ring-indigo-500 mt-1 p-2"
-                            />
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label className="block font-bold text-gray-800">
+                                Section
+                            </label>
+                            <div className="mt-1 rounded-md shadow-sm">
+                                <Selector 
+                                    options={['Multiple Choice', 'True or False', 'Short Answer', 'Fill in the Blank', 'Matching']}
+                                    selected={selectedQuestionType}
+                                    setSelected={setSelectedQuestionType}
+                                    disabled={false}
+                                />
+                            </div>
                         </div>
-                        <div className="mt-2 text-sm">
-                            The URL must be publicly accessible and not behind a login.
+                        <div>
+                            <label className="block font-bold text-gray-800">
+                                Book Name
+                            </label>
+                            <div className="mt-1 rounded-md shadow-sm">
+                                <Selector 
+                                    options={['English', 'Spanish', 'French', 'German', 'Italian', 'Russian']}
+                                    selected={selectedLanguage}
+                                    setSelected={setSelectedLanguage}
+                                    disabled={false}
+                                />
+                            </div>
                         </div>
                     </div>
+
+                    <div className='border-b border-gray-200 dark:border-gray-700 mt-8 mb-7'></div>
                 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block font-bold text-gray-800">
-                            Question type
+                                Question type
                             </label>
                             <div className="mt-1 rounded-md shadow-sm">
                                 <Selector 

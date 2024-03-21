@@ -130,6 +130,7 @@ class PdfViewer extends Component<{ url: string, highlights: any, setHighlights:
     const rgbColor = newColor.toRgbString();
     this.setState({ color: rgbColor });
     console.log("Color change", rgbColor);
+    document.documentElement.style.setProperty("--text-selection-color", rgbColor);
   };
 
   handlePageInput = (e: any) => {

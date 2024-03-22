@@ -4,6 +4,31 @@
 
 When creating GraphQL requests, feel free to use [shema](./schema.graphql) to find names and logic.
 
+# Get pdf
+
+POST request on ``` /getbook ```
+with body ``` { "document": "__data_from_db__"} ```
+where ```__data_from_db__``` is field from response on achieving the book.
+
+### Example
+request:
+```
+{
+    "document": "./uploads/1/aaBook1.pdf"
+}
+```
+response:
+* on success:
+application/pdf data
+* on error:
+```
+{
+	"error": "Error: file not found: ./uploads/1/aaBook1.pdf"
+}
+```
+
+
+
 # Get data
 
 Either
@@ -43,8 +68,8 @@ response:
 
 # Create, Update, Delete
 
-Create - has no *id* parameter
-Update - has *id* parameter
+* Create - has no *id* parameter
+* Update - has *id* parameter
 
 Always ``` mutation {} ```
 
@@ -211,7 +236,7 @@ Name(Parameter: Type): Returning_Table
 ```
 
 
-* Get nested data
+# Get nested data
 
 Works with one-to-many and one-to-one.
 May be some problems with many-to-many.

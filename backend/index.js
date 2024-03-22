@@ -96,6 +96,18 @@ router.get('/graphql', graphqlHTTP({
     schema: schema,
     graphiql: true
 }));
+router.post('/getbook', (ctx, next) => {
+    let path = ctx.request.body.document;
+    if (fs.existsSync(path)) {
+        ctx.response.type = 'application/pdf';
+        let pdf = fs.createReadStream(path);
+        console.log(pdf);
+        ctx.body = pdf;
+    } else {
+        ctx.status = 404;
+        ctx.body = { error: "Error: file not found: " + path };
+    }
+});
 
 app.use(router.routes()).use(router.allowedMethods());
 

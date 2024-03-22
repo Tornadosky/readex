@@ -1,10 +1,10 @@
-* Database base info
+* Database base info *
 
 [DB Diagram](./readex_dbd.png "Readex Database Diagram")
 
 When creating GraphQL requests, feel free to use [shema](./schema.graphql) to find names and logic.
 
-* Get data
+* Get data *
 
 Either
 ``` query {} ```

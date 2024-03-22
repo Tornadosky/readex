@@ -1,10 +1,10 @@
-* Database base info *
+# Database base info 
 
 [DB Diagram](./readex_dbd.png "Readex Database Diagram")
 
 When creating GraphQL requests, feel free to use [shema](./schema.graphql) to find names and logic.
 
-* Get data *
+# Get data
 
 Either
 ``` query {} ```
@@ -17,7 +17,7 @@ Next is table name (Books, Users, Collections etc.)
 And name all fields you want to get
 ``` id title ``` or ``` id, title ```
 
-*** Example
+### Example
 request:
 ```
 query {
@@ -41,7 +41,7 @@ response:
 ```
 
 
-* Create, Update, Delete
+# Create, Update, Delete
 
 Create - has no *id* parameter
 Update - has *id* parameter
@@ -55,7 +55,7 @@ With or without commas
 Add fields you want to get in response:
 ``` id name ```
 
-*** Example *Create*
+### Example ***Create***
 request:
 ```
 mutation {
@@ -76,7 +76,7 @@ response:
 }
 ```
 
-*** Error if creating with already existing name
+### Error if creating with already existing name
 request:
 ```
 mutation {
@@ -108,7 +108,7 @@ response:
 }
 ```
 
-*** Example *Update*
+### Example ***Update***
 request:
 ```
 mutation {
@@ -129,7 +129,7 @@ response:
 }
 ```
 
-*** Example *Delete*
+### Example ***Delete***
 request:
 ```
 mutation {
@@ -150,7 +150,7 @@ response (returns deleted values):
 }
 ```
 
-*** Error if delete not existing record
+### Error if delete not existing record
 request:
 ```
 mutation {
@@ -182,7 +182,7 @@ response (returns deleted values):
 }
 ```
 
-* How to find names and parameters
+# How to find names and parameters
 
 In file [schema.graphql](./schema.graphql)
 For queries (aka *Select*) - from line 103
@@ -216,7 +216,7 @@ Name(Parameter: Type): Returning_Table
 Works with one-to-many and one-to-one.
 May be some problems with many-to-many.
 
-*** Example *Query*
+### Example ***Query***
 request:
 ```
 { Highlights {
@@ -266,7 +266,7 @@ response:
 }
 ```
 
-*** Example *Mutation*
+### Example ***Mutation***
 request:
 ```
 mutation {
@@ -291,7 +291,7 @@ response:
 
 
 
-* Important tips
+# Important tips
 
 1) on query *Questions(test user)* must be both
 2) same with *Words(color user)* and *Words(word user)*

@@ -16,13 +16,15 @@ model Users {
   email     String @unique
   password  String
   phone     String?
-  comments  Comments[]
-  bookmarks Bookmarks[]
   highlights Highlights[]
   collections Collections[]
   words     Words[]
   tests     Tests[]
   achievements AchievementsOnUsers[]
+  language  String
+  theme     String
+  openedBooks Books[] @relation("openedBooks")
+  books     Books[] @relation("bookOwner")
 }
 
 model Books {
@@ -30,10 +32,14 @@ model Books {
   title     String
   author    String?
   document  String
-  comments  Comments[]
-  bookmarks Bookmarks[]
+  image     String?
   highlights Highlights[]
   collections BooksOnCollections[]
+  uploaded  String
+  openedBooks Users @relation("openedBooks", fields: [isOpened], references: [id])
+  isOpened  Int
+  user      Users @relation("bookOwner", fields: [userid], references: [id]) 
+  userid    Int   
 }
 
 model Achievements {
@@ -45,11 +51,11 @@ model Achievements {
 
 model Positions {
   id            Int @id @default(autoincrement())
-  page          Int
-  line          Int
-  symbol        Int
-  comments      Comments[]
-  bookmarks     Bookmarks[]
+  page          Int?
+  line          Int?
+  symbol        Int?
+  coordinateX Int?
+  coordinateY Int?
   highlightsfrom Highlights[] @relation("positionsOnHighlightsFrom")
   highlightsto Highlights[] @relation("positionsOnHighlightsTo")
 }
@@ -60,28 +66,7 @@ model Collections {
   user            Users @relation(fields: [userid], references: [id]) 
   userid          Int
   books           BooksOnCollections[]
-}
-
-model Comments {
-  id           Int @id @default(autoincrement())
-  book         Books @relation(fields: [bookid], references: [id])
-  bookid       Int
-  user         Users @relation(fields: [userid], references: [id])
-  userid       Int
-  position     Positions @relation(fields: [positionid], references: [id])
-  positionid   Int
-  text         String
-}
-
-model Bookmarks {
-  id            Int @id @default(autoincrement())
-  title         String
-  position      Positions @relation(fields: [positionid], references: [id])
-  positionid    Int
-  book          Books @relation(fields: [bookid], references: [id])
-  bookid        Int
-  user          Users @relation(fields: [userid], references: [id])
-  userid        Int
+  tests           TestsOnCollections[]
 }
 
 model Highlights {
@@ -94,6 +79,9 @@ model Highlights {
   fromid         Int
   to             Positions @relation("positionsOnHighlightsTo", fields: [toid], references: [id])
   toid           Int
+  title          String
+  text           String
+  color          String
 }
 
 model Words {
@@ -104,6 +92,8 @@ model Words {
   translation String
   user      Users @relation(fields: [userid], references: [id])
   userid    Int
+  test      Tests @relation(fields: [testid], references: [id])
+  testid    Int
 }
 
 model Tests {
@@ -115,6 +105,8 @@ model Tests {
   user      Users @relation(fields: [userid], references: [id])
   userid    Int
   questions Questions[]
+  collections TestsOnCollections[]
+  words     Words[]
 }
 
 model Questions {
@@ -138,10 +130,19 @@ model AchievementsOnUsers {
 }
 
 model BooksOnCollections {
-  book                    Books @relation(fields: [bookid], references: [id])
-  bookid                  Int
+  book                   Books @relation(fields: [bookid], references: [id])
+  bookid                 Int
+  collection             Collections @relation(fields: [collectionid], references: [id])
+  collectionid           Int
+  position               Int
+  @@id([bookid, collectionid])
+}
+
+model TestsOnCollections {
+  test                   Tests @relation(fields: [testid], references: [id])
+  testid                 Int
   collection             Collections @relation(fields: [collectionid], references: [id])
   collectionid           Int
 
-  @@id([bookid, collectionid])
+  @@id([testid, collectionid])
 }

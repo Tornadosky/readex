@@ -7,17 +7,18 @@ const {
     graphql,
     buildSchema
 } = require('graphql');
+const resolver = require('./resolver');
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const session = require('koa-session');
 
 const dotenv = require('dotenv');
-dotenv.config();
+//dotenv.config();
 
 const app = new koa();
 const router = new koaRouter();
-app.keys = ['nohornyplease'];
+/*app.keys = ['nohornyplease'];
 const sessionConfig = {
   key: 'koa:sess', // the cookie key name (default is koa:sess)
   maxAge: 86400000, // 1 day in milliseconds
@@ -29,7 +30,7 @@ const sessionConfig = {
                  // Default is false.
   renew: false, // renew session when session is nearly expired, so we can always keep user logged in. Default is false.
 };
-app.use(session(sessionConfig, app));
+app.use(session(sessionConfig, app));*/
 app.use(koaBody());
 
 router.get("/test", (ctx) => {
@@ -39,16 +40,16 @@ router.get("/test", (ctx) => {
 //app.use(passport.initialize());
 //app.use(passport.session());
 
-passport.serializeUser(function(user, done) {
+/*passport.serializeUser(function(user, done) {
     console.log('Serializing user' + user.profile.displayName);
     done(null, user);
 });
 passport.deserializeUser(function(user, done) {
     console.log('Deserializing user' + user.profile.displayName);
     done(null, user);
-});
+});*/
 
-passport.use(
+/*passport.use(
     new GoogleStrategy({
             clientID: process.env.CLIENT_ID,
             clientSecret: process.env.CLIENT_SECRET,
@@ -56,7 +57,7 @@ passport.use(
         },
         (token, refreshToken, profile, done) => { done(null, {profile: profile, token: token}); }
     )
-);
+);*/
 
 router.get(
     '/auth/google',
@@ -88,9 +89,13 @@ router.get('/logout', (ctx, next) => {
 const schema = buildSchema(fs.readFileSync('./schema.graphql').toString());
 router.post('/graphql', graphqlHTTP({
     schema: schema,
-    graphiql: true,
+    rootValue: resolver,
   })
 );
+router.get('/graphql', graphqlHTTP({
+    schema: schema,
+    graphiql: true
+}));
 
 app.use(router.routes()).use(router.allowedMethods());
 

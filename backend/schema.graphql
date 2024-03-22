@@ -9,13 +9,14 @@ type Users {
   email: String!
   password: String!
   phone: String
-  comments: [Comments!]!
-  bookmarks: [Bookmarks!]!
   highlights: [Highlights!]!
   collections: [Collections!]!
   words: [Words!]!
   tests: [Tests!]!
   achievements: [Achievements!]!
+  language: String!
+  theme: String!
+  openedBooks: [Books!]!
 }
 
 type Books {
@@ -23,28 +24,28 @@ type Books {
   title: String!
   author: String
   document: String!
-  comments: [Comments!]!
-  bookmarks: [Bookmarks!]!
+  image: String
   highlights: [Highlights!]!
   collections: [Collections!]!
+  uploaded: String!
+  user: Users!
 }
 
 type Achievements {
   id: ID!
   name: String!
   description: String!
-  users: [Users!]!
+  users: [Users!]
 }
 
 type Positions {
   id: ID!
-  page: Int!
-  line: Int!
-  symbol: Int!
-  comments: [Comments!]!
-  bookmarks: [Bookmarks!]!
-  highlightsFrom: [Highlights!]!
-  highlightsTo: [Highlights!]!
+  page: Int
+  line: Int
+  symbol: Int
+  coordinateXfrom: Int
+  coordinateYfrom: Int
+  highlights: [Highlights!]!
 }
 
 type Collections {
@@ -52,22 +53,7 @@ type Collections {
   title: String!
   user: Users!
   books: [Books!]!
-}
-
-type Comments {
-  id: ID!
-  book: Books!
-  user: Users!
-  position: Positions!
-  text: String!
-}
-
-type Bookmarks {
-  id: ID!
-  title: String!
-  position: Positions!
-  book: Books!
-  user: Users!
+  tests: [Tests!]!
 }
 
 type Highlights {
@@ -76,6 +62,9 @@ type Highlights {
   user: Users!
   from: Positions!
   to: Positions!
+  title: String
+  text: String
+  color: String!
 }
 
 type Words {
@@ -85,6 +74,7 @@ type Words {
   description: String
   translation: String
   user: Users!
+  test: Tests!
 }
 
 type Tests {
@@ -95,6 +85,7 @@ type Tests {
   difficulty: String!
   user: Users!
   questions: [Questions!]!
+  collections: [Collections!]!
 }
 
 type Questions {
@@ -110,92 +101,117 @@ type Questions {
 
 
 type Query {
-  Books: [Books]
-  Comments: [Comments]
-  Bookmarks: [Bookmarks]
-  Highlights: [Highlights]
-  Collections: [Collections]
-  Positions: [Positions]
-  Users: [Users]
-  Achievements: [Achievements]
-  Tests: [Tests]
-  Words: [Words]
-  Questions: [Questions]
+  Books(id: Int title: String author: String, user: Int): [Books]
+  Highlights(id: Int, book: Int, user: Int): [Highlights]
+  Collections(id: Int, title: String, user: Int): [Collections]
+  Positions(id: Int!): Positions
+  Users(id: Int, login: String, password: String, email: String, phone: String): [Users]
+  Achievements(id: Int, name: String, users: Int): [Achievements]
+  Tests(id: Int, user: Int, title: String): [Tests]
+  Words(id: Int, color: String, word: String, user: Int): [Words]
+  Questions(id: Int, test: Int, user: Int): [Questions]
+}
+
+input iAchievements {
+  id: ID
+  name: String
+  description: String
+}
+input iPositions {
+  id: ID
+  page: Int
+  line: Int
+  symbol: Int
+  coordinateXfrom: Int
+  coordinateYfrom: Int
 }
 
 type Mutation {
-  updateBook(id: Int
+  setBook(id: Int
     title: String
     author: String
     document: String
-  ): [Books]
-  updateUser(
+    image: String
+    highlights: [Int]
+    collections: [Int]
+    user: Int!
+  ): Books
+  setUser(
     id: ID
     login: String
     email: String
     password: String
     phone: String
+    language: String
+    theme: String
+    achievements: [iAchievements]
+    openedBooks: [Int]
   ): Users
-  updateAchievement(
+  setAchievement(
     id: ID
     name: String
     description: String
+    user: Int
   ): Achievements
-  updatePosition(
+  setPosition(
     id: ID
     page: Int
     line: Int
     symbol: Int
+    coordinateX: Int
+    coordinateY: Int
   ): Positions
-  updateCollection(
+  setCollection(
     id: ID
     title: String
-    user: ID
+    user: Int
+    books: [Int]
+    tests: [Int]
   ): Collections
-  updateComment(
+  setHighlight(
     id: ID
-    book: ID
-    user: ID
-    position: ID
-    text: String
-  ): Comments
-  updateBookmark(
-    id: ID
+    book: Int
+    user: Int
+    from: iPositions
+    to: iPositions
     title: String
-    position: ID
-    book: ID
-    user: ID
-  ): Bookmarks
-  updateHighlight(
-    id: ID
-    book: ID
-    user: ID
-    from: ID
-    to: ID
+    text: String
+    color: String
   ): Highlights
-  updateWord(
+  setWord(
     id: ID
     color: String
     word: String
     description: String
     translation: String
-    user: ID
+    user: Int
+    test: Int
   ): Words
-  updateTest(
+  setTest(
     id: ID
     title: String
     prompt: String
     language: String
     difficulty: String
-    user: ID
+    user: Int
   ): Tests
-  updateQuestion(
+  setQuestion(
     id: ID
-    test: ID
+    test: Int
     number: Int
     type: String
     answers: String
     correct: String
     explanation: String
   ): Questions
+
+  delUser(id: Int!): Users
+  delBook(id: Int!): Books
+  delAchievement(id: Int!): Achievements
+  delPosition(id: Int!): Positions
+  delCollection(id: Int!): Collections
+  delHighlight(id: Int!): Highlights
+  delWord(id: Int!): Words
+  delTest(id: Int!): Tests
+  delQuestion(id: Int!): Questions
 }

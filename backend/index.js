@@ -8,7 +8,7 @@ const {
     buildSchema
 } = require('graphql');
 const resolver = require('./resolver');
-
+const cors = require('@koa/cors');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const session = require('koa-session');
@@ -18,6 +18,12 @@ const dotenv = require('dotenv');
 
 const app = new koa();
 const router = new koaRouter();
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+}));
+
 /*app.keys = ['nohornyplease'];
 const sessionConfig = {
   key: 'koa:sess', // the cookie key name (default is koa:sess)

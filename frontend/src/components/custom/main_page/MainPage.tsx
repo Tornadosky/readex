@@ -8,6 +8,7 @@ import { AlertDialog } from './AlertDialog';
 import MyCircularProgress from './Sections/MyCircularProgress.tsx';
 import './style.css'
 import { MyAlert } from "./MyAlert";
+import axios from 'axios';
 
 interface MainPageProps {
   userData: any;
@@ -15,7 +16,7 @@ interface MainPageProps {
 
 interface SectionType {
   id: number; 
-  section_name: string;
+  title: string;
   books: any[]; 
 }
 
@@ -44,12 +45,26 @@ const MainPage: React.FC<MainPageProps> = ({ userData }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        //const response = await client.get("api/section/all");
-        //console.log(response.data.sections);
-        //setSections(response.data.sections);
-        setSections([{id: 1, section_name: "Section 1", books: [{id: 1, title: "Book 1", is_processed: true, index: 0}, {id: 2, title: "Book 2", is_processed: true, index: 1}]},
-        {id: 2, section_name: "Section 1", books: [{id: 1, title: "Book 1", is_processed: true, index: 0}, {id: 2, title: "Book 2", is_processed: true, index: 1}]},
-        {id: 3, section_name: "Section 1", books: [{id: 1, title: "Book 1", is_processed: true, index: 0}, {id: 2, title: "Book 2", is_processed: true, index: 1}]}]);
+        const response = await axios.post('http://localhost:3000/graphql', {
+          query: `
+            query GetAllCollections {
+              Collections {
+                id
+                title
+                books {
+                  id
+                  title
+                }
+              }
+            }
+          `,
+        });
+
+        console.log(response.data.data.Collections);
+        setSections(response.data.data.Collections);
+        // setSections([{id: 1, section_name: "Section 1", books: [{id: 1, title: "Book 1", is_processed: true, index: 0}, {id: 2, title: "Book 2", is_processed: true, index: 1}]},
+        // {id: 2, section_name: "Section 1", books: [{id: 1, title: "Book 1", is_processed: true, index: 0}, {id: 2, title: "Book 2", is_processed: true, index: 1}]},
+        // {id: 3, section_name: "Section 1", books: [{id: 1, title: "Book 1", is_processed: true, index: 0}, {id: 2, title: "Book 2", is_processed: true, index: 1}]}]);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -78,26 +93,41 @@ const MainPage: React.FC<MainPageProps> = ({ userData }) => {
 
   const handleCreateSection = async () => {
     try {
-      // const response = await client.post("api/section/", {
-      //   section_name: "New Section"
-      // });
+      const mutation = `
+        mutation SetCollection($title: String!, $user: Int!) {
+          setCollection(title: $title, user: $user) {
+            id
+            title
+          }
+        }
+      `;
 
-      // if (response.data.error === 0) {
-      //   const newSection = {
-      //     id: response.data.section_id,
-      //     section_name: response.data.section_name,
-      //     books: []      
-      //   };
-      //   setSections([...sections, newSection]);
-      // } else if (response.data.error === 2) {
-      //   console.error("Limit exceeded: ", response.data.details);
-      //   setOpenAlert(true);
-      //   setAlertMessage("Limit exceeded: " + response.data.details);
-      // } else {
-      //   console.error("Failed to create section");
-      //   setOpenAlert(true);
-      //   setAlertMessage("Failed to create section");
-      // }
+      const variables = {
+        title: "New Section",
+        user: 1, 
+      };
+
+      const response = await axios.post('http://localhost:3000/graphql', {
+        query: mutation,
+        variables,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.data.data && response.data.data.setCollection) {
+        const newSection = {
+          id: response.data.data.setCollection.id,
+          title: response.data.data.setCollection.title,
+          books: []
+        };
+        setSections([...sections, newSection]);
+      } else {
+        console.error("Failed to create section");
+        setOpenAlert(true);
+        setAlertMessage("Failed to create section");
+      }
       console.log("Create section");
     } catch (error) {
       console.error("Error during the API call", error);
@@ -108,17 +138,34 @@ const MainPage: React.FC<MainPageProps> = ({ userData }) => {
 
   const handleDeleteSection = async (sectionId: number | null) => {
     try {
-      // const response = await client.post("api/section/delete/", {
-      //   section_id: sectionId
-      // });
+      const mutation = `
+        mutation DelCollection($id: Int!) {
+          delCollection(id: $id) {
+            id
+          }
+        }
+      `;
+      console.log(sectionId);
 
-      // if (response.status === 200) {
-      //   const updatedSections = sections.filter(section => section.id !== sectionId);
-      //   setSections(updatedSections);
-      // } else {
-      //   console.error("Failed to delete section");
-      //   alert("Failed to delete section");
-      // }
+      const variables = {
+        id: parseInt(sectionId),
+      };
+
+      const response = await axios.post('http://localhost:3000/graphql', {
+        query: mutation,
+        variables,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.data && !response.data.errors) {
+        setSections(sections => sections.filter(section => section.id !== sectionId));
+      } else {
+        console.error("Failed to delete section");
+        alert("Failed to delete section");
+      }
       console.log("Delete section");
     } catch (error) {
       console.error("Error during the API call", error);
@@ -157,7 +204,7 @@ const MainPage: React.FC<MainPageProps> = ({ userData }) => {
                 key={section.id}
                 sectionId={section.id}
                 booksList={section.books}
-                name={section.section_name}
+                name={section.title}
                 handleDeleteSection={handleActionConfirmation}
                 globalLoading={globalLoading}
                 setGlobalLoading={setGlobalLoading}

@@ -25,7 +25,7 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
     const props: UploadProps = {
         name: 'file',
         multiple: false,
-        action: 'https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188',
+        action: 'https://65fc54bf9fc4425c652fd135.mockapi.io/api/v1/status',
         beforeUpload: (file) => {
             const isPDF = file.type === 'application/pdf';
             if (!isPDF) {
@@ -35,6 +35,7 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
         },
         onChange(info) {
           const { status } = info.file;
+          console.log(info.file);
           if (status !== 'uploading') {
             console.log(info.file, info.fileList);
           }
@@ -127,7 +128,6 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                                 type="text"
                                 name="url"
                                 id="url"
-                                x-model="formData.url"
                                 placeholder="E.g. https://cs231n.github.io/neural-networks-3/"
                                 className="flex-1 block w-full min-w-0 border border-gray-300 rounded-md text-gray-800 focus:border-indigo-500 focus:ring-indigo-500 mt-1 p-2"
                             />

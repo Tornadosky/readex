@@ -7,6 +7,7 @@ import MyCircularProgress from './MyCircularProgress';
 
 import { AlertDialog } from '../AlertDialog.jsx';
 
+import axios from 'axios';
 import "./style.css";
 
 const VerticalLine = () => {
@@ -69,18 +70,35 @@ export const Section: React.FC<SectionProps> = ({
 
   const handleSectionNameChange = async (newName: string) => {
     try {
-      // const response = await client.post('api/section/change-section/', {
-      //   section_id: sectionId,
-      //   section_name: newName,
-      // });
+      const mutation = `
+        mutation UpdateCollection($id: ID!, $newTitle: String!) {
+          setCollection(id: $id, title: $newTitle) {
+            id
+            title
+          }
+        }
+      `;
 
-      // if (response.status === 200) {
-      //   // Handle the successful update
-      // } else {
-      //   console.error('Failed to update section name');
-      //   alert('Failed to update section name');
-      // }
-      console.log(`Change section name to ${newName}`);
+      const variables = {
+        id: sectionId,
+        newTitle: newName,
+      };
+
+      const response = await axios.post('http://localhost:3000/graphql', {
+        query: mutation,
+        variables,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.data && !response.data.errors) {
+        console.log(`Successfully changed section name to ${newName}`);
+      } else {
+        console.error('Failed to update section name');
+        alert('Failed to update section name');
+      }
     } catch (error) {
       console.error('Error during the API call', error);
       alert('Error during the API call');

@@ -29,6 +29,8 @@ interface SectionProps {
   handleDeleteSection: (sectionId: number, name: string) => void;
   globalLoading: number;
   setGlobalLoading: React.Dispatch<React.SetStateAction<number>>;
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const Section: React.FC<SectionProps> = ({
@@ -38,6 +40,8 @@ export const Section: React.FC<SectionProps> = ({
   handleDeleteSection,
   globalLoading,
   setGlobalLoading,
+  isModalOpen,
+  setIsModalOpen,
 }) => {
   const [books, setBooks] = useState<BookType[]>(booksList);
   const [loading, setLoading] = useState(false);
@@ -204,6 +208,7 @@ export const Section: React.FC<SectionProps> = ({
         }
         <AddBook
           onFileSelect={addNewBook}
+          setIsModalOpen={setIsModalOpen}
           sectionId={sectionId}
           globalLoading={globalLoading}
           setGlobalLoading={setGlobalLoading}

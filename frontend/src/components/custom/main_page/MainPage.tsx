@@ -11,7 +11,8 @@ import { MyAlert } from "./MyAlert";
 import axios from 'axios';
 
 interface MainPageProps {
-  userData: any;
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface SectionType {
@@ -25,7 +26,7 @@ interface ActionConfirmationType {
   name: string;
 }
 
-const MainPage: React.FC<MainPageProps> = ({ userData }) => {
+const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen }) => {
   const sectionsContainerRef = useRef<HTMLDivElement>(null);
   const [sections, setSections] = useState<SectionType[]>([]);
   const [showSettings, setShowSettings] = useState<boolean>(false);
@@ -136,7 +137,7 @@ const MainPage: React.FC<MainPageProps> = ({ userData }) => {
     }
   };
 
-  const handleDeleteSection = async (sectionId: number | null) => {
+  const handleDeleteSection = async (sectionId: any) => {
     try {
       const mutation = `
         mutation DelCollection($id: Int!) {
@@ -195,7 +196,7 @@ const MainPage: React.FC<MainPageProps> = ({ userData }) => {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
         <div className="flex flex-col w-full bg-bgColor min-h-full">
           <MyAlert open={openAlert} setOpen={setOpenAlert} severity={"error"} message={alertMessage} />
-          <TopBar userData={userData} handleCreateSection={handleCreateSection} setShowSettings={setShowSettings} />
+          <TopBar handleCreateSection={handleCreateSection} setShowSettings={setShowSettings} />
           <AlertDialog open={open} handleClose={handleClose} actionConfirmation={actionConfirmation} type={"Section"} />
           <Divider variant="middle" className="main-divider" />
           <div ref={sectionsContainerRef}> 
@@ -208,6 +209,8 @@ const MainPage: React.FC<MainPageProps> = ({ userData }) => {
                 handleDeleteSection={handleActionConfirmation}
                 globalLoading={globalLoading}
                 setGlobalLoading={setGlobalLoading}
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
               />
             ))}
           </div>

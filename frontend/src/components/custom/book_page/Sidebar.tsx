@@ -1,4 +1,4 @@
-import { useState } from 'react'; 
+import { useState, useEffect } from 'react'; 
 import HighlightsList from './HighlightsList'; 
 import BooksList from './BooksList';
 import TestsList from './tests/TestsList';
@@ -6,48 +6,109 @@ import type { IHighlight } from "./react-pdf-highlighter";
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import SmallSidebar from './SmallSidebar';
 import BookCreateModal from './BookCreateModal';
-
-const sections = [
-  { id: 1, name: 'Artificial Intelligence' },
-  { id: 2, name: 'Design' },
-  { id: 3, name: 'My favourite books' },
-  { id: 4, name: 'Web pages' },
-]
-
-const testBooks = [
-  {
-    id: '1',
-    title: 'GRE Official Guide',
-    url: '/pdfs/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/view',
-  },
-  {
-    id: '2',
-    title: 'TOEFL Preparation Book',
-    url: '/pdfs/54f1c2bd-ec4e-4f2e-a10e-2f639e8d8f47/view',
-  },
-  {
-    id: '3',
-    title: 'GMAT Exam Guide',
-    url: '/pdfs/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/view',
-  },
-];
+import axios from 'axios';
 
 interface Props {
   highlights: Array<IHighlight>;
   resetHighlights: () => void;
   toggleDocument: () => void;
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function Sidebar({
   highlights,
   toggleDocument,
   resetHighlights,
+  isModalOpen,
+  setIsModalOpen,
 }: Props) {
   const [view, setView] = useState('Books');
+  const [sections, setSections] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedSection, setSelectedSection] = useState(sections[0])
-  const [booksList, setBooksList] = useState(testBooks);
+  const [selectedSection, setSelectedSection] = useState("")
+  const [booksList, setBooksList] = useState([]);
+
+  useEffect(() => {
+    const fetchSections = async () => {
+      try {
+        const query = `
+          query GetCollectionsForUser($userId: Int!) {
+            Collections(user: $userId) {
+              id
+              title
+              books {
+                id
+                title
+              }
+              user {
+                id
+                login
+              }
+            }
+          }
+        `;
+
+        const variables = {
+          userId: 1,
+        };
+        
+        const response = await axios.post('http://localhost:3000/graphql', {
+          query,
+          variables
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const { data } = response.data;
+        console.log(data);
+        if (data && data.Collections) {
+          setSections(data.Collections);
+          setSelectedSection(data.Collections[0]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch sections:', error);
+      }
+    };
+    const fetchBooksForUser = async () => {
+      try {
+        const query = `
+          query GetBooksForUser($userId: Int!) {
+            Books(user: $userId) {
+              id
+              title
+            }
+          }
+        `;
+
+        const variables = {
+          userId: 1,
+        };
+        
+        const response = await axios.post('http://localhost:3000/graphql', {
+          query,
+          variables
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const { data } = response.data;
+        console.log(data);
+        if (data && data.Books) {
+          setBooksList(data.Books);
+        }
+      } catch (error) {
+        console.error('Failed to fetch books for user 1:', error);
+      }
+    };
+  
+    fetchBooksForUser();
+    fetchSections();
+  }, []);
 
   const handleViewChange = (newView: string) => () => {
     if (view === newView && isSidebarOpen) {
@@ -152,12 +213,12 @@ export function Sidebar({
         setSelectedSection={setSelectedSection}
         sections={sections}
         disabled={false}
-        onSubmit={(filename) => {
+        onSubmit={(file, newId) => {
           setBooksList((prevBooks) => [
             ...prevBooks,
             {
-              id: Math.random().toString(36).substring(2, 4),
-              title: filename.replace('.pdf', ''),
+              id: newId,
+              title: file.name.replace('.pdf', ''),
               url: '/pdfs/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/view',
             }
           ]);

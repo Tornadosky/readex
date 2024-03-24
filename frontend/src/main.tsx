@@ -21,6 +21,7 @@ function AppWrapper() {
 
   const [highlights, setHighlights] = useState<IHighlight[]>(testHighlights[initialUrl] ? [...testHighlights[initialUrl]] : []);
   const [url, setUrl] = useState(initialUrl);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const resetHighlights = () => {
     setHighlights([]);
@@ -37,8 +38,14 @@ function AppWrapper() {
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/landing-page" element={<div>Landing Page Content Here</div>} />
-        <Route element={<LayoutWithSidebar highlights={highlights} resetHighlights={resetHighlights} toggleDocument={toggleDocument} />}>
-          <Route path="/home" element={<MainPage userData={""} />} />
+        <Route element={<LayoutWithSidebar
+          highlights={highlights}
+          resetHighlights={resetHighlights}
+          toggleDocument={toggleDocument}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+        />}>
+          <Route path="/home" element={<MainPage isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />} />
           <Route path="/pdfs/:pdfName/view" element={<PdfViewer url={url} highlights={highlights} setHighlights={setHighlights} />} />
           <Route path="/tests/:testName/edit" element={<TestPage isSolving={false} />} />
           <Route path="/tests/:testName/play" element={<TestPage isSolving={true} />} />

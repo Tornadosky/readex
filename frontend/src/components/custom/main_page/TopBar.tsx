@@ -1,18 +1,13 @@
 import { FC } from "react";
 import { AccountMenu } from "./AccountMenu";
 import { Logo } from "./Logo/Logo";
-
-interface UserData {
-    username: string;
-}
   
 interface TopBarProps {
-    userData: UserData | null;
     handleCreateSection: () => void;
     setShowSettings: (showSettings: boolean) => void;
 }
 
-  export const TopBar: FC<TopBarProps> = ({ userData, handleCreateSection, setShowSettings }) => {
+  export const TopBar: FC<TopBarProps> = ({ handleCreateSection, setShowSettings }) => {
       return (
           <div className="topbar">
               <Logo />
@@ -20,7 +15,7 @@ interface TopBarProps {
                   <button className="create-section-button" onClick={handleCreateSection}>
                       {'Create new section'}
                   </button>
-                  <AccountMenu username={userData ? userData.username : ''} setShowSettings={setShowSettings} />
+                  <AccountMenu username={'Username'} setShowSettings={setShowSettings} />
               </div>
           </div>
       );

@@ -5,6 +5,7 @@ import BookCreateModal from "../../book_page/BookCreateModal";
 
 interface AddBookProps {
   onFileSelect: (file: any, newId: number, coverImage: string) => void;
+  setIsModalOpen: (value: React.SetStateAction<boolean>) => void;
   sectionId: string | number;
   globalLoading: number;
   setGlobalLoading: (value: React.SetStateAction<number>) => void;
@@ -13,12 +14,13 @@ interface AddBookProps {
 
 export const AddBook: React.FC<AddBookProps> = ({
   onFileSelect,
+  setIsModalOpen,
   sectionId,
   globalLoading,
   setGlobalLoading,
   setLoading,
 }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    //const [isModalOpen, setIsModalOpen] = useState(false);
     const fileInputRef = useRef<any>(null);
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,7 +86,7 @@ export const AddBook: React.FC<AddBookProps> = ({
           accept=".pdf"
         />
 
-        <BookCreateModal
+        {/* <BookCreateModal
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
           selectedSection={{name: 'Artificial Intelligence'}}
@@ -95,7 +97,7 @@ export const AddBook: React.FC<AddBookProps> = ({
             console.log("Uploading", filename, "to section", "Artificial Intelligence");
             setLoading(true);
           }}
-        />
+        /> */}
       </div>
     );
 };

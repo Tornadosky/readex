@@ -3,6 +3,7 @@ import { NotesIcon, DotsIcon } from '@/assets/svg';
 import type { MenuProps } from 'antd';
 import { Dropdown } from 'antd';
 import { DeleteOutlined, EditOutlined, DownloadOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 interface IBook {
   id: string;
@@ -29,9 +30,38 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
     const handleMenuClick: MenuProps['onClick'] = (e) => {
       console.log('click', e);
       if (e.key === '3' && selectedBookId) { // If "Delete" is clicked
-        setBooksList((currentBooks: any) => currentBooks.filter((book: any) => book.id !== selectedBookId));
-        setSelectedBookId(null);
-      } 
+        const mutation = `
+          mutation delBook($id: Int!) {
+            delBook(id: $id) {
+              id
+            }
+          }
+        `;
+        console.log(selectedBookId)
+        
+        const variables = {
+          id: parseInt(selectedBookId),
+        };
+
+        axios.post('http://localhost:3000/graphql', {
+          query: mutation,
+          variables: variables,
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(response => {
+          console.log(response.data);
+          setBooksList((currentBooks: any) => currentBooks.filter((book: any) => book.id !== selectedBookId));
+        })
+        .catch(error => {
+          console.error('Failed to delete book:', error);
+        });
+
+        setSelectedBookId(null); 
+      }
+
       if (e.key === '2' && selectedBookId) { // If "Rename" is clicked
         // Find the book to prepopulate the editing title
         const bookToEdit = booksList.find(book => book.id === selectedBookId);
@@ -40,6 +70,7 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
           setEditingBookId(selectedBookId);
         }
       }
+
       if (e.key === '1' && selectedBookId) { // If "Download" is clicked
         const bookToDownload = booksList.find(book => book.id === selectedBookId);
         if (bookToDownload) {
@@ -52,6 +83,45 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
           document.body.removeChild(a);
         }
       }
+    };
+
+    const updateBookTitle = (id: string, newTitle: string) => {
+      const mutation = `
+        mutation UpdateBook($id: Int!, $title: String!, $user: Int!) {
+          setBook(id: $id, title: $title, user: $user) {
+            id
+            title
+          }
+        }
+      `;
+  
+      axios.post('http://localhost:3000/graphql', {
+        query: mutation,
+        variables: {
+          id: parseInt(id),
+          title: newTitle,
+          user: 1,
+        },
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => {
+        console.log(response.data);
+        // Update the local state to reflect the new title
+        setBooksList((currentBooks: any) =>
+          currentBooks.map((book: any) =>
+            book.id === id ? { ...book, title: newTitle } : book
+          )
+        );
+      })
+      .catch(error => {
+        console.error('Failed to update book title:', error);
+      });
+  
+      // Reset editing state
+      setEditingBookId(null);
     };
 
     const items: MenuProps['items'] = [
@@ -96,29 +166,10 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
                   type="text"
                   value={editingTitle}
                   onChange={(e) => setEditingTitle(e.target.value)}
-                  onBlur={() => {
-                    // Call a function to update the book's title
-                    // Reset editing state
-                    const updatedBooks = booksList.map(b => {
-                      if (b.id === editingBookId) {
-                        return { ...b, title: editingTitle };
-                      }
-                      return b;
-                    });
-                    setBooksList(updatedBooks);
-                    setEditingBookId(null);
-                  }}
+                  onBlur={() => updateBookTitle(book.id, editingTitle)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      // Same as onBlur
-                      const updatedBooks = booksList.map(b => {
-                        if (b.id === editingBookId) {
-                          return { ...b, title: editingTitle };
-                        }
-                        return b;
-                      });
-                      setBooksList(updatedBooks);
-                      setEditingBookId(null);
+                      updateBookTitle(book.id, editingTitle);
                     }
                   }}
                   autoFocus

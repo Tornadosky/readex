@@ -5,6 +5,8 @@ import { Dialog, Transition } from '@headlessui/react';
 import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';
 import Selector from './Selector';
+import { RcFile } from 'antd/es/upload';
+import axios from 'axios';
   
 const { Dragger } = Upload;
   
@@ -15,23 +17,35 @@ interface Props {
     setSelectedSection: (value: any) => void;
     sections: Array<any>;
     disabled: boolean;
-    onSubmit: (file: string) => void; // change to file type
+    onSubmit: (file: File, newId: string) => void;
 }
 
 const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selectedSection, setSelectedSection, sections, disabled , onSubmit }) => {
-    const [uploadedFile, setUploadedFile] = useState('');
+    const [uploadedFile, setUploadedFile] = useState<any>(null);
     const [uploading, setUploading] = useState(false);
+
+    const fileToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    };
 
     const props: UploadProps = {
         name: 'file',
         multiple: false,
-        action: 'https://65fc54bf9fc4425c652fd135.mockapi.io/api/v1/status',
         beforeUpload: (file) => {
             const isPDF = file.type === 'application/pdf';
             if (!isPDF) {
                 message.error(`${file.name} is not a pdf file`);
+                return Upload.LIST_IGNORE;
             }
-            return isPDF || Upload.LIST_IGNORE;
+            // Instead of uploading, just save the file object
+            setUploadedFile(file);
+            // Prevent the file from being added to the list, as we're handling it manually
+            return false; 
         },
         onChange(info) {
           const { status } = info.file;
@@ -40,38 +54,85 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
             console.log(info.file, info.fileList);
           }
           if (status === 'removed') {
-            setUploadedFile('');
+            setUploadedFile(null);
           }
           if (status === 'done') {
             message.success(`${info.file.name} file uploaded successfully.`);
-            setUploadedFile(info.file.name);
+            setUploadedFile(info.file);
           } else if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`);
-            setUploadedFile('');
+            setUploadedFile(null);
           }
         },
         onDrop(e) {
           console.log('Dropped files', e.dataTransfer.files);
-          setUploadedFile(e.dataTransfer.files[0].name);
+          setUploadedFile(e.dataTransfer.files[0]);
         },
     };
 
     const handleSubmit = async () => {
-        // Simulate a backend call to upload file and section
+        if (!uploadedFile) return; 
+
         setUploading(true);
-        console.log("Uploading", uploadedFile, "to section", selectedSection.name);
-        // Mock backend call delay
-        setTimeout(() => {
-            message.success('File uploaded and section updated successfully');
-            onSubmit(uploadedFile);
-            setUploading(false);
-            setUploadedFile('');
-            setIsModalOpen(false);
-        }, 2000);
+        const formData = new FormData();
+        formData.append('file', uploadedFile);
+        try {
+            const documentBase64 = await fileToBase64(uploadedFile);
+
+            const response = await axios.post('http://localhost:3000/graphql', {
+                query: `
+                    mutation AddBook($title: String!, $author: String, $document: String!, $image: String, $highlights: [Int], $collections: [Int], $user: Int!) {
+                        setBook(
+                            title: $title,
+                            author: $author,
+                            document: $document,
+                            image: $image,
+                            highlights: $highlights,
+                            collections: $collections,
+                            user: $user
+                        ) {
+                            id
+                            title
+                            author
+                            document
+                            image
+                            user {
+                                id
+                                login
+                            }
+                        }
+                    }
+                `,
+                variables: {
+                    title: uploadedFile.name,
+                    author: "Autroh",
+                    document: documentBase64.replace('data:application/pdf;base64,', ''),
+                    image: null,
+                    highlights: [],
+                    collections: [1],
+                    user: 1,
+                }
+            });
+
+            console.log(response.data);
+
+            if (response.data.data && !response.data.errors) {
+                message.success('File uploaded and section updated successfully');
+                onSubmit(uploadedFile, response.data.data.setBook.id);
+            } else {
+                message.error('File upload failed.');
+            }
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            message.error('File upload failed.');
+        }
+        setUploading(false);
+        setUploadedFile(null);
+        setIsModalOpen(false);
     };
 
     const handleClosed = () => {
-        setUploadedFile('');
+        setUploadedFile(null);
         setIsModalOpen(false);
     }
 
@@ -110,10 +171,10 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                                 Section
                             </label>
                             <Selector 
-                                options={sections.map((section) => section.name)}
-                                selected={selectedSection.name}
+                                options={sections.map((section) => section.title)}
+                                selected={selectedSection.title}
                                 disabled={disabled}
-                                setSelected={(value) => setSelectedSection(sections.find((section) => section.name === value) || sections[0])}
+                                setSelected={(value) => setSelectedSection(sections.find((section) => section.title === value) || sections[0])}
                             />
                         </div>
 
@@ -152,7 +213,7 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                                     banned files.
                                 </p>
                             </Dragger>
-                            {uploadedFile && <div className="mt-2 text-sm font-medium text-green-600">Uploaded: {uploadedFile}</div>}
+                            {uploadedFile && <div className="mt-2 text-sm font-medium text-green-600">Uploaded: {uploadedFile.name}</div>}
                         </div>
                         <div className="mt-4">
                             <button

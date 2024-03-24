@@ -37,7 +37,14 @@ const sessionConfig = {
   renew: false, // renew session when session is nearly expired, so we can always keep user logged in. Default is false.
 };
 app.use(session(sessionConfig, app));*/
-app.use(koaBody());
+app.use(koaBody({
+    multipart: true, // to enable multipart/form-data
+    formidable: {
+      maxFileSize: 200*1024*1024    // set file size limit (this example sets it to 200MB)
+    },
+    jsonLimit: '50mb', // for JSON payload
+    formLimit: '50mb', // for URL-encoded form payload
+}));
 
 router.get("/test", (ctx) => {
     ctx.body = "<h3>Server online!</h3>";

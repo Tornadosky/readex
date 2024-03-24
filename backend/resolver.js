@@ -528,6 +528,9 @@ const resolver = {
             upsertParams = {
                 data: {
                     uploaded: moment().format('yyyy-mm-dd:hh:mm:ss'),
+                },
+                include: {
+                    user: true
                 }
             };
             if (args.title) {
@@ -576,6 +579,9 @@ const resolver = {
                            id: args.user  
                         }
                     }
+                },
+                include: {
+                    user: true
                 }
             };
             upsertParams.data.image = (args.image);

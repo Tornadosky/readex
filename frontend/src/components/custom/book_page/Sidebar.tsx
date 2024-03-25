@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'; 
+import { useState, useEffect, useRef, useCallback } from 'react'; 
+import { MouseEvent } from 'react';
 import HighlightsList from './HighlightsList'; 
 import BooksList from './BooksList';
 import TestsList from './tests/TestsList';
@@ -7,6 +8,13 @@ import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import SmallSidebar from './SmallSidebar';
 import BookCreateModal from './BookCreateModal';
 import axios from 'axios';
+import './style.css';
+
+interface Book {
+  id: string;
+  title: string;
+  url?: string;
+}
 
 interface Props {
   highlights: Array<IHighlight>;
@@ -27,7 +35,29 @@ export function Sidebar({
   const [sections, setSections] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedSection, setSelectedSection] = useState("")
-  const [booksList, setBooksList] = useState([]);
+  const [booksList, setBooksList] = useState<Book[]>([]);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState("20vw");
+
+  const startResizing = useCallback((mouseDownEvent: MouseEvent) => {
+    setIsResizing(true);
+  }, []);
+
+  const stopResizing = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  const resize = useCallback(
+    (mouseMoveEvent: MouseEvent) => {
+      if (isResizing && sidebarRef.current) {
+        setSidebarWidth(
+          `${mouseMoveEvent.clientX - sidebarRef.current.getBoundingClientRect().left}px`
+        );
+      }
+    },
+    [isResizing]
+  );
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -110,6 +140,15 @@ export function Sidebar({
     fetchSections();
   }, []);
 
+  useEffect(() => {
+    window.addEventListener("mousemove", resize);
+    window.addEventListener("mouseup", stopResizing);
+    return () => {
+      window.removeEventListener("mousemove", resize);
+      window.removeEventListener("mouseup", stopResizing);
+    };
+  }, [resize, stopResizing]);
+
   const handleViewChange = (newView: string) => () => {
     if (view === newView && isSidebarOpen) {
       // If the new view is the same as the current view and the sidebar is open, toggle it
@@ -164,45 +203,54 @@ export function Sidebar({
       />
 
       {isSidebarOpen && (
-        <div className="sidebar border-r" style={{ width: "20vw" }}>
-          <div className="submenu-header focus-visible:none border-b" style={{ backgroundColor: '#f3f3f6'}}>
-            <span className="ellipsis flex items-center gap-1 mx-3">
-              {view}
-            </span>
-            <div className="flex items-center">
-              {view === 'Books' && (
-                <>
-                  <PlusOutlined onClick={() => setIsModalOpen(true)} className="cursor-pointer text-gray-400 hover:text-gray-500 rounded" style={{ fontSize: '18px' }} />
-                  <div className="border-l mx-2 h-5" style={{ borderColor: '#d1d5db' }}></div>
-                </>
+        <div 
+          className="app-sidebar border-r" 
+          style={{ width: sidebarWidth }}
+          ref={sidebarRef}
+          onMouseDown={(e) => e.preventDefault()}
+        >
+          <div className="app-sidebar-content">
+            <div className="submenu-header focus-visible:none border-b" style={{ backgroundColor: '#f3f3f6'}}>
+              <span className="ellipsis flex items-center gap-1 mx-3">
+                {view}
+              </span>
+              <div className="flex items-center">
+                {view === 'Books' && (
+                  <>
+                    <PlusOutlined onClick={() => setIsModalOpen(true)} className="cursor-pointer text-gray-400 hover:text-gray-500 rounded" style={{ fontSize: '18px' }} />
+                    <div className="border-l mx-2 h-5" style={{ borderColor: '#d1d5db' }}></div>
+                  </>
+                )}
+                <CloseOutlined onClick={toggleSidebar} className="cursor-pointer mr-4 text-gray-400 hover:text-gray-500 rounded" />
+              </div>
+            </div>
+            
+            <div style={{ maxHeight: 'calc(100vh - 57px)', overflowY: 'auto' }}>
+              {view === 'Notes' ? (
+                <HighlightsList 
+                  highlights={highlights}
+                  resetHighlights={resetHighlights}
+                  toggleDocument={toggleDocument}
+                />
+              ) : view === "Books" ? (
+                <BooksList 
+                  booksList={booksList}
+                  setBooksList={setBooksList}
+                />
+              ) : view === "Tests" ? (
+                <TestsList 
+                  tests={testTests}
+                />
+              ) : (
+                <BooksList 
+                  booksList={booksList}
+                  setBooksList={setBooksList}
+                />
               )}
-              <CloseOutlined onClick={toggleSidebar} className="cursor-pointer mr-4 text-gray-400 hover:text-gray-500 rounded" />
             </div>
           </div>
-          
-          <div style={{ maxHeight: 'calc(100vh - 57px)', overflowY: 'auto' }}>
-            {view === 'Notes' ? (
-              <HighlightsList 
-                highlights={highlights}
-                resetHighlights={resetHighlights}
-                toggleDocument={toggleDocument}
-              />
-            ) : view === "Books" ? (
-              <BooksList 
-                booksList={booksList}
-                setBooksList={setBooksList}
-              />
-            ) : view === "Tests" ? (
-              <TestsList 
-                tests={testTests}
-              />
-            ) : (
-              <BooksList 
-                booksList={booksList}
-                setBooksList={setBooksList}
-              />
-            )}
-          </div>
+
+          <div className="app-sidebar-resizer" onMouseDown={startResizing} />
         </div>
       )}
       
@@ -219,7 +267,6 @@ export function Sidebar({
             {
               id: newId,
               title: file.name.replace('.pdf', ''),
-              url: '/pdfs/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/view',
             }
           ]);
         }}

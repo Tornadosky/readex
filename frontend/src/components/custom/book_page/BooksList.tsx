@@ -155,7 +155,7 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
             key={book.id} 
             className="group h-full flex items-center hover:bg-gray-100 p-2 rounded-lg transition-colors"
             draggable="false" 
-            href={book.url}
+            href={`http://localhost:5173/pdfs/${book.id}/view`}
           >
             <div className="shrink-0 items-center mr-2 flex">
               <NotesIcon />

@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react'; 
+import React, { Fragment, SetStateAction, useState } from 'react'; 
 import { LoadingIcon } from '@/assets/svg';
 import { CloseOutlined, InboxOutlined } from '@ant-design/icons';
 import { Dialog, Transition } from '@headlessui/react';
@@ -17,7 +17,7 @@ interface Props {
     setSelectedSection: (value: any) => void;
     sections: Array<any>;
     disabled: boolean;
-    onSubmit: (file: File, newId: string) => void;
+    onSubmit: (file: File, newId: string) => SetStateAction<void>;
 }
 
 const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selectedSection, setSelectedSection, sections, disabled , onSubmit }) => {

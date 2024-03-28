@@ -10,7 +10,7 @@ import BookCreateModal from './BookCreateModal';
 import axios from 'axios';
 import './style.css';
 
-interface Book {
+export interface IBook {
   id: string;
   title: string;
   url?: string;
@@ -35,7 +35,7 @@ export function Sidebar({
   const [sections, setSections] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedSection, setSelectedSection] = useState("")
-  const [booksList, setBooksList] = useState<Book[]>([]);
+  const [booksList, setBooksList] = useState<IBook[]>([]);
   const sidebarRef = useRef<HTMLElement>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState("20vw");

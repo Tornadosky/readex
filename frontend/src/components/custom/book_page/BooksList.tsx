@@ -4,12 +4,7 @@ import type { MenuProps } from 'antd';
 import { Dropdown } from 'antd';
 import { DeleteOutlined, EditOutlined, DownloadOutlined } from '@ant-design/icons';
 import axios from 'axios';
-
-interface IBook {
-  id: string;
-  title: string;
-  url: string;
-}
+import type { IBook } from './Sidebar';
 
 interface BooksListProps {
   booksList: Array<IBook>;
@@ -75,7 +70,7 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
         const bookToDownload = booksList.find(book => book.id === selectedBookId);
         if (bookToDownload) {
           const a = document.createElement('a');
-          a.href = bookToDownload.url; // Use the URL from your book object
+          //a.href = bookToDownload.url; // Use the URL from your book object
           a.download = bookToDownload.title + ".pdf"; // Use the book title as the filename
           document.body.appendChild(a);
           a.click();

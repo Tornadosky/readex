@@ -1,6 +1,8 @@
-import { Component } from "react";
+import { useState, useEffect, Component } from "react";
+import { useParams } from 'react-router-dom';
 import ColorPickerWithPresets from './ColorPickerWithPresets';
 import Topbar from "./Topbar";
+import axios from 'axios';
 
 // import type { ColorPickerProps, GetProp } from 'antd';
 // type Color = GetProp<ColorPickerProps, 'value'>;
@@ -49,7 +51,7 @@ const HighlightPopup = ({
     </div>
   ) : null;
 
-class PdfViewer extends Component<{ url: string, highlights: any, setHighlights: any }, State> {
+class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: any }, State> {
   state = {
     destinationPage: 1,
     pageCount: 0,
@@ -310,4 +312,76 @@ class PdfViewer extends Component<{ url: string, highlights: any, setHighlights:
   }
 }
 
-export default PdfViewer;
+function PdfViewerWrapper(props: any) {
+  const { pdfId } = useParams();
+  const [pdfUrl, setPdfUrl] = useState('');
+
+  useEffect(() => {
+    const fetchBookName = async () => {
+      try {
+        const response = await axios.post('http://localhost:3000/graphql', {
+          query: `
+            query {
+              Books(id: ${pdfId}) {
+                  id title
+              }
+            }
+          `,
+        });
+        //console.log('Response:', response.data.data);
+
+        if (response.data && response.data.data.Books.length > 0) {
+          const bookName = response.data.data.Books[0].title;
+          console.log('Book name:', bookName)
+          return bookName;
+        } else {
+          console.error('Book not found');
+          return null;
+        }
+      } catch (error) {
+        console.error('Error fetching book name:', error);
+        return null;
+      }
+    };
+
+    const fetchPdfData = async (bookName: string) => {
+      try {
+        const response = await fetch('http://localhost:3000/getbook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            document: `./uploads/1/${bookName}`
+          }),
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          setPdfUrl(blobUrl);
+        } else {
+          const errorResponse = await response.json();
+          console.error('Error fetching PDF:', errorResponse.error);
+        }
+      } catch (error) {
+        console.error('Error fetching PDF data:', error);
+      }
+    };
+
+    const executeFetchSequence = async () => {
+      if (pdfId) {
+        const bookName = await fetchBookName();
+        if (bookName) {
+          await fetchPdfData(bookName);
+        }
+      }
+    };
+
+    executeFetchSequence();
+  }, [pdfId]);
+
+  return <PdfViewer {...props} url={pdfUrl} />;
+}
+
+export default PdfViewerWrapper;

@@ -11,6 +11,7 @@ import '../app/globals.css';
 
 import type { IHighlight } from "./components/custom/book_page/react-pdf-highlighter";
 import { testHighlights as _testHighlights } from "./components/custom/book_page/test-highlights";
+import PdfViewerWrapper from './components/custom/book_page/PdfViewer.tsx';
 
 function AppWrapper() {
   const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
@@ -46,7 +47,7 @@ function AppWrapper() {
           setIsModalOpen={setIsModalOpen}
         />}>
           <Route path="/home" element={<MainPage isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />} />
-          <Route path="/pdfs/:pdfName/view" element={<PdfViewer url={url} highlights={highlights} setHighlights={setHighlights} />} />
+          <Route path="/pdfs/:pdfId/view" element={<PdfViewerWrapper highlights={highlights} setHighlights={setHighlights} />} />
           <Route path="/tests/:testName/edit" element={<TestPage isSolving={false} />} />
           <Route path="/tests/:testName/play" element={<TestPage isSolving={true} />} />
         </Route>

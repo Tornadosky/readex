@@ -184,7 +184,6 @@ const resolver = {
                         }
                     },
                     include: {
-                        openedBooks: true,
                         collections: true,
                         achievements: true,
                         words: true
@@ -199,7 +198,6 @@ const resolver = {
                         }
                     },
                     include: {
-                        openedBooks: true,
                         collections: true,
                         achievements: true,
                         words: true
@@ -214,7 +212,6 @@ const resolver = {
                         }
                     },
                     include: {
-                        openedBooks: true,
                         collections: true,
                         achievements: true,
                         words: true
@@ -228,7 +225,6 @@ const resolver = {
                         phone: args.phone
                     },
                     include: {
-                        openedBooks: true,
                         collections: true,
                         achievements: true,
                         words: true
@@ -240,7 +236,6 @@ const resolver = {
                         email: args.email
                     },
                     include: {
-                        openedBooks: true,
                         collections: true,
                         achievements: true,
                         words: true
@@ -252,7 +247,6 @@ const resolver = {
                         login: args.login
                     },
                     include: {
-                        openedBooks: true,
                         collections: true,
                         achievements: true,
                         words: true
@@ -264,7 +258,6 @@ const resolver = {
                         id: parseInt(args.id)
                     },
                     include: {
-                        openedBooks: true,
                         collections: true,
                         achievements: true,
                         words: true
@@ -273,7 +266,6 @@ const resolver = {
             } else {
                 answer = await prisma.Users.findMany({
                     include: {
-                        openedBooks: true,
                         collections: true,
                         achievements: true,
                         words: true
@@ -291,7 +283,7 @@ const resolver = {
                     name: args.name
                 },
                 include: {
-                    user: true
+                    users: true
                 }
             });
         } else if (args.users) {
@@ -308,7 +300,7 @@ const resolver = {
                     }
                 },
                 include: {
-                    user: true
+                    users: true
                 }
             });
         } else if (args.id) {
@@ -317,13 +309,13 @@ const resolver = {
                     selectid: parseInt(args.id)
                 },
                 include: {
-                    user: true
+                    users: true
                 }
             });
         } else {
             answer = await prisma.Achievements.findMany({
                 include: {
-                    user: true
+                    users: true
                 }});
         }
         console.log(answer);
@@ -344,7 +336,8 @@ const resolver = {
                 include: {
                     user: true,
                     questions: true,
-                    collections: true
+                    collections: true,
+                    words: true
                 }
             });
         } else if (args.id) {
@@ -355,7 +348,8 @@ const resolver = {
                 include: {
                     user: true,
                     questions: true,
-                    collections: true
+                    collections: true,
+                    words: true
                 }
             });
         } else {
@@ -363,7 +357,8 @@ const resolver = {
                 include: {
                     user: true,
                     questions: true,
-                    collections: true
+                    collections: true,
+                    words: true
                 }});
         }
         console.log(answer);
@@ -486,21 +481,14 @@ const resolver = {
                             }
                         }
                     } : null;
-            args.openedBooks ? upsertParams.data.openedBooks = {
-                connect: {
-                    id: {
-                        in: args.books //array of ids
-                        }
-                }
-            } : null ;
             upsertParams.where = {
                 id: args.id
             };
             upsertParams.include = {
-                openedBooks: true,
                 collections: true,
                 achievements: true,
-                words: true
+                words: true,
+                highlights: true
             };
             answer = await prisma.Users.update(upsertParams);
         } else {
@@ -511,6 +499,12 @@ const resolver = {
                     email: args.email,
                     language: args.language,
                     theme: args.theme
+                },
+                include: {
+                    collections: true,
+                    achievements: true,
+                    words: true,
+                    highlights: true
                 }
             };
             answer = await prisma.Users.create(upsertParams);
@@ -551,6 +545,11 @@ const resolver = {
             upsertParams.where = {
                 id: args.id
             };
+            upsertParams.include = {
+                highlights: true,
+                collections: true,
+                user: true
+            };
             answer = await prisma.Books.update(upsertParams);
         } else {
             console.log("setBook->create");
@@ -573,14 +572,14 @@ const resolver = {
                         connect: {
                             id: args.user
                         }
-                    },
-                    openedBooks: {
-                        connect: {
-                           id: args.user  
-                        }
                     }
                 },
                 include: {
+<<<<<<< HEAD
+=======
+                    highlights: true,
+                    collections: true,
+>>>>>>> e62c2d1 (backend 0.8.4: openedBooks removed, include checked)
                     user: true
                 }
             };
@@ -598,13 +597,16 @@ const resolver = {
         let answer = null;
         if (args.id) {
             upsertParams = {
-                data: {}
+                data: {},
+                include: {
+                    users: true
+                }
             };
             upsertParams.data.name = (args.name);
             upsertParams.data.description = (args.description);
             args.users ? upsertParams.data.users = {
                 create: {
-                    user: {
+                    users: {
                         connect: {
                             id: args.users
                         }
@@ -620,6 +622,9 @@ const resolver = {
                 data: {
                     name: args.name,
                     description: args.description
+                },
+                include: {
+                    users: true
                 }
             };
             answer = await prisma.Achievements.create(upsertParams);
@@ -668,7 +673,12 @@ const resolver = {
         let answer = null;
         if (args.id) {
             upsertParams = {
-                data: {}
+                data: {},
+                include: {
+                    user: true,
+                    books: true,
+                    tests: true
+                }
             };
             upsertParams.data.title = (args.title);
             args.books ? upsertParams.data.books = {
@@ -690,11 +700,6 @@ const resolver = {
             upsertParams.where = {
                 id: parseInt(args.id)
             };
-            upsertParams.include = {
-                user: true,
-                books: true,
-                tests: true
-            }
             answer = await prisma.Collections.update(upsertParams);
         } else {
             upsertParams = {
@@ -882,7 +887,8 @@ const resolver = {
             upsertParams.include = {
                 user: true,
                 questions: true,
-                collections: true
+                collections: true,
+                words: true
             };
             answer = await prisma.Tests.update(upsertParams);
         } else {
@@ -901,7 +907,8 @@ const resolver = {
                 include: {
                     user: true,
                     questions: true,
-                    collections: true
+                    collections: true,
+                    words: true
                 }
             };
             answer = await prisma.Tests.create(upsertParams);

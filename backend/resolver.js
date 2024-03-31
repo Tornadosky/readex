@@ -253,7 +253,7 @@ const resolver = {
                     }
                 });
             } else if (args.id) {
-                answer = await prisma.Users.findUnique({
+                answer = await prisma.Users.findMany({
                     where: {
                         id: parseInt(args.id)
                     },
@@ -304,9 +304,9 @@ const resolver = {
                 }
             });
         } else if (args.id) {
-            answer = await prisma.Achievements.findUnique({
+            answer = await prisma.Achievements.findMany({
                 where: {
-                    selectid: parseInt(args.id)
+                    id: parseInt(args.id)
                 },
                 include: {
                     users: true
@@ -575,11 +575,8 @@ const resolver = {
                     }
                 },
                 include: {
-<<<<<<< HEAD
-=======
                     highlights: true,
                     collections: true,
->>>>>>> e62c2d1 (backend 0.8.4: openedBooks removed, include checked)
                     user: true
                 }
             };

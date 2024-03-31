@@ -36,7 +36,7 @@ export function Sidebar({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedSection, setSelectedSection] = useState("")
   const [booksList, setBooksList] = useState<IBook[]>([]);
-  const sidebarRef = useRef<HTMLElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState("20vw");
 
@@ -49,7 +49,7 @@ export function Sidebar({
   }, []);
 
   const resize = useCallback(
-    (mouseMoveEvent: MouseEvent) => {
+    (mouseMoveEvent: globalThis.MouseEvent) => {
       if (isResizing && sidebarRef.current) {
         setSidebarWidth(
           `${mouseMoveEvent.clientX - sidebarRef.current.getBoundingClientRect().left}px`
@@ -161,6 +161,9 @@ export function Sidebar({
   };
 
   const toggleSidebar = () => {
+    if (isSidebarOpen) {
+      setView('');
+    }
     setIsSidebarOpen(!isSidebarOpen);
   };
 

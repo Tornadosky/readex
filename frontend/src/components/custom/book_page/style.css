@@ -1,4 +1,4 @@
-body {
+  body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
       "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
@@ -147,6 +147,11 @@ body {
 
   .app-sidebar .app-sidebar-content {
     flex: 1;
+    /* flex-grow: 0;
+    flex-shrink: 0; */
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
   }
 
   @media (max-width: 800px) {

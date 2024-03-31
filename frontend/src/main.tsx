@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App.tsx';
-import PdfViewer from './components/custom/book_page/PdfViewer.tsx';
 import MainPage from './components/custom/main_page/MainPage.tsx';
 import TestPage from './components/custom/book_page/tests/TestsPage.tsx';
 import Page404 from './components/custom/misc/Page404.tsx';

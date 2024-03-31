@@ -10,7 +10,7 @@ const scales = [
     { id: 1, name: 'Default', icon: <DefaultScaleIcon /> },
     { id: 2, name: 'Width Fit', icon: <WidthFitIcon /> },
     { id: 3, name: 'Page Fit', icon: <PageFitIcon /> },
-  ]
+]
 
 interface TopbarProps {
     name: string;

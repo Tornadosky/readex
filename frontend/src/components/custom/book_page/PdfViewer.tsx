@@ -51,14 +51,14 @@ const HighlightPopup = ({
     </div>
   ) : null;
 
-class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: any }, State> {
+class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: any, bookName: string }, State> {
   state = {
     destinationPage: 1,
     pageCount: 0,
     currentPage: 1,
     inputPage: "1",
     color: "rgba(255, 226, 143, 1)",
-    bookName: "Book name",
+    bookName: this.props.bookName,
     scaleValue: "auto",
   };
 
@@ -195,7 +195,7 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
 
         <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>          
           <Topbar
-            name="Book name"
+            name={this.state.bookName}
             inputPage={this.state.inputPage}
             pageCount={this.state.pageCount}
             handleDecrease={this.handleDecreasePage}
@@ -315,6 +315,7 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
 function PdfViewerWrapper(props: any) {
   const { pdfId } = useParams();
   const [pdfUrl, setPdfUrl] = useState('');
+  const [bookName, setBookName] = useState('');
 
   useEffect(() => {
     const fetchBookName = async () => {
@@ -333,6 +334,7 @@ function PdfViewerWrapper(props: any) {
         if (response.data && response.data.data.Books.length > 0) {
           const bookName = response.data.data.Books[0].title;
           console.log('Book name:', bookName)
+          setBookName(bookName);
           return bookName;
         } else {
           console.error('Book not found');
@@ -381,7 +383,11 @@ function PdfViewerWrapper(props: any) {
     executeFetchSequence();
   }, [pdfId]);
 
-  return <PdfViewer {...props} url={pdfUrl} />;
+  return (
+  <>
+    {bookName && <PdfViewer {...props} url={pdfUrl} bookName={bookName.replace(".pdf", "")} />}
+  </>
+);
 }
 
 export default PdfViewerWrapper;

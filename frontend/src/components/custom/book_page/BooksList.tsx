@@ -94,7 +94,7 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
         query: mutation,
         variables: {
           id: parseInt(id),
-          title: newTitle,
+          title: newTitle + ".pdf",
           user: 1,
         },
       }, {
@@ -172,7 +172,7 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
                 />
               ) : (
                 <span className="text-ellipsis whitespace-nowrap overflow-hidden text-zinc-800">
-                  {book.title}<span className="text-zinc-400">.pdf</span>
+                  {book.title.replace(".pdf", "")}<span className="text-zinc-400">.pdf</span>
                 </span>
               )}
             </div>

@@ -23,7 +23,6 @@ model Users {
   achievements AchievementsOnUsers[]
   language  String
   theme     String
-  openedBooks Books[] @relation("openedBooks")
   books     Books[] @relation("bookOwner")
 }
 
@@ -36,8 +35,6 @@ model Books {
   highlights Highlights[]
   collections BooksOnCollections[]
   uploaded  String
-  openedBooks Users @relation("openedBooks", fields: [isOpened], references: [id])
-  isOpened  Int
   user      Users @relation("bookOwner", fields: [userid], references: [id]) 
   userid    Int   
 }

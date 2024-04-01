@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import QuestionCard from './QuestionCard';
+import axios from 'axios';
 
 interface Answer {
   id: string;
@@ -11,6 +13,7 @@ interface Question {
   question: string;
   answers: Answer[];
   loading: boolean;
+  correct: string;
 }
 
 interface QuizInfo {
@@ -20,8 +23,21 @@ interface QuizInfo {
   lastEdited: string;
 }
 
+interface ShuffleHelper {
+  value: Answer;
+  sort: number;
+}
+
 const QuizSolver: React.FC = () => {
+  const { testId } = useParams();
   const [isFinished, setIsFinished] = useState(false);
+  const [quizInfo, setQuizInfo] = useState<QuizInfo>({
+    testName: '',
+    numberOfQuestions: 0,
+    difficulty: '',
+    lastEdited: '',
+  });
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<{[key: string]: string}>({});
   const [result, setResult] = useState<string | null>(null);
 
@@ -40,93 +56,70 @@ const QuizSolver: React.FC = () => {
     setResult(`${correctCount} correct out of ${questions.length}`);
   };
 
-  const questions: Question[] = [
-    {
-      id: '1',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '2',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '3',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '4',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '5',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '6',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '7',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    }
-  ];
+ useEffect(() => {
+  const fetchQuestions = async () => {
+    const query = `
+      query GetTestAndQuestions($testId: Int!, $userId: Int!) {
+        Tests(id: $testId, user: $userId) {
+          id
+          title
+          prompt
+          language
+          difficulty
+          questions {
+            id
+            questionText
+            answers
+            correct
+            explanation
+          }
+        }
+      }
+    `;
 
-  // Example quiz info
-  const quizInfo: QuizInfo = {
-    testName: 'Neural Network Basics',
-    numberOfQuestions: questions.length,
-    difficulty: 'Intermediate',
-    lastEdited: 'Mar 5, 2024, 10:29:29 AM',
+    try {
+      const response = await axios.post('http://localhost:3000/graphql', {
+        query,
+        variables: { testId: parseInt(testId!), userId: 1},
+      }, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      console.log('response:', response.data.data.Tests)
+
+      if (response.data.data.Tests) {
+        const test = response.data.data.Tests[0];
+        const formattedQuestions = test.questions.map((q: any) => ({
+          id: q.id,
+          question: q.questionText, // Rename questionText to question
+          answers: JSON.parse(q.answers).map((answer: string, index: number) => ({
+            id: String(index + 1), // Generate IDs for answers if not provided
+            text: answer,
+          })).map((value: Answer): ShuffleHelper => ({ value, sort: Math.random() }))
+            .sort((a: ShuffleHelper, b: ShuffleHelper): number => a.sort - b.sort)
+            .map(({ value }: ShuffleHelper): Answer => value),
+          correct: q.correct,
+          loading: false,
+        }));
+
+        setQuestions(formattedQuestions);
+
+        setQuizInfo({
+          testName: test.title,
+          numberOfQuestions: formattedQuestions.length,
+          difficulty: test.difficulty,
+          lastEdited: new Date().toLocaleString(),
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch test and questions:', error);
+    }
   };
+
+  if (testId) {
+    fetchQuestions();
+  }
+}, [testId]);
 
   return (
     <>
@@ -166,13 +159,13 @@ const QuizSolver: React.FC = () => {
                         <QuestionCard 
                             key={question.id}
                             id={question.id}
-                            answers={question.answers} 
+                            answers={question.answers}
                             question={question.question}
                             question_number={index+1}
-                            loading={question.loading}
+                            loading={false}
                             solving={true}
                             isFinished={isFinished}
-                            correctAnswerId="1"
+                            correctAnswerId={question.correct}
                             onSelectAnswer={handleSelectAnswer}
                         />
                     ))}

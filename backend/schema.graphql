@@ -91,6 +91,7 @@ type Tests {
 type Questions {
   id: ID!
   test: Tests!
+  questionText: String!
   number: Int!
   type: String!
   answers: String
@@ -198,6 +199,7 @@ type Mutation {
     id: ID
     test: Int
     number: Int
+    questionText: String
     type: String
     answers: String
     correct: String

@@ -111,6 +111,7 @@ model Questions {
   test          Tests @relation(fields: [testid], references: [id])
   testid        Int
   number        Int
+  questionText  String
   type          String
   answers       String?
   correct       String

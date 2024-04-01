@@ -352,6 +352,7 @@ const resolver = {
                     words: true
                 }
             });
+            answer = answer ? [answer] : []; // Wrap the result in an array if the test is found, otherwise return an empty array
         } else {
             answer = await prisma.Tests.findMany({
                 include: {
@@ -919,6 +920,7 @@ const resolver = {
         if (args.id) {
             upsertParams.data = {};
             upsertParams.data.answers = (args.answers);
+            upsertParams.data.questionText = (args.questionText);
             upsertParams.data.type = (args.type);
             upsertParams.data.number = (args.number);
             upsertParams.data.correct = (args.correct);
@@ -948,6 +950,7 @@ const resolver = {
                 }
             };
             upsertParams.data.answers = (args.answers);
+            upsertParams.data.questionText = (args.questionText); // Not sure
             answer = await prisma.Questions.create(upsertParams);
         }
         console.log(answer);

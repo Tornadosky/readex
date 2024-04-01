@@ -47,8 +47,8 @@ function AppWrapper() {
         />}>
           <Route path="/home" element={<MainPage isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />} />
           <Route path="/pdfs/:pdfId/view" element={<PdfViewerWrapper highlights={highlights} setHighlights={setHighlights} />} />
-          <Route path="/tests/:testName/edit" element={<TestPage isSolving={false} />} />
-          <Route path="/tests/:testName/play" element={<TestPage isSolving={true} />} />
+          <Route path="/tests/:testId/edit" element={<TestPage isSolving={false} />} />
+          <Route path="/tests/:testId/play" element={<TestPage isSolving={true} />} />
         </Route>
         {/* Fallback route for 404 Not Found */}
         <Route path="*" element={<Page404 />} />

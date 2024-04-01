@@ -7,14 +7,9 @@ import type { IHighlight } from "./react-pdf-highlighter";
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import SmallSidebar from './SmallSidebar';
 import BookCreateModal from './BookCreateModal';
+import type { IBook } from './LayoutWithSidebar';
 import axios from 'axios';
 import './style.css';
-
-export interface IBook {
-  id: string;
-  title: string;
-  url?: string;
-}
 
 interface Props {
   highlights: Array<IHighlight>;
@@ -22,6 +17,8 @@ interface Props {
   toggleDocument: () => void;
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  booksList: Array<IBook>;
+  setBooksList: (value: any) => void;
 }
 
 export function Sidebar({
@@ -30,12 +27,13 @@ export function Sidebar({
   resetHighlights,
   isModalOpen,
   setIsModalOpen,
+  booksList,
+  setBooksList,
 }: Props) {
   const [view, setView] = useState('Books');
   const [sections, setSections] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [selectedSection, setSelectedSection] = useState("")
-  const [booksList, setBooksList] = useState<IBook[]>([]);
+  const [selectedSection, setSelectedSection] = useState("");
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState("20vw");
@@ -265,7 +263,7 @@ export function Sidebar({
         sections={sections}
         disabled={false}
         onSubmit={(file, newId) => {
-          setBooksList((prevBooks) => [
+          setBooksList((prevBooks: any) => [
             ...prevBooks,
             {
               id: newId,

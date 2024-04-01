@@ -1,6 +1,7 @@
 import { useState, useEffect, Component } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import ColorPickerWithPresets from './ColorPickerWithPresets';
+import type { IBook } from './LayoutWithSidebar';
 import Topbar from "./Topbar";
 import axios from 'axios';
 
@@ -51,7 +52,7 @@ const HighlightPopup = ({
     </div>
   ) : null;
 
-class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: any, bookName: string }, State> {
+class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: any, bookName: string, setBooksList: any }, State> {
   state = {
     destinationPage: 1,
     pageCount: 0,
@@ -85,6 +86,9 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
     if (prevState.currentPage !== this.state.currentPage && !isNaN(this.state.currentPage)) {
       this.setState({ inputPage: this.state.currentPage.toString() });
     }
+    // if (this.props.bookName !== prevProps.bookName) {
+    //   this.setState({ bookName: this.props.bookName });
+    // }
   }
 
   getHighlightById(id: string) {
@@ -195,7 +199,8 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
 
         <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>          
           <Topbar
-            name={this.state.bookName}
+            name={this.props.bookName}
+            setBooksList={this.props.setBooksList}
             inputPage={this.state.inputPage}
             pageCount={this.state.pageCount}
             handleDecrease={this.handleDecreasePage}
@@ -312,13 +317,20 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
   }
 }
 
+interface OutletContextType {
+  booksList: IBook[];
+  setBooksList: React.Dispatch<React.SetStateAction<IBook[]>>;
+}
+
 function PdfViewerWrapper(props: any) {
   const { pdfId } = useParams();
   const [pdfUrl, setPdfUrl] = useState('');
   const [bookName, setBookName] = useState('');
+  const { setBooksList } = useOutletContext<OutletContextType>();
 
   useEffect(() => {
     const fetchBookName = async () => {
+      setBookName('');
       try {
         const response = await axios.post('http://localhost:3000/graphql', {
           query: `
@@ -385,7 +397,7 @@ function PdfViewerWrapper(props: any) {
 
   return (
   <>
-    {bookName && <PdfViewer {...props} url={pdfUrl} bookName={bookName.replace(".pdf", "")} />}
+    {bookName && <PdfViewer key={pdfId} {...props} setBooksList={setBooksList} url={pdfUrl} bookName={bookName.replace(".pdf", "")} />}
   </>
 );
 }

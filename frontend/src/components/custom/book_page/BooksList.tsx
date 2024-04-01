@@ -4,7 +4,8 @@ import type { MenuProps } from 'antd';
 import { Dropdown } from 'antd';
 import { DeleteOutlined, EditOutlined, DownloadOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import type { IBook } from './Sidebar';
+import type { IBook } from './LayoutWithSidebar';
+import { useNavigate } from 'react-router-dom';
 
 interface BooksListProps {
   booksList: Array<IBook>;
@@ -15,6 +16,7 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
     const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
     const [editingBookId, setEditingBookId] = useState<string | null>(null);
     const [editingTitle, setEditingTitle] = useState("");
+    const navigate = useNavigate();
 
     const handleDotsClick = (bookId: string) => (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault(); // Prevents the default action (navigation)
@@ -146,11 +148,11 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
     return (
       <div className="books-list">
         {booksList.map((book) => (
-          <a 
+          <div
             key={book.id} 
-            className="group h-full flex items-center hover:bg-gray-100 p-2 rounded-lg transition-colors"
-            draggable="false" 
-            href={`http://localhost:5173/pdfs/${book.id}/view`}
+            className="group h-full flex items-center hover:bg-gray-100 p-2 rounded-lg transition-colors cursor-pointer"
+            draggable="false"
+            onClick={() => navigate(`/pdfs/${book.id}/view`)}
           >
             <div className="shrink-0 items-center mr-2 flex">
               <NotesIcon />
@@ -184,8 +186,7 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
                 <DotsIcon />
               </button>
             </Dropdown>
-            
-          </a>
+          </div>
         ))}
       </div>
     );

@@ -1,6 +1,8 @@
 import { Fragment, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import { EditIcon, PageScaleIcon, DefaultScaleIcon, PageFitIcon, WidthFitIcon } from '@/assets/svg';
+import axios from 'axios';
 
 import { Menu, Transition } from '@headlessui/react';
 import { CheckIcon } from '@heroicons/react/20/solid'
@@ -22,6 +24,7 @@ interface TopbarProps {
     submitPageInput: (e: any) => void;
     handleBookNameChange: (newBookName: string) => void;
     handleScaleChange: (scale: string) => void;
+    setBooksList: (value: any) => void;
 }
 
 const Topbar = ({
@@ -33,11 +36,13 @@ const Topbar = ({
     handlePageInput, 
     submitPageInput,
     handleBookNameChange,
-    handleScaleChange
+    handleScaleChange,
+    setBooksList,
 } : TopbarProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [newBookName, setNewBookName] = useState(name);
     const [selectedScale, setSelectedScale] = useState(scales[0]);
+    const { pdfId } = useParams();
 
     const toggleEditMode = () => {
         setIsEditing(!isEditing);
@@ -49,6 +54,39 @@ const Topbar = ({
 
     const handleSubmitBookNameChange = () => {
         handleBookNameChange(newBookName);
+        const mutation = `
+            mutation UpdateBook($id: Int!, $title: String!, $user: Int!) {
+                setBook(id: $id, title: $title, user: $user) {
+                    id
+                    title
+                }
+            }
+        `;
+    
+        axios.post('http://localhost:3000/graphql', {
+            query: mutation,
+            variables: {
+            id: parseInt(pdfId!),
+            title: newBookName + ".pdf",
+            user: 1,
+            },
+        }, {
+            headers: {
+            'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            console.log(response.data);
+            setBooksList((currentBooks: any) =>
+            currentBooks.map((book: any) =>
+                book.id === pdfId ? { ...book, title: newBookName } : book
+            )
+            );
+        })
+        .catch(error => {
+            console.error('Failed to update book title:', error);
+        });
+        
         setIsEditing(false);
     };
 

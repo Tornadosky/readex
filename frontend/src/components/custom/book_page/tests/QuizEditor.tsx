@@ -1,66 +1,79 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import QuestionCard from './QuestionCard';
 import { SuccessIcon } from '@/assets/svg';
 import QuizMenu from './QuizMenu';
+import axios from 'axios';
+
+interface Answer {
+  id: string;
+  text: string;
+}
 
 interface Question {
   id: string;
   question: string;
-  option_1: string;
-  option_2: string;
-  option_3: string;
-  option_4: string;
+  answers: Answer[];
+  correct?: string;
+  loading: boolean;
 }
 
 const QuizEditor = () => {
   const [activePage, setActivePage] = useState('URL');
-  const [questions, setQuestions] = useState([
-    {
-      id: '1',
-      question: 'Represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '2',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '3',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-    {
-      id: '4',
-      question: 'What do (z_1)² and (z_2)² represent in the context of the neural network?',
-      answers: [
-        { id: '1', text: "The input and output of the activation function" },
-        { id: '2', text: "The input and output of the activation function The input and output of the activation function" },
-        { id: '3', text: "The input and output of the activation function" },
-        { id: '4', text: "The input and output of the activation function" }
-      ],
-      loading: false,
-    },
-  ]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [generating, setGenerating] = useState<boolean>(false);
+  const { testId } = useParams();
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      const query = `
+        query GetTestAndQuestions($testId: Int!, $userId: Int!) {
+          Tests(id: $testId, user: $userId) {
+            questions {
+              id
+              questionText
+              answers
+              correct
+              explanation
+            }
+          }
+        }
+      `;
+  
+      try {
+        const response = await axios.post('http://localhost:3000/graphql', {
+          query,
+          variables: { testId: parseInt(testId!), userId: 1},
+        }, {
+          headers: { 'Content-Type': 'application/json' },
+        });
+  
+        console.log('response:', response.data.data.Tests)
+  
+        if (response.data.data.Tests) {
+          const test = response.data.data.Tests[0];
+          const formattedQuestions = test.questions.map((q: any) => ({
+            id: q.id,
+            question: q.questionText,
+            answers: JSON.parse(q.answers).map((answer: string, index: number) => ({
+              id: String(index + 1),
+              text: answer,
+            })),
+            correct: q.correct,
+            loading: false,
+          }));
+  
+          setQuestions(formattedQuestions);
+        }
+      } catch (error) {
+        console.error('Failed to fetch test and questions:', error);
+      }
+    };
+  
+    if (testId) {
+      fetchQuestions();
+    }
+  }, [testId]);
 
   const handleBackendRequest = async (submissionData: any) => {
     setGenerating(true);
@@ -112,9 +125,9 @@ const QuizEditor = () => {
   
       const newQuestions = await response.json();
   
-      setQuestions((prevQuestions) => [
+      setQuestions((prevQuestions: any) => [
         ...prevQuestions,
-        ...newQuestions.map((question: Question) => ({
+        ...newQuestions.map((question: any) => ({
             id: Math.random().toString(36).substr(2, 9),
             question: question.question,
             answers: [{id: Math.random().toString(36).substr(2, 9), text: question.option_1.replace(/\s?[a-d]\)\s?/, '')},
@@ -135,8 +148,31 @@ const QuizEditor = () => {
     setActivePage(page);
   };
 
-  const handleDeleteQuestion = (questionId: string) => {
-    setQuestions(questions.filter((question) => question.id !== questionId));
+  const handleDeleteQuestion = async (questionId: string) => {
+    const mutation = `
+      mutation DeleteQuestion($id: Int!) {
+        delQuestion(id: $id) {
+          id
+        }
+      }
+    `;
+  
+    try {
+      const response = await axios.post('http://localhost:3000/graphql', {
+        query: mutation,
+        variables: { id: parseInt(questionId) },
+      }, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.data.errors) {
+        setQuestions((currentQuestions) => currentQuestions.filter((question) => question.id !== questionId));
+      } else {
+        console.error('Failed to delete question:', response.data.errors);
+      }
+    } catch (error) {
+      console.error('Error deleting question:', error);
+    }
   };
 
   return (

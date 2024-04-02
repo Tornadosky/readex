@@ -81,6 +81,8 @@ type Tests {
   id: ID!
   title: String!
   prompt: String!
+  questionCount: Int!
+  lastResult: Int
   language: String!
   difficulty: String!
   user: Users!
@@ -193,6 +195,8 @@ type Mutation {
     prompt: String
     language: String
     difficulty: String
+    questionCount: Int
+    lastResult: Int
     user: Int
   ): Tests
   setQuestion(

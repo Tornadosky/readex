@@ -875,10 +875,25 @@ const resolver = {
         let upsertParams = null;
         let answer = null;
         if (args.id) {
+            upsertParams = {
+                data: {},
+                where: {
+                  id: parseInt(args.id),
+                },
+                include: {
+                  user: true,
+                  questions: true,
+                  collections: true,
+                  words: true,
+                },
+            };
+
             args.title ? upsertParams.data.title = args.title : null;
             args.prompt ? upsertParams.data.prompt = args.prompt : null;
             args.language ? upsertParams.data.language = args.language : null;
             args.difficulty ? upsertParams.data.difficulty = args.difficulty : null;
+            args.questionCount ? upsertParams.data.questionCount = args.questionCount : null;
+            args.lastResult ? upsertParams.data.lastResult = args.lastResult : null;
             upsertParams.where = {
                 id: parseInt(args.id)
             };
@@ -896,6 +911,8 @@ const resolver = {
                     prompt: args.prompt,
                     language: args.language,
                     difficulty: args.difficulty,
+                    questionCount: args.questionCount,
+                    lastResult: args.lastResult,
                     user: {
                         connect: {
                             id: args.user

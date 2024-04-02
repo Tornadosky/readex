@@ -45,15 +45,46 @@ const QuizSolver: React.FC = () => {
     setSelectedAnswers(prev => ({...prev, [questionId]: answerId}));
   };
 
-  const handleFinishTest = () => {
+  const handleFinishTest = async () => {
     setIsFinished(true);
     let correctCount = questions.reduce((count, question) => {
-      if (selectedAnswers[question.id] === question.answers[0].id) {
+      if (selectedAnswers[question.id] === question.correct) {
         return count + 1;
       }
       return count;
     }, 0);
-    setResult(`${correctCount} correct out of ${questions.length}`);
+    const resultPercentage = ((correctCount / questions.length) * 100).toFixed(0);
+    setResult(resultPercentage);
+
+    const mutation = `
+    mutation UpdateTestLastResult($id: ID!, $lastResult: Int!) {
+        setTest(id: $id, lastResult: $lastResult) {
+          id
+          lastResult
+        }
+      }
+    `;
+
+    try {
+      const response = await axios.post('http://localhost:3000/graphql', {
+        query: mutation,
+        variables: {
+          id: parseInt(testId!),
+          lastResult: parseFloat(resultPercentage),
+        },
+      }, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      console.log(response.data.data.setTest)
+      if (response.data.data.setTest) {
+        console.log('Test lastResult updated successfully');
+      } else {
+        console.error('Failed to update test lastResult:', response.data.errors);
+      }
+    } catch (error) {
+      console.error('Failed to update test lastResult:', error);
+    }
   };
 
  useEffect(() => {
@@ -137,7 +168,7 @@ const QuizSolver: React.FC = () => {
             <p className='flex-shrink-0 mr-9'>{quizInfo.numberOfQuestions} Questions | Difficulty: {quizInfo.difficulty}</p>
             <div>
               {result && (
-                <div className="text-lg bg-slate-400 rounded-md px-2 text-black">{result}</div>
+                <div className="text-lg bg-slate-400 rounded-md px-2 text-black">{result}%</div>
               )}
               {!isFinished && (
                 <button 

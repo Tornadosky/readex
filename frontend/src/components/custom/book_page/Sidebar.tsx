@@ -7,7 +7,7 @@ import type { IHighlight } from "./react-pdf-highlighter";
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import SmallSidebar from './SmallSidebar';
 import BookCreateModal from './BookCreateModal';
-import type { IBook } from './LayoutWithSidebar';
+import type { IBook, ITest } from './LayoutWithSidebar';
 import axios from 'axios';
 import './style.css';
 
@@ -19,6 +19,8 @@ interface Props {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   booksList: Array<IBook>;
   setBooksList: (value: any) => void;
+  testsList: Array<ITest>;
+  setTestsList: (value: any) => void;
 }
 
 export function Sidebar({
@@ -29,6 +31,8 @@ export function Sidebar({
   setIsModalOpen,
   booksList,
   setBooksList,
+  testsList,
+  setTestsList,
 }: Props) {
   const [view, setView] = useState('Books');
   const [sections, setSections] = useState([]);
@@ -133,7 +137,53 @@ export function Sidebar({
         console.error('Failed to fetch books for user 1:', error);
       }
     };
-  
+    const fetchTestsForUser = async () => {
+      try {
+        const query = `
+          query GetTestsForUser($userId: Int!) {
+            Tests(user: $userId) {
+              id
+              title
+              prompt
+              language
+              difficulty
+              questionCount
+              lastResult
+            }
+          }
+        `;
+    
+        const variables = {
+          userId: 1,
+        };
+    
+        const response = await axios.post('http://localhost:3000/graphql', {
+          query,
+          variables
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+    
+        const { data } = response.data;
+        console.log(data);
+        if (data && data.Tests) {
+          setTestsList(data.Tests.map((test: ITest) => ({
+            id: test.id,
+            title: test.title,
+            questionCount: test.questionCount,
+            difficulty: test.difficulty,
+            lastUpdated: '2021-09-01',
+            lastResult: test.lastResult,
+          })));
+        }
+      } catch (error) {
+        console.error('Failed to fetch tests for user:', error);
+      }
+    };
+    
+    fetchTestsForUser();
     fetchBooksForUser();
     fetchSections();
   }, []);
@@ -163,38 +213,7 @@ export function Sidebar({
       setView('');
     }
     setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const testTests = [
-    {
-      id: '1',
-      title: 'GRE Official Guide',
-      url: '/tests/42a4bed4-e125-4bf3-a4c0-1e66fb875b77/edit',
-      questionCount: 10,
-      difficulty: 'Hard',
-      lastUpdated: '2023-09-01',
-      lastResult: 85,
-    },
-    {
-      id: '2',
-      title: 'TOEFL Preparation Book',
-      url: '/tests/54f1c2bd-ec4e-4f2e-a10e-2f639e8d8f47/edit',
-      questionCount: 5,
-      difficulty: 'Medium',
-      lastUpdated: '2023-08-15',
-      lastResult: 60,
-    },
-    {
-      id: '3',
-      title: 'GMAT Exam Guide',
-      url: '/tests/e1b5b2de-3bfa-4a5b-8a9a-7e4f422c4c4e/edit',
-      questionCount: 15,
-      difficulty: 'Very Hard',
-      lastUpdated: '2023-10-05',
-      lastResult: 45,
-    },
-  ];
-  
+  };  
 
   return (
     <>
@@ -240,7 +259,8 @@ export function Sidebar({
                 />
               ) : view === "Tests" ? (
                 <TestsList 
-                  tests={testTests}
+                  testsList={testsList}
+                  setTestsList={setTestsList}
                 />
               ) : (
                 <BooksList 

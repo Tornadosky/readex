@@ -99,6 +99,8 @@ model Tests {
   prompt    String
   language  String
   difficulty String
+  questionCount Int
+  lastResult Int?
   user      Users @relation(fields: [userid], references: [id])
   userid    Int
   questions Questions[]

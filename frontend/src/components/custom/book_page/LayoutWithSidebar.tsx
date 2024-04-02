@@ -11,6 +11,15 @@ export interface IBook {
     url?: string;
 }
 
+export interface ITest {
+    id: string;
+    title: string;
+    questionCount: number;
+    difficulty: string;
+    lastUpdated: string;
+    lastResult: number | null;
+}
+
 interface LayoutWithSidebarProps {
     highlights: IHighlight[];
     resetHighlights: () => void;
@@ -21,6 +30,7 @@ interface LayoutWithSidebarProps {
 
 const LayoutWithSidebar = ({highlights, resetHighlights, toggleDocument, isModalOpen, setIsModalOpen }: LayoutWithSidebarProps) => {
     const [booksList, setBooksList] = useState<IBook[]>([]);
+    const [testsList, setTestsList] = useState<ITest[]>([]);
 
     return (
         <div className="App" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -33,6 +43,8 @@ const LayoutWithSidebar = ({highlights, resetHighlights, toggleDocument, isModal
                     setIsModalOpen={setIsModalOpen}
                     booksList={booksList}
                     setBooksList={setBooksList}
+                    testsList={testsList}
+                    setTestsList={setTestsList}
                 />
                 <Outlet context={{ booksList, setBooksList }}/> 
             </div>

@@ -18,7 +18,7 @@ interface QuestionCardProps {
   handleDeleteQuestion?: (id: string) => void;
   correctAnswerId?: string;
   isFinished?: boolean;
-  onSelectAnswer: (questionId: string, answerId: string) => void;
+  onSelectAnswer?: (questionId: string, answerId: string) => void;
 }
 
 const QuestionCard: React.FC<QuestionCardProps> = ({ 
@@ -36,7 +36,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
 
   const handleSelectAnswer = (answerId: string) => {
-    if (!isFinished) { 
+    if (!isFinished && onSelectAnswer) { 
       onSelectAnswer(id, answerId);
       setSelectedAnswer(answerId);
     }

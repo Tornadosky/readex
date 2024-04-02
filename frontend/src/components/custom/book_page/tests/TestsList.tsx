@@ -4,29 +4,19 @@ import type { MenuProps } from 'antd';
 import { Dropdown } from 'antd';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-
-interface ITest {
-    id: string;
-    title: string;
-    url: string;
-    questionCount: number;
-    difficulty: string;
-    lastUpdated: string;
-    lastResult: number | null;
-}
+import { ITest } from '../LayoutWithSidebar';
 
 interface TestsListProps {
-    tests: Array<ITest>;
+    testsList: Array<ITest>;
+    setTestsList: (value: any) => void;
 }
 
-const TestsList: React.FC<TestsListProps> = ({ tests }) => {
-    const [testsList, setTestsList] = useState<Array<ITest>>(tests);
+const TestsList: React.FC<TestsListProps> = ({ testsList, setTestsList }) => {
     const [selectedTestId, setSelectedTestId] = useState<string | null>(null);
-
     const navigate = useNavigate()
 
     const handleAddTest = (test: ITest) => {
-        setTestsList(currentTests => [...currentTests, test]);
+        setTestsList((currentTests: ITest[]): any => [...currentTests, test]);
     };
 
     const AddQuizButton: React.FC = () => {
@@ -34,7 +24,7 @@ const TestsList: React.FC<TestsListProps> = ({ tests }) => {
             <button 
                 type="button" 
                 className="mt-4 inline-flex items-center px-3 border shadow-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 h-[42px] sm:h-[38px] text-sm border-transparent bg-green-600 hover:bg-green-700 text-white"
-                onClick={() => handleAddTest({ id: testsList.length.toString() + Math.floor(Math.random() * 1000).toString(), title: 'New Quiz', url: 'http://localhost:5173/tests/new', questionCount: 0, difficulty: 'easy', lastUpdated: '2021-09-01', lastResult: 0 })}
+                onClick={() => handleAddTest({ id: testsList.length.toString() + Math.floor(Math.random() * 1000).toString(), title: 'New Quiz', questionCount: 0, difficulty: 'easy', lastUpdated: '2021-09-01', lastResult: 0 })}
             >
                 <PlusIcon />
                 <span className="max-w-full overflow-hidden">New quiz</span>
@@ -51,7 +41,7 @@ const TestsList: React.FC<TestsListProps> = ({ tests }) => {
     const handleMenuClick: MenuProps['onClick'] = (e) => {
         console.log('click', e);
         if (e.key === '2' && selectedTestId) { // If "Delete" is clicked
-            setTestsList(currentTests => currentTests.filter(test => test.id !== selectedTestId));
+            setTestsList((currentTests: ITest[]): any => currentTests.filter(test => test.id !== selectedTestId));
             setSelectedTestId(null);
         } 
         if (e.key === '1' && selectedTestId) { // If "Edit" is clicked

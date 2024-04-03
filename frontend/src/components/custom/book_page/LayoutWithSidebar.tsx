@@ -18,6 +18,7 @@ export interface ITest {
     difficulty: string;
     lastUpdated: string;
     lastResult: number | null;
+    questions: any[];
 }
 
 interface LayoutWithSidebarProps {

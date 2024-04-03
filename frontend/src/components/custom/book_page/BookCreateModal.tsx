@@ -5,7 +5,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';
 import Selector from './Selector';
-import { RcFile } from 'antd/es/upload';
+// import { RcFile } from 'antd/es/upload';
 import axios from 'axios';
   
 const { Dragger } = Upload;

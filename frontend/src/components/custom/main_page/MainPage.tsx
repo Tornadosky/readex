@@ -72,6 +72,7 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen }) => {
         setLoading(false);
       }
     };
+    console.log("Fetching data")
   
     fetchData();
   }, []);

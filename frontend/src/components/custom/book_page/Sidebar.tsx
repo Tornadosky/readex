@@ -149,6 +149,9 @@ export function Sidebar({
               difficulty
               questionCount
               lastResult
+              questions {
+                id
+              }
             }
           }
         `;
@@ -172,7 +175,7 @@ export function Sidebar({
           setTestsList(data.Tests.map((test: ITest) => ({
             id: test.id,
             title: test.title,
-            questionCount: test.questionCount,
+            questionCount: test.questions.length,
             difficulty: test.difficulty,
             lastUpdated: '2021-09-01',
             lastResult: test.lastResult,
@@ -259,6 +262,7 @@ export function Sidebar({
                 />
               ) : view === "Tests" ? (
                 <TestsList 
+                  booksList={booksList}
                   testsList={testsList}
                   setTestsList={setTestsList}
                 />

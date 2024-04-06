@@ -4,6 +4,8 @@ import { CloseOutlined } from '@ant-design/icons';
 import Selector from '../Selector';
 import axios from 'axios';
 import { LoadingIcon } from '@/assets/svg';
+import { Select } from 'antd';
+
 
 interface Props {
   isModalOpen: boolean;
@@ -15,6 +17,8 @@ interface Props {
 const TestCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, booksList, onSubmit }) => {
     const [selectedBook, setSelectedBook] = useState<any>(booksList[0]); // Adapt this state as per your actual book type
     const [questionSource, setQuestionSource] = useState<'pdf' | 'highlights'>('pdf');
+    const [selectedLanguage, setSelectedLanguage] = useState<string>('English');
+    const [selectedQuestionType, setSelectedQuestionType] = useState<string>('Multiple Choice');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleClosed = () => {
@@ -137,6 +141,51 @@ const TestCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, booksLi
                                 Highlights
                             </label>
                         </div>
+
+                        <div className="border-b mt-5 mb-3 w-full" style={{ borderColor: '#d1d5db' }}></div>
+
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label className="block font-bold text-gray-800">
+                                    Question Type
+                                </label>
+                                <div className="mt-1 rounded-md shadow-sm">
+                                    <Select
+                                        disabled
+                                        defaultValue={selectedQuestionType}
+                                        style={{ minWidth: "100%" }}
+                                        onChange={(value) => setSelectedQuestionType(value)}
+                                        options={[
+                                            { value: 'Multiple Choice', label: 'Multiple Choice' },
+                                            { value: 'True or False', label: 'True or False' },
+                                            { value: 'Short Answer', label: 'Short Answer' },
+                                            { value: 'Fill in the Blank', label: 'Fill in the Blank' },
+                                            { value: 'Matching', label: 'Matching' },
+                                        ]}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block font-bold text-gray-800">
+                                    Language
+                                </label>
+                                <div className="mt-1 rounded-md shadow-sm">
+                                    <Select
+                                        defaultValue={selectedLanguage}
+                                        style={{ minWidth: "100%" }}
+                                        onChange={(value: string) => setSelectedLanguage(value)}
+                                        options={[
+                                            { value: 'English', label: 'English' },
+                                            { value: 'Spanish', label: 'Spanish' },
+                                            { value: 'German', label: 'German' },
+                                            { value: 'Russian', label: 'Russian' },
+                                        ]}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        
 
                         <div className="mt-4">
                             <button

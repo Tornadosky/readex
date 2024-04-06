@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Skeleton } from 'antd';
 import { DislikeIcon, LikeIcon, PencilIcon, TrashIcon, SuccessIcon } from '@/assets/svg';
 import { CloseOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 interface Answer {
   id: string;
@@ -34,12 +35,77 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   onSelectAnswer,
  }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState<boolean>(false);
+  const [editedQuestion, setEditedQuestion] = useState<string>(question);
+  const [editedAnswers, setEditedAnswers] = useState<Answer[]>(answers);
 
   const handleSelectAnswer = (answerId: string) => {
     if (!isFinished && onSelectAnswer) { 
       onSelectAnswer(id, answerId);
       setSelectedAnswer(answerId);
     }
+  };
+
+  const toggleEditMode = () => {
+    setEditMode(!editMode);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, questionId?: string) => {
+    if (e.key === 'Enter' && editMode) {
+      e.preventDefault();
+      toggleEditMode();
+      handleEditBackend();
+    }
+  };
+
+  const handleEditBackend = async () => {
+    const mutation = `
+      mutation EditQuestion($id: ID!, $questionText: String!, $answers: String!) {
+        setQuestion(id: $id, questionText: $questionText, answers: $answers) {
+          id
+          questionText
+          answers
+        }
+      }
+    `;
+    
+    const answerTexts = editedAnswers.map(answer => answer.text);
+  
+    try {
+      const response = await axios.post('http://localhost:3000/graphql', {
+        query: mutation,
+        variables: {
+          id: parseInt(id),
+          questionText: editedQuestion,
+          answers: JSON.stringify(answerTexts)
+        },
+      }, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+  
+      if (!response.data.errors) {
+        console.log('Question updated:', response.data.data.setQuestion);
+        setEditedQuestion(response.data.data.setQuestion.questionText);
+        console.log(response.data.data.setQuestion.answers);
+        setEditedAnswers(JSON.parse(response.data.data.setQuestion.answers).map((answer: string, index: number) => ({ id: index.toString(), text: answer })));
+      } else {
+        console.error('Failed to update question:', response.data.errors);
+      }
+    } catch (error) {
+      console.error('Error updating question:', error);
+    }
+  };
+
+
+  const handleEditQuestion = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditedQuestion(e.target.value);
+  };
+
+  const handleEditAnswer = (answerId: string, newText: string) => {
+    const updatedAnswers = editedAnswers.map((answer) =>
+      answer.id === answerId ? { ...answer, text: newText } : answer
+    );
+    setEditedAnswers(updatedAnswers);
   };
 
   const isCorrect = isFinished && selectedAnswer && selectedAnswer === correctAnswerId;
@@ -55,14 +121,25 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
               <div className="flex items-center">
                 <h3 className="text-lg font-bold text-gray-700">
                   <span>{question_number}</span>. 
-                  <span> {question}</span>
+                  {editMode ? (
+                    <input
+                      type="text"
+                      value={editedQuestion}
+                      onChange={handleEditQuestion}
+                      onKeyDown={(e) => handleKeyPress(e)}
+                      className="ml-4 text-md font-medium rounded text-gray-400 outline-slate-400 px-1 focus:ring-0 focus:border-0"
+                      style={{ border: '1px solid #ccc' }}
+                    />
+                  ) : (
+                    <span> {editedQuestion}</span>
+                  )}
                 </h3>
               </div>
             </div>
           </div>
           {/* Question Options */}
           <div className="mt-4 mb-2">
-            {answers.map((answer, index) => {
+            {editedAnswers.map((answer, index) => {
               const isCorrectAnswer = answer.id === correctAnswerId;
               const isSelected = selectedAnswer === answer.id;
 
@@ -77,7 +154,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                     <input
                       type="radio"
                       name={`quiz-input-${question_number}`}
-                      className="w-4 h-4 text-indigo-600 border-gray-300 cursor-pointer focus:ring-indigo-500"
+                      className="w-4 h-4 text-indigo-600 border-gray-300 cursor-pointer focus:ring-0 focus:border-0"
                       checked={selectedAnswer === answer.id}
                       onChange={() => handleSelectAnswer(answer.id)}
                       disabled={isFinished}
@@ -85,9 +162,18 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                   </div>
                   <div className={`ml-3 cursor-pointer text-md rtl:mr-3 px-2 ${isFinished && isCorrectAnswer ? "rounded-md border-2 border-green-500" : ""}`}>
                     <label className="font-medium text-gray-700">{String.fromCharCode(65 + index)}) </label>
-                    <span className="text-gray-600 quiz-markdown">
-                      {answer.text}
-                    </span>
+                    {editMode ? (
+                      <input
+                        type="text"
+                        value={editedAnswers[index].text}
+                        onKeyDown={(e) => handleKeyPress(e, answer.id)}
+                        onChange={(e) => handleEditAnswer(answer.id, e.target.value)}
+                        className="text-md font-medium rounded text-gray-400 outline-slate-400 px-1 focus:ring-0 focus:border-0"
+                        style={{ border: '1px solid #ccc' }}
+                      />
+                    ) : (
+                      <span className="text-gray-600 quiz-markdown">{answer.text}</span>
+                    )}
                   </div>
                 </div>
               );
@@ -106,7 +192,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
               </div>
               <div className="flex justify-end px-4 pt-3 space-x-2 rtl:space-x-reverse grow">
                 <div>
-                  <span className="text-gray-500 hover:text-gray-800 cursor-pointer inline mb-0.5">
+                  <span className="text-gray-500 hover:text-gray-800 cursor-pointer inline mb-0.5" onClick={toggleEditMode}>
                     <PencilIcon />
                   </span>
                 </div>

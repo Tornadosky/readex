@@ -932,7 +932,7 @@ const resolver = {
         return answer;
     },
     setQuestion: async (args, context) => {
-        let upsertParams = null;
+        let upsertParams = {};
         let answer = null;
         if (args.id) {
             upsertParams.data = {};

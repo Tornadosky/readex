@@ -22,9 +22,10 @@ interface Props {
 
 const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selectedSection, setSelectedSection, sections, disabled , onSubmit }) => {
     const [uploadedFile, setUploadedFile] = useState<any>(null);
+    const [pdfUrl, setPdfUrl] = useState('');
     const [uploading, setUploading] = useState(false);
 
-    const fileToBase64 = (file: File): Promise<string> => {
+    const fileToBase64 = (file: File | Blob): Promise<string> => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result as string);
@@ -71,14 +72,43 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
     };
 
     const handleSubmit = async () => {
-        if (!uploadedFile) return; 
+        if (!uploadedFile && !pdfUrl) return; 
 
         setUploading(true);
-        const formData = new FormData();
-        formData.append('file', uploadedFile);
-        try {
-            const documentBase64 = await fileToBase64(uploadedFile);
 
+        let documentBase64;
+  
+        if (pdfUrl && !uploadedFile) {
+            try {
+                const renderResponse = await axios.post('http://localhost:9000/api/render', {
+                    url: pdfUrl
+                }, {
+                    responseType: 'blob' 
+                }); 
+                if (renderResponse.status === 200) {
+                    const blob = new Blob([renderResponse.data], {type: 'application/pdf'});
+                    documentBase64 = await fileToBase64(blob);
+                    documentBase64 = documentBase64.replace('data:application/pdf;base64,', '');
+                    console.log('PDF successfully rendered from URL.');
+                } else {
+                    console.error('Error rendering PDF from URL:', renderResponse.data);
+                    message.error('Error rendering PDF.');
+                    setUploading(false);
+                    return;
+                }
+            } catch (error) {
+                console.error('Error rendering PDF from URL:', error);
+                message.error('Error rendering PDF.');
+                setUploading(false);
+                return;
+            }
+        } else {
+            console.log('Uploading file:', uploadedFile);
+            documentBase64 = await fileToBase64(uploadedFile);
+            documentBase64 = documentBase64.replace('data:application/pdf;base64,', '');
+        }
+
+        try {
             const response = await axios.post('http://localhost:3000/graphql', {
                 query: `
                     mutation AddBook($title: String!, $author: String, $document: String!, $image: String, $highlights: [Int], $collections: [Int], $user: Int!) {
@@ -104,9 +134,9 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                     }
                 `,
                 variables: {
-                    title: uploadedFile.name,
-                    author: "Autroh",
-                    document: documentBase64.replace('data:application/pdf;base64,', ''),
+                    title: uploadedFile ? uploadedFile.name : new URL(pdfUrl).hostname,
+                    author: "Author",
+                    document: documentBase64,
                     image: null,
                     highlights: [],
                     collections: [1],
@@ -118,7 +148,7 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
 
             if (response.data.data && !response.data.errors) {
                 message.success('File uploaded and section updated successfully');
-                onSubmit(uploadedFile, response.data.data.setBook.id);
+                onSubmit(uploadedFile ? uploadedFile : {name: new URL(pdfUrl).hostname}, response.data.data.setBook.id);
             } else {
                 message.error('File upload failed.');
             }
@@ -127,12 +157,14 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
             message.error('File upload failed.');
         }
         setUploading(false);
+        setPdfUrl('');
         setUploadedFile(null);
         setIsModalOpen(false);
     };
 
     const handleClosed = () => {
         setUploadedFile(null);
+        setPdfUrl('');
         setIsModalOpen(false);
     }
 
@@ -189,6 +221,8 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                                 type="text"
                                 name="url"
                                 id="url"
+                                value={pdfUrl}
+                                onChange={(e) => setPdfUrl(e.target.value)}
                                 placeholder="E.g. https://cs231n.github.io/neural-networks-3/"
                                 className="flex-1 block w-full min-w-0 border border-gray-300 rounded-md text-gray-800 focus:border-indigo-500 focus:ring-indigo-500 mt-1 p-2"
                             />
@@ -213,14 +247,15 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                                     banned files.
                                 </p>
                             </Dragger>
-                            {uploadedFile && <div className="mt-2 text-sm font-medium text-green-600">Uploaded: {uploadedFile.name}</div>}
+                            {(uploadedFile || pdfUrl) && <div className="mt-2 text-sm font-medium text-green-600">Will be Uploaded: { uploadedFile ? uploadedFile.name : pdfUrl }</div>}
+                            
                         </div>
                         <div className="mt-4">
                             <button
                                 type="button"
                                 className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                 onClick={handleSubmit}
-                                disabled={uploading || !uploadedFile}
+                                disabled={uploading || (!uploadedFile && !pdfUrl)}
                             >
                                 {uploading ? (
                                     <>

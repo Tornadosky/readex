@@ -70,7 +70,7 @@ const QuizSolver: React.FC = () => {
         query: mutation,
         variables: {
           id: parseInt(testId!),
-          lastResult: parseFloat(resultPercentage),
+          lastResult: parseInt(resultPercentage),
         },
       }, {
         headers: { 'Content-Type': 'application/json' },

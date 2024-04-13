@@ -75,6 +75,79 @@ const QuizEditor = () => {
     }
   }, [testId]);
 
+  const saveQuestionsToBackend = async (questions: any, testId: number) => {
+    for (let question of questions) {
+      const answers = [
+        question.option_1,
+        question.option_2,
+        question.option_3,
+        question.option_4
+      ];
+  
+      // Extract correct answer index based on 'answer' property from the question
+      const correctIndex = answers.findIndex(option => option === question.answer) + 1;
+      const correctAnswer = correctIndex !== -1 ? correctIndex.toString() : '4';  // A, B, C, or D
+
+      // delete letters form answers options, e.g. a), b), c), d)
+      answers.forEach((answer, index) => {
+        answers[index] = answer.replace(/^[a-d]\)\s/, '');
+      });
+  
+      try {
+        const response = await axios.post('http://localhost:3000/graphql', {
+          query: `
+            mutation SetQuestion($test: Int!, $number: Int!, $questionText: String!, $type: String!, $answers: String!, $correct: String!, $explanation: String) {
+              setQuestion(
+                test: $test,
+                number: $number,
+                questionText: $questionText,
+                type: $type,
+                answers: $answers,
+                correct: $correct,
+                explanation: $explanation
+              ) {
+                id
+                questionText
+              }
+            }
+          `,
+          variables: {
+            test: testId,
+            number: questions.indexOf(question) + 1,
+            questionText: question.question,
+            type: "Multiple Choice",  // Assume type for simplicity
+            answers: JSON.stringify(answers),
+            correct: correctAnswer,
+            explanation: "Automatically generated question"
+          }
+        }, {
+          headers: { 'Content-Type': 'application/json' }
+        });
+  
+        if (response.data.data) {
+          console.log('Question saved:', response.data.data.setQuestion);
+          setQuestions(prev => [
+            ...prev,
+            {
+              id: response.data.data.setQuestion.id,
+              loading: false,
+              question: question.question,
+              answers: answers.map((text, index) => ({
+                id: String(index + 1),
+                text: text
+              })),
+              correct: correctAnswer
+            }
+          ]);
+        } else {
+          console.error('Failed to save question:', response.data.errors);
+        }
+      } catch (error) {
+        console.error('Error saving question:', error);
+      }
+    }
+  };
+
   const handleBackendRequest = async (submissionData: any) => {
     setGenerating(true);
 
@@ -119,23 +192,12 @@ const QuizEditor = () => {
         body: JSON.stringify(submissionData),
       });
   
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      if (!response.ok) throw new Error('Network response was not ok');
   
-      const newQuestions = await response.json();
-  
-      setQuestions((prevQuestions: any) => [
-        ...prevQuestions,
-        ...newQuestions.map((question: any) => ({
-            id: Math.random().toString(36).substr(2, 9),
-            question: question.question,
-            answers: [{id: Math.random().toString(36).substr(2, 9), text: question.option_1.replace(/\s?[a-d]\)\s?/, '')},
-              {id: Math.random().toString(36).substr(2, 9), text: question.option_2.replace(/\s?[a-d]\)\s?/, '')},
-              {id: Math.random().toString(36).substr(2, 9), text: question.option_3.replace(/\s?[a-d]\)\s?/, '')},
-              {id: Math.random().toString(36).substr(2, 9), text: question.option_4.replace(/\s?[a-d]\)\s?/, '')}],
-            loading: false }))
-      ]);
+      const generatedQuestions = await response.json();
+      console.log('Generated questions:', generatedQuestions);
+      
+      await saveQuestionsToBackend(generatedQuestions, parseInt(testId!));
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
     } finally {

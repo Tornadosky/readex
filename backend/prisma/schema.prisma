@@ -79,6 +79,10 @@ model Highlights {
   title          String
   text           String
   color          String
+  image          String?
+  width          Int?
+  height         Int?
+  emoji          String?
 }
 
 model Words {
@@ -106,6 +110,7 @@ model Tests {
   questions Questions[]
   collections TestsOnCollections[]
   words     Words[]
+  result    Int
 }
 
 model Questions {

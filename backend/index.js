@@ -95,7 +95,7 @@ router.get('/resource', (ctx, next) => {
     return ctx.body = '[ERROR] 401: Unauthorized.';
 });
 router.get('/logout', (ctx, next) => {
-    ctx.logout();
+    //ctx.logout();
     ctx.redirect('/login');
 });
 
@@ -109,17 +109,33 @@ router.get('/graphql', graphqlHTTP({
     schema: schema,
     graphiql: true
 }));
-router.post('/getbook', (ctx, next) => {
-    let path = ctx.request.body.document;
-    if (fs.existsSync(path)) {
-        ctx.response.type = 'application/pdf';
-        let pdf = fs.createReadStream(path);
-        console.log(pdf);
-        ctx.body = pdf;
+router.post('/getbook', async (ctx, next) => {
+    let pdf = {};
+    if (ctx.request.body.id){
+        let book = await resolver.Books({id: ctx.request.body.id},{});
+        let path = book[0].document;
+        if (fs.existsSync(path)) {
+            console.log(path);
+            ctx.response.type = 'application/pdf';
+            let pdf = fs.createReadStream(path);
+            console.log(pdf);
+            ctx.body = pdf;
+        } else {
+            ctx.status = 404;
+            ctx.body = { error: "Error: file not found: " + path };
+        }
     } else {
-        ctx.status = 404;
-        ctx.body = { error: "Error: file not found: " + path };
-    }
+        let path = ctx.request.body.document;
+        if (fs.existsSync(path)) {
+            console.log(path);
+            ctx.response.type = 'application/pdf';
+            let pdf = fs.createReadStream(path);
+            console.log(pdf);
+            ctx.body = pdf;
+        } else {
+            ctx.status = 404;
+            ctx.body = { error: "Error: file not found: " + path };
+    }}
 });
 
 app.use(router.routes()).use(router.allowedMethods());

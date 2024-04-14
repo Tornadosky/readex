@@ -65,6 +65,10 @@ type Highlights {
   title: String
   text: String
   color: String!
+  image: String
+  width: Int
+  height: Int
+  emoji: String
 }
 
 type Words {
@@ -88,6 +92,7 @@ type Tests {
   user: Users!
   questions: [Questions!]!
   collections: [Collections!]!
+  result: Int
 }
 
 type Questions {
@@ -167,8 +172,8 @@ type Mutation {
     id: ID
     title: String
     user: Int
-    books: [Int]
-    tests: [Int]
+    books: Int
+    tests: Int
   ): Collections
   setHighlight(
     id: ID
@@ -179,6 +184,10 @@ type Mutation {
     title: String
     text: String
     color: String
+    image: String
+    width: Int
+    height: Int
+    emoji: String
   ): Highlights
   setWord(
     id: ID

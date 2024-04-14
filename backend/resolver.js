@@ -679,22 +679,10 @@ const resolver = {
                 }
             };
             upsertParams.data.title = (args.title);
-            args.books ? upsertParams.data.books = {
-                connect: {OR: args.books.map(bookId => ({ book: { connect: {id: bookId}} }))}
+            args.books ? upsertParams.data.books = 
+                {connect: {bookid: args.books}   
             } : null;
-            args.tests ? upsertParams.data.tests = {
-                connectOrCreate: {
-                    tests: {
-                        create: {
-                            where: {
-                                id: {
-                                        in: args.tests
-                                    }
-                            }
-                        }
-                    }                    
-                }
-            } : null;
+            
             upsertParams.where = {
                 id: parseInt(args.id)
             };
@@ -724,16 +712,6 @@ const resolver = {
         if (args.id) {
             upsertParams = {
                 data: {
-                    book: {
-                        connect: {
-                            id: args.book
-                        }
-                    },
-                    user: {
-                        connect: {
-                            id: args.user
-                        }
-                    },
                     from: { create: {}},
                     to: { create: {}},
                 },
@@ -744,7 +722,19 @@ const resolver = {
                     to: true
                 }
             };
-            args.from.page ? upsertParams.data.from.create = {
+            args.book ? upsertParams.data.book = {
+                connect: {
+                    id: args.book
+                }
+            }: null;
+            args.user ? upsertParams.data.user = {
+                connect: {
+                    id: args.user
+                }
+            }: null;
+            if (args.from)
+            {
+                args.from.page ? upsertParams.data.from.create = {
                     page: args.from.page,
                     line: args.from.line,
                     symbol: args.from.symbol
@@ -752,7 +742,7 @@ const resolver = {
                     coordinateX: args.from.coordinateX,
                     coordinateY: args.from.coordinateY
                 } : null;
-            args.to.page ? upsertParams.data.to.create = {
+                args.to.page ? upsertParams.data.to.create = {
                     page: args.to.page,
                     line: args.to.line,
                     symbol: args.to.symbol
@@ -760,9 +750,16 @@ const resolver = {
                     coordinateX: args.to.coordinateX,
                     coordinateY: args.to.coordinateY
                 } : null;
+            }
             upsertParams.data.title = (args.title);
             upsertParams.data.text = (args.text);
             upsertParams.data.color = (args.color);
+            if (args.image) {
+                upsertParams.data.image = args.image;
+                upsertParams.data.width = args.width;
+                upsertParams.data.height = args.height;
+            }
+            upsertParams.data.emoji = (args.emoji);
             upsertParams.where = {
                 id: parseInt(args.id)
             };
@@ -790,7 +787,9 @@ const resolver = {
                     to: true
                 }
             };
-            args.from.page ? upsertParams.data.from.create = {
+            if (args.from)
+            {
+                args.from.page ? upsertParams.data.from.create = {
                     page: args.from.page,
                     line: args.from.line,
                     symbol: args.from.symbol
@@ -798,7 +797,7 @@ const resolver = {
                     coordinateX: args.from.coordinateX,
                     coordinateY: args.from.coordinateY
                 } : null;
-            args.to.page ? upsertParams.data.to.create = {
+                args.to.page ? upsertParams.data.to.create = {
                     page: args.to.page,
                     line: args.to.line,
                     symbol: args.to.symbol
@@ -806,9 +805,16 @@ const resolver = {
                     coordinateX: args.to.coordinateX,
                     coordinateY: args.to.coordinateY
                 } : null;
+            }
             upsertParams.data.title = (args.title);
             upsertParams.data.text = (args.text);
             upsertParams.data.color = (args.color);
+            if (args.image) {
+                upsertParams.data.image = args.image;
+                upsertParams.data.width = args.width;
+                upsertParams.data.height = args.height;
+            }
+            upsertParams.data.emoji = (args.emoji);
             answer = await prisma.Highlights.create(upsertParams);
         }
         console.log(answer);
@@ -894,6 +900,7 @@ const resolver = {
             args.difficulty ? upsertParams.data.difficulty = args.difficulty : null;
             args.questionCount ? upsertParams.data.questionCount = args.questionCount : null;
             args.lastResult ? upsertParams.data.lastResult = args.lastResult : null;
+            args.result ? upsertParams.data.result = args.result : null;
             upsertParams.where = {
                 id: parseInt(args.id)
             };
@@ -913,6 +920,7 @@ const resolver = {
                     difficulty: args.difficulty,
                     questionCount: args.questionCount,
                     lastResult: args.lastResult,
+                    result: 0,
                     user: {
                         connect: {
                             id: args.user

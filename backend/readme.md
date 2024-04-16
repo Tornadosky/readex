@@ -1,14 +1,27 @@
-# Database base info 
+# Table of contents
+
+1. [DB info](#dbi)
+2. [Get pdf](#gpdf)
+3. [General rules of gathering data](#grogd)
+4. [Data mutating](#dm)
+5. [How to use GraphQL schema](#gqlh)
+6. [Getting nested data - general](#gnd)
+   6.1. [Getting nested data from *Highlights* and *Collections*](#ghac) 
+7. [Tips](#tips)
+
+
+# Database base info <a name="dbi"></a>
 
 [DB Diagram](./readex_dbd.png "Readex Database Diagram")
 
 When creating GraphQL requests, feel free to use [shema](./schema.graphql) to find names and logic.
 
-# Get pdf
+# Get pdf <a name="gpdf"></a>
 
 POST request on ``` /getbook ```
 with body ``` { "document": "__data_from_db__"} ```
-where ```__data_from_db__``` is field from response on achieving the book.
+or ``` { "id": id } ```
+where ```__data_from_db__``` is field from response on achieving the book and ``` id ``` is scalar.
 
 ### Example
 request:
@@ -29,7 +42,7 @@ application/pdf data
 
 
 
-# Get data
+# Get data <a name="grogd"></a>
 
 Either
 ``` query {} ```
@@ -66,7 +79,7 @@ response:
 ```
 
 
-# Create, Update, Delete
+# Create, Update, Delete <a name="dm"></a>
 
 * Create - has no *id* parameter
 * Update - has *id* parameter
@@ -207,7 +220,7 @@ response (returns deleted values):
 }
 ```
 
-# How to find names and parameters
+# How to find names and parameters <a name="gqlh"></a>
 
 In file [schema.graphql](./schema.graphql)
 For queries (aka *Select*) - from line 103
@@ -236,7 +249,7 @@ Name(Parameter: Type): Returning_Table
 ```
 
 
-# Get nested data
+# Get nested data <a name="gnd"></a>
 
 Works with one-to-many and one-to-one.
 May be some problems with many-to-many.
@@ -314,9 +327,59 @@ response:
 }
 ```
 
+# Getting nested data from *Highlights* and *Collections*
+
+The only difference is dublicating names in many-to-many relations.
+Correct request:
+```
+{
+  Highlights {
+    boundingRect {
+      id width height
+    }
+    rects {
+      rects {
+        id x1 y1
+      }
+    }
+  }
+}
+```
+Response:
+```
+{
+  "data": {
+    "Highlights": [
+      {
+        "boundingRect": {
+          "id": "4",
+          "width": 15,
+          "height": 56
+        },
+        "rects": [
+          {
+            "rects": {
+              "id": "2",
+              "x1": 2,
+              "y1": 2
+            }
+          },
+          {
+            "rects": {
+              "id": "3",
+              "x1": 1,
+              "y1": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
 
 
-# Important tips
+# Important tips <a name="tips"></a>
 
 1) on query *Questions(test user)* must be both
 2) same with *Words(color user)* and *Words(word user)*

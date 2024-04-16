@@ -94,8 +94,12 @@ const resolver = {
                 include: {
                     book: true,
                     user: true,
-                    from: true,
-                    to: true
+                    boundingRect: true,
+                    rects: {
+                        include: {
+                            rects: true
+                        }
+                    }
                 }
             });
         } else if (args.id) {
@@ -106,8 +110,12 @@ const resolver = {
                 include: {
                     book: true,
                     user: true,
-                    from: true,
-                    to: true
+                    boundingRect: true,
+                    rects: {
+                        include: {
+                            rects: true
+                        }
+                    }
                 }
             });
         } else {
@@ -115,11 +123,15 @@ const resolver = {
                 include: {
                     book: true,
                     user: true,
-                    from: true,
-                    to: true
+                    boundingRect: true,
+                    rects: {
+                        select: {
+                            rects: true
+                        }
+                    }
                 }});
         }
-        console.log(answer);
+        console.log(answer[0].rects);
         return answer;
     },
     Collections: async (args, context) => {
@@ -162,9 +174,9 @@ const resolver = {
         console.log(answer);
         return answer;
     },
-    Positions: async (args, context) => {
+    Rects: async (args, context) => {
         let answer = null;
-        answer = await prisma.Positions.findUnique({
+        answer = await prisma.Rects.findMany({
             where: {
                 id: args.id
             }
@@ -337,7 +349,8 @@ const resolver = {
                     user: true,
                     questions: true,
                     collections: true,
-                    words: true
+                    words: true,
+                    book: true
                 }
             });
         } else if (args.id) {
@@ -349,7 +362,8 @@ const resolver = {
                     user: true,
                     questions: true,
                     collections: true,
-                    words: true
+                    words: true,
+                    book: true
                 }
             });
             answer = answer ? [answer] : []; // Wrap the result in an array if the test is found, otherwise return an empty array
@@ -359,7 +373,8 @@ const resolver = {
                     user: true,
                     questions: true,
                     collections: true,
-                    words: true
+                    words: true,
+                    book: true
                 }});
         }
         console.log(answer);
@@ -561,13 +576,15 @@ const resolver = {
                 fs.mkdirSync(path);
             }
 
-            fs.writeFileSync(path+args.title, Buffer.from(args.document, 'base64'), 'binary');
+            let pathDB = CheckFile(path, args.title);
+            console.log("+->"+pathDB);
+            fs.writeFileSync(pathDB, Buffer.from(args.document, 'base64'), 'binary');
             
             upsertParams = {
                 data: {
                     title: args.title,
                     author: args.author,
-                    document: path+args.title,
+                    document: pathDB,
                     uploaded: moment().format('yyyy-mm-dd:hh:mm:ss'),
                     user: {
                         connect: {
@@ -588,7 +605,6 @@ const resolver = {
         console.log(answer);
         return answer;
     },
-
     
     setAchievement: async (args, context) => {
         let upsertParams = null;
@@ -630,38 +646,40 @@ const resolver = {
         console.log(answer);
         return answer;
     },
-    setPosition: async (args, context) => {
+    setRect: async (args, context) => {
         let upsertParams = null;
         let answer = null;
         if (args.id) {
             upsertParams = {
                 data: {}
             };
-            args.page ? upsertParams.data = {
-                    page: args.page,
-                    line: args.line,
-                    symbol: args.symbol
-                } : args.coordinateX ? upsertParams.data = {
-                    coordinateX: args.coordinateX,
-                    coordinateY: args.coordinateY
+            args.x1 ? upsertParams.data = {
+                    pagenum: args.pagenum,
+                    x1: args.x1,
+                    y1: args.y1,
+                    x2: args.x2,
+                    y2: args.y2,
+                    width: args.width,
+                    height: args.height
                 } : null;
             upsertParams.where = {
                 id: args.id
             };
-            answer = await prisma.Positions.update(upsertParams);
+            answer = await prisma.Rects.update(upsertParams);
         } else {
             upsertParams = {
                 data: {}
             };
-            args.page ? upsertParams.data = {
-                    page: args.page,
-                    line: args.line,
-                    symbol: args.symbol
-                } : args.coordinateX ? upsertParams.data = {
-                    coordinateX: args.coordinateX,
-                    coordinateY: args.coordinateY
-                } : null;
-            answer = await prisma.Positions.create(upsertParams);
+            args.x1 ? upsertParams.data = {
+                pagenum: args.pagenum,
+                x1: args.x1,
+                y1: args.y1,
+                x2: args.x2,
+                y2: args.y2,
+                width: args.width,
+                height: args.height
+            } : null;
+            answer = await prisma.Rects.create(upsertParams);
         }
         console.log(answer);
         return answer;
@@ -712,14 +730,18 @@ const resolver = {
         if (args.id) {
             upsertParams = {
                 data: {
-                    from: { create: {}},
-                    to: { create: {}},
+                    boundingRect: { connectOrCreate: {}},
+                    rects: { connectOrCreate: [] },
                 },
                 include: {
                     user: true,
                     book: true,
-                    from: true,
-                    to: true
+                    boundingRect: true,
+                    rects: {
+                        select: {
+                            rects: true
+                        }
+                    }
                 }
             };
             args.book ? upsertParams.data.book = {
@@ -732,24 +754,60 @@ const resolver = {
                     id: args.user
                 }
             }: null;
-            if (args.from)
-            {
-                args.from.page ? upsertParams.data.from.create = {
-                    page: args.from.page,
-                    line: args.from.line,
-                    symbol: args.from.symbol
-                } : args.from.coordinateX ? upsertParams.data.from.create = {
-                    coordinateX: args.from.coordinateX,
-                    coordinateY: args.from.coordinateY
-                } : null;
-                args.to.page ? upsertParams.data.to.create = {
-                    page: args.to.page,
-                    line: args.to.line,
-                    symbol: args.to.symbol
-                } : args.to.coordinateX ? upsertParams.data.to.create = {
-                    coordinateX: args.to.coordinateX,
-                    coordinateY: args.to.coordinateY
-                } : null;
+            if (args.boundingRect) {
+                upsertParams.data.boundingRect.connectOrCreate = {
+                    create: {
+                        pagenum: args.boundingRect.pagenum,
+                        x1: args.boundingRect.x1,
+                        y1: args.boundingRect.y1,
+                        x2: args.boundingRect.x2,
+                        y2: args.boundingRect.y2,
+                        width: args.boundingRect.width,
+                        height: args.boundingRect.height
+                    },
+                    where: {
+                        x1_y1_x2_y2_width_height_pagenum: {
+                            x1: args.boundingRect.x1,
+                            y1: args.boundingRect.y1,
+                            x2: args.boundingRect.x2,
+                            y2: args.boundingRect.y2,
+                            width: args.boundingRect.width,
+                            height: args.boundingRect.height,
+                            pagenum: args.boundingRect.pagenum
+                        }
+                    }
+                };
+            }
+            if (args.rects) {
+                upsertParams.data.rects.connectOrCreate.where = args.rects.map((rect) => {
+                    return {
+                        rects: {
+                            x1_y1_x2_y2_width_height_pagenum: {
+                                x1: rect.x1,
+                                y1: rect.y1,
+                                x2: rect.x2,
+                                y2: rect.y2,
+                                width: rect.width,
+                                height: rect.height,
+                                pagenum: rect.pagenum
+                            }
+                        } 
+                    };
+                });
+                upsertParams.data.rects.connectOrCreate.create = args.rects.map((rect) => {
+                    return {
+                        rects: {
+                            pagenum: rect.pagenum,
+                            x1: rect.x1,
+                            y1: rect.y1,
+                            x2: rect.x2,
+                            y2: rect.y2,
+                            width: rect.width,
+                            height: rect.height
+   
+                        }
+                    };
+                });
             }
             upsertParams.data.title = (args.title);
             upsertParams.data.text = (args.text);
@@ -777,34 +835,74 @@ const resolver = {
                             id: args.user
                         }
                     },
-                    from: { create: {}},
-                    to: { create: {}},
+                    boundingRect: { connectOrCreate: {}},
+                    rects: { connectOrCreate: []},
                 },
                 include: {
                     user: true,
                     book: true,
-                    from: true,
-                    to: true
+                    boundingRect: true,
+                    rects: {
+                        select: {
+                            rects: true
+                        }
+                    }
                 }
             };
-            if (args.from)
-            {
-                args.from.page ? upsertParams.data.from.create = {
-                    page: args.from.page,
-                    line: args.from.line,
-                    symbol: args.from.symbol
-                } : args.from.coordinateX ? upsertParams.data.from.create = {
-                    coordinateX: args.from.coordinateX,
-                    coordinateY: args.from.coordinateY
-                } : null;
-                args.to.page ? upsertParams.data.to.create = {
-                    page: args.to.page,
-                    line: args.to.line,
-                    symbol: args.to.symbol
-                } : args.to.coordinateX ? upsertParams.data.to.create = {
-                    coordinateX: args.to.coordinateX,
-                    coordinateY: args.to.coordinateY
-                } : null;
+            if (args.boundingRect) {
+                upsertParams.data.boundingRect.connectOrCreate = {
+                    create: {
+                        pagenum: args.boundingRect.pagenum,
+                        x1: args.boundingRect.x1,
+                        y1: args.boundingRect.y1,
+                        x2: args.boundingRect.x2,
+                        y2: args.boundingRect.y2,
+                        width: args.boundingRect.width,
+                        height: args.boundingRect.height
+                    },
+                    where: {
+                        x1_y1_x2_y2_width_height_pagenum: {
+                            x1: args.boundingRect.x1,
+                            y1: args.boundingRect.y1,
+                            x2: args.boundingRect.x2,
+                            y2: args.boundingRect.y2,
+                            width: args.boundingRect.width,
+                            height: args.boundingRect.height,
+                            pagenum: args.boundingRect.pagenum
+                        }
+                    }
+                };
+            }
+            if (args.rects) {
+                upsertParams.data.rects.connectOrCreate.where = args.rects.map((rect) => {
+                    return {
+                        rects: {
+                            x1_y1_x2_y2_width_height_pagenum: {
+                                x1: rect.rects.x1,
+                                y1: rect.rects.y1,
+                                x2: rect.rects.x2,
+                                y2: rect.rects.y2,
+                                width: rect.rects.width,
+                                height: rect.rects.height,
+                                pagenum: rect.rects.pagenum
+                            }
+                        } 
+                    };
+                });
+                upsertParams.data.rects.connectOrCreate.create = args.rects.map((rect) => {
+                    return {
+                        rects: {
+                            pagenum: rect.rects.pagenum,
+                            x1: rect.rects.x1,
+                            y1: rect.rects.y1,
+                            x2: rect.rects.x2,
+                            y2: rect.rects.y2,
+                            width: rect.rects.width,
+                            height: rect.rects.height
+   
+                        }
+                    };
+                });
             }
             upsertParams.data.title = (args.title);
             upsertParams.data.text = (args.text);
@@ -1064,5 +1162,22 @@ const resolver = {
         return answer;
     },
 };
+
+function CheckFile (path, title) {
+    if (fs.existsSync(path+title)) {
+        let array = [], c = 0;
+        title.split(/([().])/).filter(Boolean).forEach(e => e == '(' ? c++ : e == ')' ? c-- : c > 0 ? array.push(e) : array.push(e));
+        console.log("->"+array);
+        let count = 1;
+        if (array.length > 2) {
+            count = parseInt(array[1]);
+            count++;
+        }
+        return CheckFile(path, array[0]+'('+count+').pdf');
+    } else {
+        console.log("<-"+path+title);
+        return path+title;
+    }   
+}
 
 module.exports = resolver;

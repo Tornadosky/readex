@@ -36,7 +36,8 @@ model Books {
   collections BooksOnCollections[]
   uploaded  String
   user      Users @relation("bookOwner", fields: [userid], references: [id]) 
-  userid    Int   
+  userid    Int
+  tests     Tests[]
 }
 
 model Achievements {
@@ -46,15 +47,19 @@ model Achievements {
   users            AchievementsOnUsers[]
 }
 
-model Positions {
-  id            Int @id @default(autoincrement())
-  page          Int?
-  line          Int?
-  symbol        Int?
-  coordinateX Int?
-  coordinateY Int?
-  highlightsfrom Highlights[] @relation("positionsOnHighlightsFrom")
-  highlightsto Highlights[] @relation("positionsOnHighlightsTo")
+model Rects {
+  id      Int @id @default(autoincrement())
+  x1      Int?
+  y1      Int?
+  x2      Int?
+  y2      Int?
+  width   Int?
+  height  Int?
+  pagenum Int?
+  highlightbr Highlights[] @relation("rectsOnHighlightsBR")
+  highlightrects RectsOnHighlights[]
+
+  @@unique([x1, y1, x2, y2, width, height, pagenum])
 }
 
 model Collections {
@@ -72,10 +77,9 @@ model Highlights {
   bookid         Int
   user           Users @relation(fields: [userid], references: [id])
   userid         Int
-  from           Positions @relation("positionsOnHighlightsFrom", fields: [fromid], references: [id])
-  fromid         Int
-  to             Positions @relation("positionsOnHighlightsTo", fields: [toid], references: [id])
-  toid           Int
+  boundingRect   Rects @relation("rectsOnHighlightsBR", fields: [brid], references: [id], onDelete: Cascade)
+  brid          Int
+  rects          RectsOnHighlights[]
   title          String
   text           String
   color          String
@@ -111,11 +115,13 @@ model Tests {
   collections TestsOnCollections[]
   words     Words[]
   result    Int
+  book      Books @relation(fields: [bookid], references: [id])
+  bookid    Int
 }
 
 model Questions {
   id            Int @id @default(autoincrement())
-  test          Tests @relation(fields: [testid], references: [id])
+  test          Tests @relation(fields: [testid], references: [id], onDelete: Cascade)
   testid        Int
   number        Int
   questionText  String
@@ -150,4 +156,13 @@ model TestsOnCollections {
   collectionid           Int
 
   @@id([testid, collectionid])
+}
+
+model RectsOnHighlights {
+  rects                 Rects @relation(fields: [rectid], references: [id], onDelete: NoAction)
+  rectid                Int
+  highlights            Highlights @relation(fields: [highlightid], references: [id], onDelete: Cascade)
+  highlightid           Int
+
+  @@id([rectid, highlightid])
 }

@@ -38,14 +38,17 @@ type Achievements {
   users: [Users!]
 }
 
-type Positions {
+type Rects {
   id: ID!
-  page: Int
-  line: Int
-  symbol: Int
-  coordinateXfrom: Int
-  coordinateYfrom: Int
-  highlights: [Highlights!]!
+  pagenum: Int
+  x1: Int
+  y1: Int
+  x2: Int
+  y2: Int
+  width: Int
+  height: Int
+  highlightbr: [Highlights]
+  highlightrects: [RectsOnHighlights]
 }
 
 type Collections {
@@ -56,12 +59,19 @@ type Collections {
   tests: [Tests!]!
 }
 
+type RectsOnHighlights {
+  rects: Rects
+  rectid: Int
+  highlights: Highlights
+  highlightid: Int
+}
+
 type Highlights {
   id: ID!
   book: Books!
   user: Users!
-  from: Positions!
-  to: Positions!
+  boundingRect: Rects
+  rects: [RectsOnHighlights]
   title: String
   text: String
   color: String!
@@ -93,6 +103,7 @@ type Tests {
   questions: [Questions!]!
   collections: [Collections!]!
   result: Int
+  book: Books
 }
 
 type Questions {
@@ -110,7 +121,7 @@ type Query {
   Books(id: Int title: String author: String, user: Int): [Books]
   Highlights(id: Int, book: Int, user: Int): [Highlights]
   Collections(id: Int, title: String, user: Int): [Collections]
-  Positions(id: Int!): Positions
+  Rects(id: Int!): [Rects]
   Users(id: Int, login: String, password: String, email: String, phone: String): [Users]
   Achievements(id: Int, name: String, users: Int): [Achievements]
   Tests(id: Int, user: Int, title: String): [Tests]
@@ -123,13 +134,15 @@ input iAchievements {
   name: String
   description: String
 }
-input iPositions {
+input iRects {
   id: ID
-  page: Int
-  line: Int
-  symbol: Int
-  coordinateXfrom: Int
-  coordinateYfrom: Int
+  pagenum: Int
+  x1: Int
+  y1: Int
+  x2: Int
+  y2: Int
+  width: Int
+  height: Int
 }
 
 type Mutation {
@@ -160,14 +173,16 @@ type Mutation {
     description: String
     user: Int
   ): Achievements
-  setPosition(
+  setRect(
     id: ID
-    page: Int
-    line: Int
-    symbol: Int
-    coordinateX: Int
-    coordinateY: Int
-  ): Positions
+    pagenum: Int
+    x1: Int
+    y1: Int
+    x2: Int
+    y2: Int
+    width: Int
+    height: Int
+  ): Rects
   setCollection(
     id: ID
     title: String
@@ -179,8 +194,8 @@ type Mutation {
     id: ID
     book: Int
     user: Int
-    from: iPositions
-    to: iPositions
+    boundingRect: iRects
+    rects: [iRects]
     title: String
     text: String
     color: String
@@ -207,6 +222,7 @@ type Mutation {
     questionCount: Int
     lastResult: Int
     user: Int
+    book: Int
   ): Tests
   setQuestion(
     id: ID
@@ -222,7 +238,7 @@ type Mutation {
   delUser(id: Int!): Users
   delBook(id: Int!): Books
   delAchievement(id: Int!): Achievements
-  delPosition(id: Int!): Positions
+  delRect(id: Int!): Rects
   delCollection(id: Int!): Collections
   delHighlight(id: Int!): Highlights
   delWord(id: Int!): Words

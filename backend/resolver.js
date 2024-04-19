@@ -61,13 +61,25 @@ const resolver = {
             });
         } else if (args.id) {
             answer = await prisma.Books.findMany({
-                where: {
-                    id: parseInt(args.id)
-                },
+                where: { id: parseInt(args.id) },
                 include: {
-                    user: true
+                    user: true,
+                    highlights: {
+                        include: {
+                            rects: {
+                                include: {
+                                    rects: true
+                                }
+                            }
+                        }
+                    }
                 }
             });
+
+            // Ensure that an empty array is returned for highlights if none exist
+            if (answer && !answer.highlights) {
+                answer.highlights = [];
+            }
         } else {
             answer = await prisma.Books.findMany({
                 include: {
@@ -878,13 +890,13 @@ const resolver = {
                     return {
                         rects: {
                             x1_y1_x2_y2_width_height_pagenum: {
-                                x1: rect.rects.x1,
-                                y1: rect.rects.y1,
-                                x2: rect.rects.x2,
-                                y2: rect.rects.y2,
-                                width: rect.rects.width,
-                                height: rect.rects.height,
-                                pagenum: rect.rects.pagenum
+                                x1: rect.x1,
+                                y1: rect.y1,
+                                x2: rect.x2,
+                                y2: rect.y2,
+                                width: rect.width,
+                                height: rect.height,
+                                pagenum: rect.pagenum
                             }
                         } 
                     };
@@ -892,13 +904,13 @@ const resolver = {
                 upsertParams.data.rects.connectOrCreate.create = args.rects.map((rect) => {
                     return {
                         rects: {
-                            pagenum: rect.rects.pagenum,
-                            x1: rect.rects.x1,
-                            y1: rect.rects.y1,
-                            x2: rect.rects.x2,
-                            y2: rect.rects.y2,
-                            width: rect.rects.width,
-                            height: rect.rects.height
+                            pagenum: rect.pagenum,
+                            x1: rect.x1,
+                            y1: rect.y1,
+                            x2: rect.x2,
+                            y2: rect.y2,
+                            width: rect.width,
+                            height: rect.height
    
                         }
                     };

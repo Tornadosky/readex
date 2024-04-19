@@ -9,7 +9,7 @@ type Users {
   email: String!
   password: String!
   phone: String
-  highlights: [Highlights!]!
+  highlights: [Highlights]!
   collections: [Collections!]!
   words: [Words!]!
   tests: [Tests!]!

@@ -212,11 +212,25 @@ const resolver = {
     },
     Rects: async (args, context) => {
         let answer = null;
-        answer = await prisma.Rects.findMany({
-            where: {
-                id: args.id
-            }
-        });
+        if (args.id) {
+            answer = await prisma.Rects.findMany({
+                where: {
+                    id: args.id
+                }
+            });
+        } else if (args.x1) {
+           answer = await prisma.Rects.findMany({
+               where: {
+                   x1: args.x1,
+                   x2: args.x2,
+                   y1: args.y1,
+                   y2: args.y2,
+                   width: args.width,
+                   height: args.height,
+                   pagenum: args.pagenum
+               } 
+           });
+        }
         console.log(answer);
         return answer;
     },
@@ -790,7 +804,6 @@ const resolver = {
         if (args.id) {
             upsertParams = {
                 data: {
-                    boundingRect: { connectOrCreate: {}},
                     rects: { connectOrCreate: [] },
                 },
                 include: {
@@ -798,7 +811,7 @@ const resolver = {
                     book: true,
                     boundingRect: true,
                     rects: {
-                        include: {
+                        select: {
                             rects: true
                         }
                     }
@@ -814,7 +827,9 @@ const resolver = {
                     id: args.user
                 }
             }: null;
+            console.log(args.boundingRect);
             if (args.boundingRect) {
+                upsertParams.data.boundingRect = { connectOrCreate: {}};
                 upsertParams.data.boundingRect.connectOrCreate = {
                     create: {
                         pagenum: args.boundingRect.pagenum,
@@ -838,27 +853,10 @@ const resolver = {
                     }
                 };
             }
-            console.log("--->");
-            console.log(args.rects==null);
             if (args.rects) {
-                upsertParams.data.rects.connectOrCreate.where = args.rects.map((rect) => {
-                    return {
-                        rects: {
-                            x1_y1_x2_y2_width_height_pagenum: {
-                                x1: rect.x1,
-                                y1: rect.y1,
-                                x2: rect.x2,
-                                y2: rect.y2,
-                                width: rect.width,
-                                height: rect.height,
-                                pagenum: rect.pagenum
-                            }
-                        } 
-                    };
-                });
-                upsertParams.data.rects.connectOrCreate.create = args.rects.map((rect) => {
-                    return {
-                        rects: {
+                const promises = args.rects.map(async (rect) => {
+                    let isrect = await prisma.Rects.findMany({
+                        where: {
                             pagenum: rect.pagenum,
                             x1: rect.x1,
                             y1: rect.y1,
@@ -866,10 +864,75 @@ const resolver = {
                             y2: rect.y2,
                             width: rect.width,
                             height: rect.height
-   
-                        }
-                    };
+                        }});
+                    console.log(isrect);
+                    if (isrect.length > 0)
+                        return {
+                            create: {
+                                rects:{
+                                    connectOrCreate: {
+                                        create: {
+                                            pagenum: rect.pagenum,
+                                            x1: rect.x1,
+                                            y1: rect.y1,
+                                            x2: rect.x2,
+                                            y2: rect.y2,
+                                            width: rect.width,
+                                            height: rect.height
+                                        },
+                                        where:{
+                                            x1_y1_x2_y2_width_height_pagenum: {
+                                                x1: rect.x1,
+                                                y1: rect.y1,
+                                                x2: rect.x2,
+                                                y2: rect.y2,
+                                                width: rect.width,
+                                                height: rect.height,
+                                                pagenum: rect.pagenum}
+                                        }}}
+                            },
+                            where: {
+                                rectid_highlightid: {
+                                    rectid: parseInt(isrect[0].id),
+                                    highlightid: parseInt(args.id)
+                                }
+                            }
+                        };
+                    else
+                        return {
+                            create: {
+                                rects:{
+                                    connectOrCreate: {
+                                        create: {
+                                            pagenum: rect.pagenum,
+                                            x1: rect.x1,
+                                            y1: rect.y1,
+                                            x2: rect.x2,
+                                            y2: rect.y2,
+                                            width: rect.width,
+                                            height: rect.height
+                                        },
+                                        where:{
+                                            x1_y1_x2_y2_width_height_pagenum: {
+                                                x1: rect.x1,
+                                                y1: rect.y1,
+                                                x2: rect.x2,
+                                                y2: rect.y2,
+                                                width: rect.width,
+                                                height: rect.height,
+                                                pagenum: rect.pagenum}
+                                        }}}
+                            },
+                            where: {
+                                rectid_highlightid: {
+                                    rectid: -1,
+                                    highlightid: parseInt(args.id)
+                                }
+                            }
+                        };
+                    
                 });
+                upsertParams.data.rects.connectOrCreate = await Promise.all(promises);
             }
             upsertParams.data.title = (args.title);
             upsertParams.data.text = (args.text);
@@ -883,6 +946,7 @@ const resolver = {
             upsertParams.where = {
                 id: parseInt(args.id)
             };
+            console.log(upsertParams);
             answer = await prisma.Highlights.update(upsertParams);
         } else {
             upsertParams = {
@@ -936,24 +1000,9 @@ const resolver = {
                 };
             }
             if (args.rects) {
-                upsertParams.data.rects.connectOrCreate.where = args.rects.map((rect) => {
-                    return {
-                        rects: {
-                            x1_y1_x2_y2_width_height_pagenum: {
-                                x1: rect.x1,
-                                y1: rect.y1,
-                                x2: rect.x2,
-                                y2: rect.y2,
-                                width: rect.width,
-                                height: rect.height,
-                                pagenum: rect.pagenum
-                            }
-                        } 
-                    };
-                });
-                upsertParams.data.rects.connectOrCreate.create = args.rects.map((rect) => {
-                    return {
-                        rects: {
+                const promises = args.rects.map(async (rect) => {
+                    let isrect = await prisma.Rects.findMany({
+                        where: {
                             pagenum: rect.pagenum,
                             x1: rect.x1,
                             y1: rect.y1,
@@ -961,10 +1010,75 @@ const resolver = {
                             y2: rect.y2,
                             width: rect.width,
                             height: rect.height
-   
-                        }
-                    };
+                        }});
+                    console.log(isrect);
+                    if (isrect.length > 0)
+                        return {
+                            create: {
+                                rects:{
+                                    connectOrCreate: {
+                                        create: {
+                                            pagenum: rect.pagenum,
+                                            x1: rect.x1,
+                                            y1: rect.y1,
+                                            x2: rect.x2,
+                                            y2: rect.y2,
+                                            width: rect.width,
+                                            height: rect.height
+                                        },
+                                        where:{
+                                            x1_y1_x2_y2_width_height_pagenum: {
+                                                x1: rect.x1,
+                                                y1: rect.y1,
+                                                x2: rect.x2,
+                                                y2: rect.y2,
+                                                width: rect.width,
+                                                height: rect.height,
+                                                pagenum: rect.pagenum}
+                                        }}}
+                            },
+                            where: {
+                                rectid_highlightid: {
+                                    rectid: parseInt(isrect[0].id),
+                                    highlightid: -1
+                                }
+                            }
+                        };
+                    else
+                        return {
+                            create: {
+                                rects:{
+                                    connectOrCreate: {
+                                        create: {
+                                            pagenum: rect.pagenum,
+                                            x1: rect.x1,
+                                            y1: rect.y1,
+                                            x2: rect.x2,
+                                            y2: rect.y2,
+                                            width: rect.width,
+                                            height: rect.height
+                                        },
+                                        where:{
+                                            x1_y1_x2_y2_width_height_pagenum: {
+                                                x1: rect.x1,
+                                                y1: rect.y1,
+                                                x2: rect.x2,
+                                                y2: rect.y2,
+                                                width: rect.width,
+                                                height: rect.height,
+                                                pagenum: rect.pagenum}
+                                        }}}
+                            },
+                            where: {
+                                rectid_highlightid: {
+                                    rectid: -1,
+                                    highlightid: -1
+                                }
+                            }
+                        };
+                    
                 });
+                upsertParams.data.rects.connectOrCreate = await Promise.all(promises);
             }
             upsertParams.data.title = (args.title);
             upsertParams.data.text = (args.text);
@@ -1169,8 +1283,8 @@ const resolver = {
         console.log(answer);
         return answer;
     },
-    delPosition: async (args, context) => {
-        let answer = await prisma.Positions.delete({
+    delRect: async (args, context) => {
+        let answer = await prisma.Rects.delete({
             where: {
                 id: parseInt(args.id)
             }

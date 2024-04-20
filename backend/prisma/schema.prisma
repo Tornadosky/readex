@@ -132,34 +132,34 @@ model Questions {
 }
 
 model AchievementsOnUsers {
-  user                    Users @relation(fields: [userid], references: [id])
+  user                    Users @relation(fields: [userid], references: [id], onDelete: Cascade)
   userid                  Int
-  achievement             Achievements @relation(fields: [achievementid], references: [id])
+  achievement             Achievements @relation(fields: [achievementid], references: [id], onDelete: Cascade)
   achievementid           Int
 
   @@id([userid, achievementid])
 }
 
 model BooksOnCollections {
-  books                  Books @relation(fields: [bookid], references: [id])
+  books                  Books @relation(fields: [bookid], references: [id], onDelete: Cascade)
   bookid                 Int
-  collections            Collections @relation(fields: [collectionid], references: [id])
+  collections            Collections @relation(fields: [collectionid], references: [id], onDelete: Cascade)
   collectionid           Int
   position               Int
   @@id([bookid, collectionid])
 }
 
 model TestsOnCollections {
-  tests                  Tests @relation(fields: [testid], references: [id])
+  tests                  Tests @relation(fields: [testid], references: [id], onDelete: Cascade)
   testid                 Int
-  collections            Collections @relation(fields: [collectionid], references: [id])
+  collections            Collections @relation(fields: [collectionid], references: [id], onDelete: Cascade)
   collectionid           Int
   position               Int
   @@id([testid, collectionid])
 }
 
 model RectsOnHighlights {
-  rects                 Rects @relation(fields: [rectid], references: [id], onDelete: NoAction)
+  rects                 Rects @relation(fields: [rectid], references: [id], onDelete: Cascade)
   rectid                Int
   highlights            Highlights @relation(fields: [highlightid], references: [id], onDelete: Cascade)
   highlightid           Int

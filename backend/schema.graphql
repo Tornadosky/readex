@@ -137,7 +137,7 @@ type Query {
   Books(id: Int title: String author: String, user: Int): [Books]
   Highlights(id: Int, book: Int, user: Int): [Highlights]
   Collections(id: Int, title: String, user: Int): [Collections]
-  Rects(id: Int): [Rects]
+  Rects(id: Int, x1: Int, x2: Int, y1: Int, y2: Int, width: Int, height: Int, pagenum: Int): [Rects]
   Users(id: Int, login: String, password: String, email: String, phone: String): [Users]
   Achievements(id: Int, name: String, users: Int): [Achievements]
   Tests(id: Int, user: Int, title: String): [Tests]
@@ -203,8 +203,8 @@ type Mutation {
     id: ID
     title: String
     user: Int
-    books: Int
-    tests: Int
+    books: [Int]
+    tests: [Int]
   ): Collections
   setHighlight(
     id: ID

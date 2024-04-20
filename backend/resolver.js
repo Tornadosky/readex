@@ -61,13 +61,25 @@ const resolver = {
             });
         } else if (args.id) {
             answer = await prisma.Books.findMany({
-                where: {
-                    id: parseInt(args.id)
-                },
+                where: { id: parseInt(args.id) },
                 include: {
-                    user: true
+                    user: true,
+                    highlights: {
+                        include: {
+                            rects: {
+                                include: {
+                                    rects: true
+                                }
+                            }
+                        }
+                    }
                 }
             });
+
+            // Ensure that an empty array is returned for highlights if none exist
+            if (answer && !answer.highlights) {
+                answer.highlights = [];
+            }
         } else {
             answer = await prisma.Books.findMany({
                 include: {

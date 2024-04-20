@@ -327,7 +327,7 @@ response:
 }
 ```
 
-# Getting nested data from *Highlights* and *Collections*
+# Getting nested data from *Highlights* and *Collections*  <a name="ghac"></a>
 
 The only difference is dublicating names in many-to-many relations.
 Correct request:

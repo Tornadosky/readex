@@ -147,8 +147,16 @@ const resolver = {
                     }
                 },
                 include: {
-                    books: true,
-                    tests: true,
+                    books: {
+                        include: {
+                            books: true
+                        }
+                    },
+                    tests: {
+                        include: {
+                            tests: true
+                        }
+                    },
                     user: true
                 }
             });
@@ -158,16 +166,32 @@ const resolver = {
                     id: args.id
                 },
                 include: {
-                    books: true,
-                    tests: true,
+                    books: {
+                        include: {
+                            books: true
+                        }
+                    },
+                    tests: {
+                        include: {
+                            tests: true
+                        }
+                    },
                     user: true
                 }
             });
         } else {
             answer = await prisma.Collections.findMany({
                 include: {
-                    books: true,
-                    tests: true,
+                    books: {
+                        include: {
+                            books: true
+                        }
+                    },
+                    tests: {
+                        include: {
+                            tests: true
+                        }
+                    },
                     user: true
                 }});
         }
@@ -691,16 +715,32 @@ const resolver = {
             upsertParams = {
                 data: {},
                 include: {
-                    user: true,
-                    books: true,
+                    books: {
+                        include: {
+                            books: true
+                        }
+                    },
+                    tests: {
+                        include: {
+                            tests: true
+                        }
+                    },
                     tests: true
                 }
             };
             upsertParams.data.title = (args.title);
             args.books ? upsertParams.data.books = 
-                {connect: {bookid: args.books}   
-            } : null;
-            
+                {
+                    connect: {
+                        books: {
+                            id: args.books
+                        },
+                        collections: {
+                            id: parseInt(args.id)
+                        }
+                    }
+                 
+            } : null;            
             upsertParams.where = {
                 id: parseInt(args.id)
             };
@@ -714,8 +754,16 @@ const resolver = {
                     }
                 },
                 include: {
-                    user: true,
-                    books: true,
+                    books: {
+                        include: {
+                            books: true
+                        }
+                    },
+                    tests: {
+                        include: {
+                            tests: true
+                        }
+                    },
                     tests: true
                 }
             };
@@ -738,7 +786,7 @@ const resolver = {
                     book: true,
                     boundingRect: true,
                     rects: {
-                        select: {
+                        include: {
                             rects: true
                         }
                     }
@@ -778,6 +826,8 @@ const resolver = {
                     }
                 };
             }
+            console.log("--->");
+            console.log(args.rects==null);
             if (args.rects) {
                 upsertParams.data.rects.connectOrCreate.where = args.rects.map((rect) => {
                     return {
@@ -878,13 +928,13 @@ const resolver = {
                     return {
                         rects: {
                             x1_y1_x2_y2_width_height_pagenum: {
-                                x1: rect.rects.x1,
-                                y1: rect.rects.y1,
-                                x2: rect.rects.x2,
-                                y2: rect.rects.y2,
-                                width: rect.rects.width,
-                                height: rect.rects.height,
-                                pagenum: rect.rects.pagenum
+                                x1: rect.x1,
+                                y1: rect.y1,
+                                x2: rect.x2,
+                                y2: rect.y2,
+                                width: rect.width,
+                                height: rect.height,
+                                pagenum: rect.pagenum
                             }
                         } 
                     };
@@ -892,13 +942,13 @@ const resolver = {
                 upsertParams.data.rects.connectOrCreate.create = args.rects.map((rect) => {
                     return {
                         rects: {
-                            pagenum: rect.rects.pagenum,
-                            x1: rect.rects.x1,
-                            y1: rect.rects.y1,
-                            x2: rect.rects.x2,
-                            y2: rect.rects.y2,
-                            width: rect.rects.width,
-                            height: rect.rects.height
+                            pagenum: rect.pagenum,
+                            x1: rect.x1,
+                            y1: rect.y1,
+                            x2: rect.x2,
+                            y2: rect.y2,
+                            width: rect.width,
+                            height: rect.height
    
                         }
                     };

@@ -141,20 +141,20 @@ model AchievementsOnUsers {
 }
 
 model BooksOnCollections {
-  book                   Books @relation(fields: [bookid], references: [id])
+  books                  Books @relation(fields: [bookid], references: [id])
   bookid                 Int
-  collection             Collections @relation(fields: [collectionid], references: [id])
+  collections            Collections @relation(fields: [collectionid], references: [id])
   collectionid           Int
   position               Int
   @@id([bookid, collectionid])
 }
 
 model TestsOnCollections {
-  test                   Tests @relation(fields: [testid], references: [id])
+  tests                  Tests @relation(fields: [testid], references: [id])
   testid                 Int
-  collection             Collections @relation(fields: [collectionid], references: [id])
+  collections            Collections @relation(fields: [collectionid], references: [id])
   collectionid           Int
-
+  position               Int
   @@id([testid, collectionid])
 }
 

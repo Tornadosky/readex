@@ -69,10 +69,6 @@ export function Sidebar({
             Collections(user: $userId) {
               id
               title
-              books {
-                id
-                title
-              }
               user {
                 id
                 login

@@ -41,12 +41,12 @@ type Achievements {
 type Rects {
   id: ID
   pagenum: Int
-  x1: Int
-  y1: Int
-  x2: Int
-  y2: Int
-  width: Int
-  height: Int
+  x1: Float
+  y1: Float
+  x2: Float
+  y2: Float
+  width: Float
+  height: Float
   highlightbr: [Highlights]
   highlightrects: [RectsOnHighlights]
 }
@@ -153,12 +153,12 @@ input iAchievements {
 input iRects {
   id: ID
   pagenum: Int
-  x1: Int
-  y1: Int
-  x2: Int
-  y2: Int
-  width: Int
-  height: Int
+  x1: Float
+  y1: Float
+  x2: Float
+  y2: Float
+  width: Float
+  height: Float
 }
 
 type Mutation {

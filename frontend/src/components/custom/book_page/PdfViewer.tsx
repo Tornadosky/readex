@@ -326,6 +326,7 @@ function PdfViewerWrapper(props: any) {
   const { pdfId } = useParams();
   const [pdfUrl, setPdfUrl] = useState('');
   const [bookName, setBookName] = useState('');
+  const [highlights, setHighlights] = useState([]);
   const { setBooksList } = useOutletContext<OutletContextType>();
 
   useEffect(() => {
@@ -334,20 +335,67 @@ function PdfViewerWrapper(props: any) {
       try {
         const response = await axios.post('http://localhost:3000/graphql', {
           query: `
-            query {
-              Books(id: ${pdfId}) {
-                  id title
+            query GetBookDetails($id: Int!) {
+              Books(id: $id) {
+                id
+                title
+                highlights {
+                  id
+                  text
+                  color
+                  emoji
+                  boundingRect {
+                    pagenum
+                    x1
+                    y1
+                    x2
+                    y2
+                    width
+                    height
+                  }
+                  rects {
+                    rects {
+                      pagenum
+                      x1
+                      y1
+                      x2
+                      y2
+                      width
+                      height
+                    }
+                  }
+                }
               }
             }
           `,
+          variables: {
+            id: parseInt(pdfId!)
+          },
         });
-        //console.log('Response:', response.data.data);
 
         if (response.data && response.data.data.Books.length > 0) {
-          const bookName = response.data.data.Books[0].title;
-          console.log('Book name:', bookName)
-          setBookName(bookName);
-          return bookName;
+          const book = response.data.data.Books[0];
+          setBookName(book.title);
+          setHighlights(book.highlights.map((h: any): any => {
+            const rects = h.rects.map((r: any): any => r.rects);
+            const boundingRect = h.boundingRect;
+  
+            return {
+              id: h.id,
+              content: { text: h.text },
+              color: h.color,
+              position: {
+                boundingRect,
+                rects,
+                pageNumber: boundingRect.pagenum
+              },
+              comment: {
+                text: h.text,
+                emoji: h.emoji
+              }
+            };
+          }));
+          return book.title;
         } else {
           console.error('Book not found');
           return null;
@@ -397,7 +445,7 @@ function PdfViewerWrapper(props: any) {
 
   return (
   <>
-    {bookName && <PdfViewer key={pdfId} {...props} setBooksList={setBooksList} url={pdfUrl} bookName={bookName.replace(".pdf", "")} />}
+    {bookName && highlights && <PdfViewer key={pdfId} {...props} highlights={highlights} setBooksList={setBooksList} url={pdfUrl} bookName={bookName.replace(".pdf", "")} />}
   </>
 );
 }

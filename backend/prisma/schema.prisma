@@ -49,12 +49,12 @@ model Achievements {
 
 model Rects {
   id      Int @id @default(autoincrement())
-  x1      Int?
-  y1      Int?
-  x2      Int?
-  y2      Int?
-  width   Int?
-  height  Int?
+  x1      Float?
+  y1      Float?
+  x2      Float?
+  y2      Float?
+  width   Float?
+  height  Float?
   pagenum Int?
   highlightbr Highlights[] @relation("rectsOnHighlightsBR")
   highlightrects RectsOnHighlights[]
@@ -78,14 +78,14 @@ model Highlights {
   user           Users @relation(fields: [userid], references: [id])
   userid         Int
   boundingRect   Rects @relation("rectsOnHighlightsBR", fields: [brid], references: [id], onDelete: Cascade)
-  brid          Int
+  brid           Int
   rects          RectsOnHighlights[]
   title          String
   text           String
   color          String
   image          String?
-  width          Int?
-  height         Int?
+  width          Float?
+  height         Float?
   emoji          String?
 }
 

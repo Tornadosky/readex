@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Selector from '../Selector';
 import { LoadingIcon } from '@/assets/svg';
+import axios from 'axios';
+
+interface Book {
+    id: string;
+    title: string;
+}
 
 interface QuizMenuProps {
     activePage: string;
@@ -10,10 +16,37 @@ interface QuizMenuProps {
 }
 
 const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage, generating, onSubmit }) => {
-    const [selectedQuestionType, setSelectedQuestionType] = useState("Multiple Choice");
-    const [selectedLanguage, setSelectedLanguage] = useState("English");
-    const [selectedDifficulty, setSelectedDifficulty] = useState("Easy");
-    const [selectedQuestionsNumber, setSelectedQuestionsNumber] = useState(5);
+    const [selectedQuestionType, setSelectedQuestionType] = useState<string>("Multiple Choice");
+    const [selectedLanguage, setSelectedLanguage] = useState<string>("English");
+    const [selectedDifficulty, setSelectedDifficulty] = useState<string>("Easy");
+    const [selectedQuestionsNumber, setSelectedQuestionsNumber] = useState<number>(5);
+    const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+    const [books, setBooks] = useState<Book[]>([]);
+
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                const response = await axios.post('http://localhost:3000/graphql', {
+                    query: `
+                        query {
+                            Books {
+                                id
+                                title
+                            }
+                        }
+                    `
+                });
+                if (response.data.data && response.data.data.Books.length > 0) {
+                    setBooks(response.data.data.Books);
+                    setSelectedBook(response.data.data.Books[0]);
+                }
+            } catch (error) {
+                console.error('Failed to fetch books:', error);
+            }
+        };
+
+        fetchBooks();
+    }, []);
 
     const handleSubmit = () => {
         const submissionData = {
@@ -21,6 +54,7 @@ const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage, ge
             language: selectedLanguage,
             difficulty: selectedDifficulty,
             question_number: 2,//selectedQuestionsNumber,
+            //bookId: selectedBook?.id
             text: "Adoption of 3D printing has reached critical mass as those who have yet to integrate additive manufacturing somewhere in their supply chain are now part of an ever-shrinking minority. Where 3D printing was only suitable for prototyping and one-off manufacturing in the early stages, it is now rapidly transforming into a production technology. Most of the current demand for 3D printing is industrial in nature. Acumen Research and Consulting forecasts the global 3D printing market to reach $41 billion by 2026. As it evolves, 3D printing technology is destined to transform almost every major industry and change the way we live, work, and play in the future."
         };
         onSubmit(submissionData);
@@ -67,11 +101,11 @@ const QuizMenu: React.FC<QuizMenuProps> = ({ activePage, handleSetActivePage, ge
                                 Book Name
                             </label>
                             <div className="mt-1 rounded-md shadow-sm">
-                                <Selector 
-                                    options={['English', 'Spanish', 'French', 'German', 'Italian', 'Russian']}
-                                    selected={selectedLanguage}
-                                    setSelected={setSelectedLanguage}
-                                    disabled={false}
+                                <Selector
+                                    options={books.map(book => book.title)}
+                                    selected={selectedBook?.title || ''}
+                                    setSelected={(value) => setSelectedBook(books.find(book => book.title === value) ?? null)}
+                                    disabled={books.length === 0}
                                 />
                             </div>
                         </div>

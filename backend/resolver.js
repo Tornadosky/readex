@@ -44,7 +44,6 @@ const resolver = {
                     user: true
                 }
             });
-            console.log("in Books->args.title");
         } else if (args.author) {
             answer = await prisma.Books.findMany({
                 where: {
@@ -70,7 +69,8 @@ const resolver = {
                                 include: {
                                     rects: true
                                 }
-                            }
+                            },
+                            boundingRect: true
                         }
                     }
                 }
@@ -584,7 +584,6 @@ const resolver = {
         let upsertParams = null;
         let answer = null;
         if (args.id) {
-            console.log("setBook->update");
             upsertParams = {
                 data: {
                     uploaded: moment().format('yyyy-mm-dd:hh:mm:ss'),
@@ -612,14 +611,22 @@ const resolver = {
                 id: args.id
             };
             upsertParams.include = {
-                highlights: true,
+                highlights: {
+                    include: {
+                        rects: {
+                            include: {
+                                rects: true
+                            }
+                        },
+                        boundingRect: true 
+                    }  
+                },
                 collections: true,
                 user: true
             };
             answer = await prisma.Books.update(upsertParams);
         } else {
             console.log("setBook->create");
-            // Ask M&W if ids as folders names are ok or make nicknames
             let path = "./uploads/"+args.user+"/";
 
             if (!fs.existsSync(path)) {
@@ -643,7 +650,16 @@ const resolver = {
                     }
                 },
                 include: {
-                    highlights: true,
+                    highlights: {
+                      include: {
+                         rects: {
+                             include: {
+                                 rects: true
+                             }
+                         },
+                         boundingRect: true 
+                      }  
+                    },
                     collections: true,
                     user: true
                 }
@@ -929,8 +945,7 @@ const resolver = {
                                     highlightid: parseInt(args.id)
                                 }
                             }
-                        };
-                    
+                        };                    
                 });
                 upsertParams.data.rects.connectOrCreate = await Promise.all(promises);
             }
@@ -961,8 +976,8 @@ const resolver = {
                             id: args.user
                         }
                     },
-                    boundingRect: { connectOrCreate: {}},
-                    rects: { connectOrCreate: []},
+                    boundingRect: { create: {}},
+                    rects: { create: []},
                 },
                 include: {
                     user: true,
@@ -976,27 +991,14 @@ const resolver = {
                 }
             };
             if (args.boundingRect) {
-                upsertParams.data.boundingRect.connectOrCreate = {
-                    create: {
-                        pagenum: args.boundingRect.pagenum,
-                        x1: args.boundingRect.x1,
-                        y1: args.boundingRect.y1,
-                        x2: args.boundingRect.x2,
-                        y2: args.boundingRect.y2,
-                        width: args.boundingRect.width,
-                        height: args.boundingRect.height
-                    },
-                    where: {
-                        x1_y1_x2_y2_width_height_pagenum: {
-                            x1: args.boundingRect.x1,
-                            y1: args.boundingRect.y1,
-                            x2: args.boundingRect.x2,
-                            y2: args.boundingRect.y2,
-                            width: args.boundingRect.width,
-                            height: args.boundingRect.height,
-                            pagenum: args.boundingRect.pagenum
-                        }
-                    }
+                upsertParams.data.boundingRect.create = {
+                    pagenum: args.boundingRect.pagenum,
+                    x1: args.boundingRect.x1,
+                    y1: args.boundingRect.y1,
+                    x2: args.boundingRect.x2,
+                    y2: args.boundingRect.y2,
+                    width: args.boundingRect.width,
+                    height: args.boundingRect.height
                 };
             }
             if (args.rects) {
@@ -1012,73 +1014,34 @@ const resolver = {
                             height: rect.height
                         }});
                     console.log(isrect);
-                    if (isrect.length > 0)
-                        return {
-                            create: {
-                                rects:{
-                                    connectOrCreate: {
-                                        create: {
-                                            pagenum: rect.pagenum,
-                                            x1: rect.x1,
-                                            y1: rect.y1,
-                                            x2: rect.x2,
-                                            y2: rect.y2,
-                                            width: rect.width,
-                                            height: rect.height
-                                        },
-                                        where:{
-                                            x1_y1_x2_y2_width_height_pagenum: {
-                                                x1: rect.x1,
-                                                y1: rect.y1,
-                                                x2: rect.x2,
-                                                y2: rect.y2,
-                                                width: rect.width,
-                                                height: rect.height,
-                                                pagenum: rect.pagenum}
-                                        }}}
-                            },
-                            where: {
-                                rectid_highlightid: {
-                                    rectid: parseInt(isrect[0].id),
-                                    highlightid: -1
+                    return {
+                        rects:{
+                            connectOrCreate: {
+                                create: {
+                                    pagenum: rect.pagenum,
+                                    x1: rect.x1,
+                                    y1: rect.y1,
+                                    x2: rect.x2,
+                                    y2: rect.y2,
+                                    width: rect.width,
+                                    height: rect.height
+                                },
+                                where:{
+                                    x1_y1_x2_y2_width_height_pagenum: {
+                                        x1: rect.x1,
+                                        y1: rect.y1,
+                                        x2: rect.x2,
+                                        y2: rect.y2,
+                                        width: rect.width,
+                                        height: rect.height,
+                                        pagenum: rect.pagenum
+                                    }
                                 }
                             }
-                        };
-                    else
-                        return {
-                            create: {
-                                rects:{
-                                    connectOrCreate: {
-                                        create: {
-                                            pagenum: rect.pagenum,
-                                            x1: rect.x1,
-                                            y1: rect.y1,
-                                            x2: rect.x2,
-                                            y2: rect.y2,
-                                            width: rect.width,
-                                            height: rect.height
-                                        },
-                                        where:{
-                                            x1_y1_x2_y2_width_height_pagenum: {
-                                                x1: rect.x1,
-                                                y1: rect.y1,
-                                                x2: rect.x2,
-                                                y2: rect.y2,
-                                                width: rect.width,
-                                                height: rect.height,
-                                                pagenum: rect.pagenum}
-                                        }}}
-                            },
-                            where: {
-                                rectid_highlightid: {
-                                    rectid: -1,
-                                    highlightid: -1
-                                }
-                            }
-                        };
-                    
+                        }
+                    };
                 });
-                upsertParams.data.rects.connectOrCreate = await Promise.all(promises);
+                upsertParams.data.rects.create = await Promise.all(promises);
             }
             upsertParams.data.title = (args.title);
             upsertParams.data.text = (args.text);

@@ -5,6 +5,10 @@
   height: 100%;
 }
 
+.PdfHighlighter:focus {
+  outline: none;
+}
+
 .PdfHighlighter__highlight-layer {
   position: absolute;
   z-index: 3;

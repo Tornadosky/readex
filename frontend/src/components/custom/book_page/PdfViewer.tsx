@@ -32,7 +32,7 @@ interface State {
   scaleValue: string;
 }
 
-const getNextId = () => String(Math.random()).slice(2);
+// const getNextId = () => String(Math.random()).slice(2);
 
 const parseIdFromHash = () =>
   document.location.hash.slice("#highlight-".length);
@@ -52,7 +52,7 @@ const HighlightPopup = ({
     </div>
   ) : null;
 
-class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: any, bookName: string, setBooksList: any }, State> {
+class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: any, bookName: string, setBooksList: any, pdfId: any }, State> {
   state = {
     destinationPage: 1,
     pageCount: 0,
@@ -100,10 +100,163 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
 
     console.log("Saving highlight", highlight);
 
-    this.props.setHighlights([{ ...highlight, id: getNextId(), color: color }, ...this.props.highlights])
+    const { content, position, comment } = highlight;
+
+    const rectsData = position.rects.map(rect => ({
+      pagenum: rect.pageNumber,
+      x1: rect.x1,
+      y1: rect.y1,
+      x2: rect.x2,
+      y2: rect.y2,
+      width: rect.width,
+      height: rect.height
+    }));
+    const boundingRect = {
+      pagenum: position.boundingRect.pageNumber,
+      x1: position.boundingRect.x1,
+      y1: position.boundingRect.y1,
+      x2: position.boundingRect.x2,
+      y2: position.boundingRect.y2,
+      width: position.boundingRect.width,
+      height: position.boundingRect.height
+    };
+  
+    const mutation = `
+      mutation SetHighlight($book: Int!, $user: Int!, $title: String, $text: String, $image: String, $color: String!, $emoji: String, $boundingRect: iRects!, $rects: [iRects!]!) {
+        setHighlight(
+          book: $book,
+          user: $user,
+          title: $title,
+          text: $text,
+          image: $image,
+          color: $color,
+          emoji: $emoji,
+          boundingRect: $boundingRect,
+          rects: $rects
+        ) {
+          id
+          text
+          title
+          image
+          emoji
+          color
+          rects {
+            rects {
+              pagenum
+              x1
+              y1
+              x2
+              y2
+              width
+              height
+            }
+          }
+          boundingRect {
+            pagenum
+            x1
+            y1
+            x2
+            y2
+            width
+            height
+          }
+          book {
+            id
+            title
+          }
+          user {
+            id
+            login
+          }
+        }
+      }
+    `;
+
+  const bookId = parseInt(this.props.pdfId);
+  const userId = 1;
+
+  // Call your API with the formatted data
+  axios.post('http://localhost:3000/graphql', {
+    query: mutation,
+    variables: {
+      book: bookId,
+      user: userId,
+      title: comment.text ? comment.text : '',
+      text: content.text ? content.text : '',
+      image: content.image ? content.image : null,
+      color: color,
+      emoji: comment.emoji ? comment.emoji : '',
+      boundingRect: boundingRect,
+      rects: rectsData
+    }
+  }).then(response => {
+    if (response.data.data) {
+      const newHighlight = response.data.data.setHighlight;
+      console.log('Highlight saved:', newHighlight);
+      this.props.setHighlights((prevHighlights: any): any => [
+        ...prevHighlights,
+        {
+          id: newHighlight.id,
+          content: { text: newHighlight.text, image: newHighlight.image},
+          color: newHighlight.color,
+          position: {
+            boundingRect: newHighlight.boundingRect,
+            rects: newHighlight.rects.map((rect: any): any => rect.rects),
+            pageNumber: newHighlight.boundingRect.pagenum
+          },
+          comment: {
+            text: newHighlight.title,
+            emoji: newHighlight.emoji ? newHighlight.emoji : ''
+          }
+        }
+      ]);
+      console.log('Highlights:', this.props.highlights)
+    } else if (response.data.errors) {
+      console.error('Failed to save highlight:', response.data.errors);
+    }
+  }).catch(error => {
+    console.error('Error saving highlight:', error);
+  });
+    // this.props.setHighlights([{ ...highlight, id: getNextId(), color: color }, ...this.props.highlights])
   }
 
-  updateHighlight(highlightId: string, position: Object, content: Object) {
+  updateHighlight(highlightId: string, position: any, content: any) {
+    const mutation = `
+      mutation SetHighlight($id: ID!, $boundingRect: iRects!, $text: String, $image: String) {
+        setHighlight(
+          id: $id,
+          boundingRect: $boundingRect,
+          text: $text,
+          image: $image
+        ) {
+          id
+          text
+          image
+          boundingRect {
+            pagenum
+            x1
+            y1
+            x2
+            y2
+            width
+            height
+          }
+        }
+      }
+    `;
+
+    console.log("Updating highlight", { highlightId, position, content })
+    
+    const boundingRectData = {
+      pagenum: this.state.currentPage,
+      x1: position.boundingRect.x1,
+      y1: position.boundingRect.y1,
+      x2: position.boundingRect.x2,
+      y2: position.boundingRect.y2,
+      width: position.boundingRect.width,
+      height: position.boundingRect.height
+    };
+
     this.props.setHighlights(
       this.props.highlights.map((h: any) => {
         const {
@@ -122,14 +275,52 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
           : h;
       })
     );
+
+    axios.post('http://localhost:3000/graphql', {
+      query: mutation,
+      variables: {
+        id: highlightId,
+        boundingRect: boundingRectData,
+        text: content.text ? content.text : '',
+        image: content.image
+      }
+    }).then(response => {
+      if (response.data.data) {
+        console.log('Highlight updated:', response.data.data.setHighlight);        
+      } else if (response.data.errors) {
+        console.error('Failed to update highlight:', response.data.errors);
+      }
+    }).catch(error => {
+      console.error('Error updating highlight:', error);
+    });
   }
 
   deleteHighlight(highlightId: string) {
-    this.props.setHighlights(
-      this.props.highlights.filter(
-        ({ id }: any) => id !== highlightId
-      )
-    );
+    const mutation = `
+      mutation DeleteHighlight($id: Int!) {
+        delHighlight(id: $id) {
+          id
+        }
+      }
+    `;
+    axios.post('http://localhost:3000/graphql', {
+      query: mutation,
+      variables: {
+        id: parseInt(highlightId)
+      }
+    }).then(response => {
+      if (response.data.data && response.data.data.delHighlight) {
+        console.log('Highlight deleted:', response.data.data.delHighlight);
+        
+        this.props.setHighlights((prevHighlights: any): any => 
+          prevHighlights.filter(({ id }: any) => id !== highlightId)
+        );
+      } else if (response.data.errors) {
+        console.error('Failed to delete highlight:', response.data.errors);
+      }
+    }).catch(error => {
+      console.error('Error deleting highlight:', error);
+    });
   }
 
   handleColorChange = (newColor: any) => {
@@ -343,7 +534,9 @@ function PdfViewerWrapper(props: any) {
                   id
                   text
                   color
+                  title
                   emoji
+                  image
                   boundingRect {
                     pagenum
                     x1
@@ -375,6 +568,7 @@ function PdfViewerWrapper(props: any) {
 
         if (response.data && response.data.data.Books.length > 0) {
           const book = response.data.data.Books[0];
+          console.log('Book:', book);
           setBookName(book.title);
           setHighlights(book.highlights.map((h: any): any => {
             const rects = h.rects.map((r: any): any => r.rects);
@@ -382,7 +576,7 @@ function PdfViewerWrapper(props: any) {
   
             return {
               id: h.id,
-              content: { text: h.text },
+              content: { text: h.text, image: h.image},
               color: h.color,
               position: {
                 boundingRect,
@@ -390,7 +584,7 @@ function PdfViewerWrapper(props: any) {
                 pageNumber: boundingRect.pagenum
               },
               comment: {
-                text: h.text,
+                text: h.title,
                 emoji: h.emoji
               }
             };
@@ -445,7 +639,17 @@ function PdfViewerWrapper(props: any) {
 
   return (
   <>
-    {bookName && highlights && <PdfViewer key={pdfId} {...props} highlights={highlights} setBooksList={setBooksList} url={pdfUrl} bookName={bookName.replace(".pdf", "")} />}
+    {bookName && highlights &&
+      <PdfViewer
+        key={pdfId}
+        {...props} 
+        highlights={highlights} 
+        setHighlights={setHighlights} 
+        setBooksList={setBooksList} 
+        pdfId={pdfId}
+        url={pdfUrl} 
+        bookName={bookName.replace(".pdf", "")}
+      />}
   </>
 );
 }

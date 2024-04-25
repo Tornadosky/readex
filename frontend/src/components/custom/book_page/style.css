@@ -96,7 +96,7 @@
     right: 10%;
     opacity: 0.5;
     transition: opacity 0.3s;
-    z-index: 2;
+    z-index: 3;
   }
 
   /* .app-sidebar .app-sidebar-resizer {

@@ -638,6 +638,31 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
                   pageBoundingRect.pageNumber
                 );
 
+                // const getTextInsideRectangle = (highlight) => {
+                //   let text = ''
+                //   for (let j = 0; j < highlight.areas.length; j++) {
+                //     const area = highlight.areas[j]
+                //     const page = area.pageIndex
+                //     const textsParent = document.querySelector('.rpv-core__text-layer[data-testid="core__text-layer-' + page + '"]')
+                //     const { clientWidth, clientHeight } = textsParent
+                //     const texts = textsParent.querySelectorAll('span')
+                //     for (let i = 0; i < texts.length; i++) {
+                //         const textElement = texts[i]
+                //         const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = textElement
+                //         // console.log(offsetLeft, offsetTop, offsetWidth, offsetHeight, clientWidth, clientHeight);
+                //         const left = offsetLeft / clientWidth * 100
+                //         const top = offsetTop / clientHeight * 100
+                //         const width = offsetWidth / clientHeight * 100
+                //         const height = offsetHeight / clientWidth * 100
+                //         // console.log(left, top, width, height, area);
+                //         if (left >= area.left && left + width <= area.left + area.width && top >= area.top && top + height <= area.top + area.height) {
+                //             text += textElement.textContent + ' '
+                //         }
+                //     }
+                //   }
+                //   return text;
+                // }
+
                 this.setTip(
                   viewportPosition,
                   onSelectionFinished(

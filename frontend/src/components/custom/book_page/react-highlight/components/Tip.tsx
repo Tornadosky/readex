@@ -56,6 +56,7 @@ export class Tip extends Component<Props, State> {
           >
             <div>
               <textarea
+                style={{ paddingLeft: "5px" }}
                 placeholder="Your comment"
                 autoFocus
                 value={text}

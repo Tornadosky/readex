@@ -14,23 +14,15 @@ import PdfViewerWrapper from './components/custom/book_page/PdfViewer.tsx';
 
 function AppWrapper() {
   const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
-  const SECONDARY_PDF_URL = "https://arxiv.org/pdf/1604.02480.pdf";
   const searchParams = new URLSearchParams(document.location.search);
   const initialUrl = searchParams.get("url") || PRIMARY_PDF_URL;
   const testHighlights: Record<string, Array<IHighlight>> = _testHighlights;
 
   const [highlights, setHighlights] = useState<IHighlight[]>(testHighlights[initialUrl] ? [...testHighlights[initialUrl]] : []);
-  const [url, setUrl] = useState(initialUrl);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const resetHighlights = () => {
     setHighlights([]);
-  };
-
-  const toggleDocument = () => {
-    const newUrl = url === PRIMARY_PDF_URL ? SECONDARY_PDF_URL : PRIMARY_PDF_URL;
-    setUrl(newUrl);
-    setHighlights(_testHighlights[newUrl] ? [..._testHighlights[newUrl]] : []);
   };
 
   return (
@@ -41,7 +33,6 @@ function AppWrapper() {
         <Route element={<LayoutWithSidebar
           highlights={highlights}
           resetHighlights={resetHighlights}
-          toggleDocument={toggleDocument}
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
         />}>

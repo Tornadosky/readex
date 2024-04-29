@@ -24,12 +24,11 @@ export interface ITest {
 interface LayoutWithSidebarProps {
     highlights: IHighlight[];
     resetHighlights: () => void;
-    toggleDocument: () => void;
     isModalOpen: boolean;
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const LayoutWithSidebar = ({highlights, resetHighlights, toggleDocument, isModalOpen, setIsModalOpen }: LayoutWithSidebarProps) => {
+const LayoutWithSidebar = ({highlights, resetHighlights, isModalOpen, setIsModalOpen }: LayoutWithSidebarProps) => {
     const [booksList, setBooksList] = useState<IBook[]>([]);
     const [testsList, setTestsList] = useState<ITest[]>([]);
 
@@ -39,7 +38,6 @@ const LayoutWithSidebar = ({highlights, resetHighlights, toggleDocument, isModal
                 <Sidebar 
                     highlights={highlights}
                     resetHighlights={resetHighlights}
-                    toggleDocument={toggleDocument}
                     isModalOpen={isModalOpen}
                     setIsModalOpen={setIsModalOpen}
                     booksList={booksList}

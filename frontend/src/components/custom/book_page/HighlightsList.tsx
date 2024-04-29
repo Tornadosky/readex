@@ -1,22 +1,93 @@
 import { useState, useEffect } from 'react';
 import type { IHighlight } from "./react-pdf-highlighter";
+import axios from 'axios';
 
 interface HighlightsListProps {
-  highlights: Array<IHighlight>;
+  bookId?: string;
   resetHighlights: () => void;
-  toggleDocument: () => void;
 }
 
 const updateHash = (highlight: IHighlight) => {
   document.location.hash = `highlight-${highlight.id}`;
 };
 
-export default function highlightsList({ highlights, resetHighlights, toggleDocument }: HighlightsListProps)  {
+export default function highlightsList({ bookId, resetHighlights }: HighlightsListProps)  {
+  const [highlights, setHighlights] = useState<IHighlight[]>([]);
+
   const [sortCriteria, setSortCriteria] = useState('');
   const [filterColor, setFilterColor] = useState('');
   const [filterPageNumber, setFilterPageNumber] = useState('');
   const [filterType, setFilterType] = useState('');
   const [filteredHighlights, setFilteredHighlights] = useState<IHighlight[]>(highlights);
+
+  useEffect(() => {
+    if (bookId) {
+      axios.post('http://localhost:3000/graphql', {
+        query: `
+          query GetHighlights($bookId: Int!) {
+            Books(id: $bookId) {
+              id
+              title
+              highlights {
+                id
+                text
+                color
+                title
+                emoji
+                image
+                boundingRect {
+                  pagenum
+                  x1
+                  y1
+                  x2
+                  y2
+                  width
+                  height
+                }
+                rects {
+                  rects {
+                    pagenum
+                    x1
+                    y1
+                    x2
+                    y2
+                    width
+                    height
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          bookId: parseInt(bookId)
+        }
+      })
+      .then(response => {
+        console.log('Highlights:', response.data)
+        const highlightsData = response.data.data.Books[0]?.highlights || [];
+        setHighlights(highlightsData.map((h: any) => ({
+          id: h.id,
+          content: { text: h.text, image: h.image },
+          color: h.color,
+          position: {
+            boundingRect: h.boundingRect,
+            rects: h.rects.map((r: any) => r.rects),
+            pageNumber: h.boundingRect.pagenum
+          },
+          comment: {
+            text: h.title,
+            emoji: h.emoji
+          }
+        })));
+      })
+      .catch(error => {
+        console.error('Error fetching highlights:', error);
+      });
+    } else {
+      setHighlights([]);
+    }
+  }, [bookId]);
 
   const changeAlpha = (color: string, newAlpha: number) => {
     const rgb = color.match(/rgb\((\d+), (\d+), (\d+)\)/);
@@ -141,9 +212,6 @@ export default function highlightsList({ highlights, resetHighlights, toggleDocu
           </li>
         ))}
       </ul>
-      <div className="p-4">
-        <button onClick={toggleDocument}>Toggle PDF document</button>
-      </div>
       {highlights.length > 0 ? (
         <div className="p-4">
           <button onClick={resetHighlights}>Reset highlights</button>

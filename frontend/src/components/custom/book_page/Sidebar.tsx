@@ -9,12 +9,12 @@ import SmallSidebar from './SmallSidebar';
 import BookCreateModal from './BookCreateModal';
 import type { IBook, ITest } from './LayoutWithSidebar';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 import './style.css';
 
 interface Props {
   highlights: Array<IHighlight>;
   resetHighlights: () => void;
-  toggleDocument: () => void;
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   booksList: Array<IBook>;
@@ -25,7 +25,6 @@ interface Props {
 
 export function Sidebar({
   highlights,
-  toggleDocument,
   resetHighlights,
   isModalOpen,
   setIsModalOpen,
@@ -41,6 +40,7 @@ export function Sidebar({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState("20vw");
+  const { pdfId } = useParams();
 
   const startResizing = useCallback((mouseDownEvent: MouseEvent) => {
     setIsResizing(true);
@@ -247,9 +247,8 @@ export function Sidebar({
             <div style={{ maxHeight: 'calc(100vh - 57px)', overflowY: 'auto' }}>
               {view === 'Notes' ? (
                 <HighlightsList 
-                  highlights={highlights}
+                  bookId={pdfId}
                   resetHighlights={resetHighlights}
-                  toggleDocument={toggleDocument}
                 />
               ) : view === "Books" ? (
                 <BooksList 

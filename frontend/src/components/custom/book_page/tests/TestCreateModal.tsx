@@ -36,8 +36,8 @@ const TestCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, booksLi
         try {
             const response = await axios.post('http://localhost:3000/graphql', {
                 query: `
-                mutation CreateTest($title: String!, $questionCount: Int!, $difficulty: String!, $language: String!, $prompt: String!, $user: Int!) {
-                    setTest(title: $title, questionCount: $questionCount, difficulty: $difficulty, language: $language, prompt: $prompt, user: $user) {
+                mutation CreateTest($title: String!, $questionCount: Int!, $difficulty: String!, $language: String!, $prompt: String!, $user: Int!, $bookId: Int!) {
+                    setTest(title: $title, questionCount: $questionCount, difficulty: $difficulty, language: $language, prompt: $prompt, user: $user, book: $bookId) {
                         id
                         title
                         questionCount
@@ -47,7 +47,7 @@ const TestCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, booksLi
                 }
                 `,
                 variables: {
-                    // bookId: selectedBook.id,
+                    bookId: parseInt(selectedBook.id),
                     // source: questionSource,
                     title: 'Test Title',
                     questionCount: 0,

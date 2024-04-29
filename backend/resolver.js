@@ -1115,40 +1115,36 @@ const resolver = {
         return answer;
     },
     setTest: async (args, context) => {
-        let upsertParams = null;
-        let answer = null;
+        let upsertParams = {};
         if (args.id) {
+            // Update logic
             upsertParams = {
+                where: { id: parseInt(args.id) },
                 data: {},
-                where: {
-                  id: parseInt(args.id),
-                },
                 include: {
-                  user: true,
-                  questions: true,
-                  collections: true,
-                  words: true,
+                    user: true,
+                    questions: true,
+                    collections: true,
+                    words: true,
+                    book: true  // Ensure book is included in response
                 },
             };
-
-            args.title ? upsertParams.data.title = args.title : null;
-            args.prompt ? upsertParams.data.prompt = args.prompt : null;
-            args.language ? upsertParams.data.language = args.language : null;
-            args.difficulty ? upsertParams.data.difficulty = args.difficulty : null;
-            args.questionCount ? upsertParams.data.questionCount = args.questionCount : null;
-            args.lastResult ? upsertParams.data.lastResult = args.lastResult : null;
-            args.result ? upsertParams.data.result = args.result : null;
-            upsertParams.where = {
-                id: parseInt(args.id)
-            };
-            upsertParams.include = {
-                user: true,
-                questions: true,
-                collections: true,
-                words: true
-            };
-            answer = await prisma.Tests.update(upsertParams);
+    
+            // Optional fields
+            if (args.title) upsertParams.data.title = args.title;
+            if (args.prompt) upsertParams.data.prompt = args.prompt;
+            if (args.language) upsertParams.data.language = args.language;
+            if (args.difficulty) upsertParams.data.difficulty = args.difficulty;
+            if (args.questionCount) upsertParams.data.questionCount = args.questionCount;
+            if (args.lastResult) upsertParams.data.lastResult = args.lastResult;
+            if (args.result) upsertParams.data.result = args.result;
+    
+            // Update the Test
+            const answer = await prisma.Tests.update(upsertParams);
+            return answer;
+    
         } else {
+            // Creation logic
             upsertParams = {
                 data: {
                     title: args.title,
@@ -1156,25 +1152,25 @@ const resolver = {
                     language: args.language,
                     difficulty: args.difficulty,
                     questionCount: args.questionCount,
-                    lastResult: args.lastResult,
+                    lastResult: args.lastResult ?? 0,  // Use default if undefined
                     result: 0,
-                    user: {
-                        connect: {
-                            id: args.user
-                        }
-                    }
+                    user: { connect: { id: args.user } },
+                    book: args.book ? { connect: { id: args.book } } : undefined,  // Connect book if provided
                 },
                 include: {
                     user: true,
                     questions: true,
                     collections: true,
-                    words: true
+                    words: true,
+                    book: true  // Ensure book is included in response
                 }
             };
-            answer = await prisma.Tests.create(upsertParams);
+    
+            // Create the Test
+            const answer = await prisma.Tests.create(upsertParams);
+            console.log(answer);
+            return answer;
         }
-        console.log(answer);
-        return answer;
     },
     setQuestion: async (args, context) => {
         let upsertParams = {};

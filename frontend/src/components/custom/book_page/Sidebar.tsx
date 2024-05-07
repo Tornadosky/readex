@@ -248,6 +248,7 @@ export function Sidebar({
               {view === 'Notes' ? (
                 <HighlightsList 
                   bookId={pdfId}
+                  highlights={highlights}
                   resetHighlights={resetHighlights}
                 />
               ) : view === "Books" ? (

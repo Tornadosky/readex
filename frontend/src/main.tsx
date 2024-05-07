@@ -8,22 +8,11 @@ import Page404 from './components/custom/misc/Page404.tsx';
 import LayoutWithSidebar from './components/custom/book_page/LayoutWithSidebar.tsx';
 import '../app/globals.css';
 
-import type { IHighlight } from "./components/custom/book_page/react-pdf-highlighter";
 import { testHighlights as _testHighlights } from "./components/custom/book_page/test-highlights";
 import PdfViewerWrapper from './components/custom/book_page/PdfViewer.tsx';
 
 function AppWrapper() {
-  const PRIMARY_PDF_URL = "https://arxiv.org/pdf/1708.08021.pdf";
-  const searchParams = new URLSearchParams(document.location.search);
-  const initialUrl = searchParams.get("url") || PRIMARY_PDF_URL;
-  const testHighlights: Record<string, Array<IHighlight>> = _testHighlights;
-
-  const [highlights, setHighlights] = useState<IHighlight[]>(testHighlights[initialUrl] ? [...testHighlights[initialUrl]] : []);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const resetHighlights = () => {
-    setHighlights([]);
-  };
 
   return (
     <BrowserRouter>
@@ -31,13 +20,11 @@ function AppWrapper() {
         <Route path="/" element={<App />} />
         <Route path="/landing-page" element={<div>Landing Page Content Here</div>} />
         <Route element={<LayoutWithSidebar
-          highlights={highlights}
-          resetHighlights={resetHighlights}
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
         />}>
           <Route path="/home" element={<MainPage isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />} />
-          <Route path="/pdfs/:pdfId/view" element={<PdfViewerWrapper highlights={highlights} setHighlights={setHighlights} />} />
+          <Route path="/pdfs/:pdfId/view" element={<PdfViewerWrapper />} />
           <Route path="/tests/:testId/edit" element={<TestPage isSolving={false} />} />
           <Route path="/tests/:testId/play" element={<TestPage isSolving={true} />} />
         </Route>

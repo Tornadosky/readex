@@ -514,14 +514,16 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
 interface OutletContextType {
   booksList: IBook[];
   setBooksList: React.Dispatch<React.SetStateAction<IBook[]>>;
+  highlights: IHighlight[];
+  setHighlights: React.Dispatch<React.SetStateAction<IHighlight[]>>;
 }
 
 function PdfViewerWrapper(props: any) {
   const { pdfId } = useParams();
   const [pdfUrl, setPdfUrl] = useState('');
   const [bookName, setBookName] = useState('');
-  const [highlights, setHighlights] = useState([]);
-  const { setBooksList } = useOutletContext<OutletContextType>();
+  //const [highlights, setHighlights] = useState([]);
+  const { setBooksList, highlights, setHighlights } = useOutletContext<OutletContextType>();
 
   useEffect(() => {
     const fetchBookName = async () => {
@@ -573,25 +575,25 @@ function PdfViewerWrapper(props: any) {
           const book = response.data.data.Books[0];
           console.log('Book:', book);
           setBookName(book.title);
-          setHighlights(book.highlights.map((h: any): any => {
-            const rects = h.rects.map((r: any): any => r.rects);
-            const boundingRect = h.boundingRect;
+          // setHighlights(book.highlights.map((h: any): any => {
+          //   const rects = h.rects.map((r: any): any => r.rects);
+          //   const boundingRect = h.boundingRect;
   
-            return {
-              id: h.id,
-              content: { text: h.text, image: h.image},
-              color: h.color,
-              position: {
-                boundingRect,
-                rects,
-                pageNumber: boundingRect.pagenum
-              },
-              comment: {
-                text: h.title,
-                emoji: h.emoji
-              }
-            };
-          }));
+          //   return {
+          //     id: h.id,
+          //     content: { text: h.text, image: h.image},
+          //     color: h.color,
+          //     position: {
+          //       boundingRect,
+          //       rects,
+          //       pageNumber: boundingRect.pagenum
+          //     },
+          //     comment: {
+          //       text: h.title,
+          //       emoji: h.emoji
+          //     }
+          //   };
+          // }));
           return book.title;
         } else {
           console.error('Book not found');

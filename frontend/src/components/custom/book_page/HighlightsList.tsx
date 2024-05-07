@@ -5,14 +5,15 @@ import axios from 'axios';
 interface HighlightsListProps {
   bookId?: string;
   resetHighlights: () => void;
+  highlights: IHighlight[];
 }
 
 const updateHash = (highlight: IHighlight) => {
   document.location.hash = `highlight-${highlight.id}`;
 };
 
-export default function highlightsList({ bookId, resetHighlights }: HighlightsListProps)  {
-  const [highlights, setHighlights] = useState<IHighlight[]>([]);
+export default function highlightsList({ bookId, resetHighlights, highlights }: HighlightsListProps)  {
+  //const [highlights, setHighlights] = useState<IHighlight[]>([]);
 
   const [sortCriteria, setSortCriteria] = useState('');
   const [filterColor, setFilterColor] = useState('');
@@ -66,26 +67,26 @@ export default function highlightsList({ bookId, resetHighlights }: HighlightsLi
       .then(response => {
         console.log('Highlights:', response.data)
         const highlightsData = response.data.data.Books[0]?.highlights || [];
-        setHighlights(highlightsData.map((h: any) => ({
-          id: h.id,
-          content: { text: h.text, image: h.image },
-          color: h.color,
-          position: {
-            boundingRect: h.boundingRect,
-            rects: h.rects.map((r: any) => r.rects),
-            pageNumber: h.boundingRect.pagenum
-          },
-          comment: {
-            text: h.title,
-            emoji: h.emoji
-          }
-        })));
+        // setHighlights(highlightsData.map((h: any) => ({
+        //   id: h.id,
+        //   content: { text: h.text, image: h.image },
+        //   color: h.color,
+        //   position: {
+        //     boundingRect: h.boundingRect,
+        //     rects: h.rects.map((r: any) => r.rects),
+        //     pageNumber: h.boundingRect.pagenum
+        //   },
+        //   comment: {
+        //     text: h.title,
+        //     emoji: h.emoji
+        //   }
+        // })));
       })
       .catch(error => {
         console.error('Error fetching highlights:', error);
       });
     } else {
-      setHighlights([]);
+      // setHighlights([]);
     }
   }, [bookId]);
 

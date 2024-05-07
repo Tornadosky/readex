@@ -114,7 +114,35 @@ const LayoutWithSidebar = ({ isModalOpen, setIsModalOpen }: LayoutWithSidebarPro
         }
     }, [pdfId]);
     
-    const resetHighlights = () => {
+    const resetHighlights = async () => {
+        if (highlights.length === 0) {
+            console.log("No highlights to reset.");
+            return;
+        }
+    
+        // Map over the highlights and create a delete request for each
+        const deleteRequests = highlights.map(highlight => {
+            return axios.post('http://localhost:3000/graphql', {
+                query: `
+                    mutation DeleteHighlight($id: Int!) {
+                        delHighlight(id: $id) {
+                            id
+                        }
+                    }
+                `,
+                variables: {
+                    id: parseInt(highlight.id)
+                },
+            });
+        });
+    
+        try {
+            await Promise.all(deleteRequests);
+            console.log("All highlights have been deleted.");
+        } catch (error) {
+            console.error("Error deleting highlights:", error);
+        }
+    
         setHighlights([]);
     };
 

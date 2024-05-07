@@ -193,6 +193,11 @@ const resolver = {
             });
         } else {
             answer = await prisma.Collections.findMany({
+                where: {
+                    user: {
+                        id: args.user
+                    }
+                },
                 include: {
                     books: {
                         include: {

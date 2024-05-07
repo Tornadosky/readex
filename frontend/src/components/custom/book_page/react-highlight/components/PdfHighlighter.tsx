@@ -36,6 +36,32 @@ import getBoundingRect from "../lib/get-bounding-rect";
 import getClientRects from "../lib/get-client-rects";
 import { HighlightLayer } from "./HighlightLayer";
 
+export const getTextInsideRectangle = (boundingRect: any, pageNumber: number) => {
+  let text = '';
+  const textsParent = document.querySelector(`.pdfViewer .page[data-page-number="${pageNumber}"] .textLayer`);
+  //console.log(textsParent)
+  if (!textsParent) return text;
+
+  const texts = textsParent.querySelectorAll('span');
+
+  texts.forEach(textElement => {
+    const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = textElement;
+    const textRect = {
+      left: offsetLeft,
+      top: offsetTop,
+      width: offsetWidth,
+      height: offsetHeight,
+    };
+    // Check if the text element's rectangle overlaps with the bounding rectangle of the selection
+    if (textRect.left >= boundingRect.left && textRect.left + textRect.width <= boundingRect.left + boundingRect.width &&
+        textRect.top >= boundingRect.top && textRect.top + textRect.height <= boundingRect.top + boundingRect.height) {
+      text += textElement.textContent + ' ';
+    }
+  });
+  
+  return text.trim();
+}
+
 export type T_ViewportHighlight<T_HT> = { position: Position } & T_HT;
 
 interface State<T_HT> {
@@ -638,36 +664,19 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
                   pageBoundingRect.pageNumber
                 );
 
-                // const getTextInsideRectangle = (highlight) => {
-                //   let text = ''
-                //   for (let j = 0; j < highlight.areas.length; j++) {
-                //     const area = highlight.areas[j]
-                //     const page = area.pageIndex
-                //     const textsParent = document.querySelector('.rpv-core__text-layer[data-testid="core__text-layer-' + page + '"]')
-                //     const { clientWidth, clientHeight } = textsParent
-                //     const texts = textsParent.querySelectorAll('span')
-                //     for (let i = 0; i < texts.length; i++) {
-                //         const textElement = texts[i]
-                //         const { offsetLeft, offsetTop, offsetWidth, offsetHeight } = textElement
-                //         // console.log(offsetLeft, offsetTop, offsetWidth, offsetHeight, clientWidth, clientHeight);
-                //         const left = offsetLeft / clientWidth * 100
-                //         const top = offsetTop / clientHeight * 100
-                //         const width = offsetWidth / clientHeight * 100
-                //         const height = offsetHeight / clientWidth * 100
-                //         // console.log(left, top, width, height, area);
-                //         if (left >= area.left && left + width <= area.left + area.width && top >= area.top && top + height <= area.top + area.height) {
-                //             text += textElement.textContent + ' '
-                //         }
-                //     }
-                //   }
-                //   return text;
-                // }
+                const text = getTextInsideRectangle(pageBoundingRect, page.number);
+                console.log("Text inside the bbox: ", text)
+
+                const content = {
+                  text: text,
+                  image: image,
+                };
 
                 this.setTip(
                   viewportPosition,
                   onSelectionFinished(
                     scaledPosition,
-                    { image },
+                    content,
                     () => this.hideTipAndSelection(),
                     () => {
                       console.log("setting ghost highlight", scaledPosition);

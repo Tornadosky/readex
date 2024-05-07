@@ -49,20 +49,33 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen }) => {
         const response = await axios.post('http://localhost:3000/graphql', {
           query: `
             query GetAllCollections {
-              Collections {
+              Collections(user: 1) {
                 id
                 title
                 books {
-                  id
-                  title
+                  books {
+                    id
+                    title
+                  }
                 }
               }
             }
           `,
         });
+        const data = response.data.data.Collections || [];
 
-        console.log(response.data.data.Collections);
-        setSections(response.data.data.Collections);
+        console.log(data);
+        setSections(data.map((section: any) => ({
+          id: section.id,
+          section_name: section.title,
+          books: section.books.map((book: any) => ({
+            id: book.books.id,
+            title: book.books.title,
+            index: 0,
+          })),
+        }))
+        );
+        
         // setSections([{id: 1, section_name: "Section 1", books: [{id: 1, title: "Book 1", is_processed: true, index: 0}, {id: 2, title: "Book 2", is_processed: true, index: 1}]},
         // {id: 2, section_name: "Section 1", books: [{id: 1, title: "Book 1", is_processed: true, index: 0}, {id: 2, title: "Book 2", is_processed: true, index: 1}]},
         // {id: 3, section_name: "Section 1", books: [{id: 1, title: "Book 1", is_processed: true, index: 0}, {id: 2, title: "Book 2", is_processed: true, index: 1}]}]);

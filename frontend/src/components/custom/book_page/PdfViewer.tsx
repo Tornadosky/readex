@@ -22,6 +22,8 @@ import { testHighlights as _testHighlights } from "./test-highlights";
 import { Spinner } from "./Spinner";
 import './style.css';
 
+import { getTextInsideRectangle } from "./react-highlight/components/PdfHighlighter";
+
 interface State {
   destinationPage: number;
   pageCount: number;
@@ -471,10 +473,11 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
                         isScrolledTo={isScrolledTo}
                         highlight={highlight}
                         onChange={(boundingRect) => {
+                          console.log("New rectangle", { boundingRect });
                           this.updateHighlight(
                             highlight.id,
                             { boundingRect: viewportToScaled(boundingRect) },
-                            { image: screenshot(boundingRect) }
+                            { text: getTextInsideRectangle(boundingRect, this.state.currentPage), image: screenshot(boundingRect) }
                           );
                         }}
                         onDelete={() => {

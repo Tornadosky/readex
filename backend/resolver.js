@@ -583,7 +583,6 @@ const resolver = {
         console.log(answer);
         return answer;
     },
-
     
     setBook: async (args, context) => {
         let upsertParams = null;
@@ -850,28 +849,15 @@ const resolver = {
             }: null;
             console.log(args.boundingRect);
             if (args.boundingRect) {
-                upsertParams.data.boundingRect = { connectOrCreate: {}};
-                upsertParams.data.boundingRect.connectOrCreate = {
-                    create: {
-                        pagenum: args.boundingRect.pagenum,
-                        x1: args.boundingRect.x1,
-                        y1: args.boundingRect.y1,
-                        x2: args.boundingRect.x2,
-                        y2: args.boundingRect.y2,
-                        width: args.boundingRect.width,
-                        height: args.boundingRect.height
-                    },
-                    where: {
-                        x1_y1_x2_y2_width_height_pagenum: {
-                            x1: args.boundingRect.x1,
-                            y1: args.boundingRect.y1,
-                            x2: args.boundingRect.x2,
-                            y2: args.boundingRect.y2,
-                            width: args.boundingRect.width,
-                            height: args.boundingRect.height,
-                            pagenum: args.boundingRect.pagenum
-                        }
-                    }
+                upsertParams.data.boundingRect = { create: {}};
+                upsertParams.data.boundingRect.create = {
+                    pagenum: args.boundingRect.pagenum,
+                    x1: args.boundingRect.x1,
+                    y1: args.boundingRect.y1,
+                    x2: args.boundingRect.x2,
+                    y2: args.boundingRect.y2,
+                    width: args.boundingRect.width,
+                    height: args.boundingRect.height
                 };
             }
             if (args.rects) {
@@ -891,58 +877,37 @@ const resolver = {
                         return {
                             create: {
                                 rects:{
-                                    connectOrCreate: {
-                                        create: {
-                                            pagenum: rect.pagenum,
-                                            x1: rect.x1,
-                                            y1: rect.y1,
-                                            x2: rect.x2,
-                                            y2: rect.y2,
-                                            width: rect.width,
-                                            height: rect.height
-                                        },
-                                        where:{
-                                            x1_y1_x2_y2_width_height_pagenum: {
-                                                x1: rect.x1,
-                                                y1: rect.y1,
-                                                x2: rect.x2,
-                                                y2: rect.y2,
-                                                width: rect.width,
-                                                height: rect.height,
-                                                pagenum: rect.pagenum}
-                                        }}}
+                                    create: {
+                                        pagenum: rect.pagenum,
+                                        x1: rect.x1,
+                                        y1: rect.y1,
+                                        x2: rect.x2,
+                                        y2: rect.y2,
+                                        width: rect.width,
+                                        height: rect.height
+                                    }
                             },
                             where: {
                                 rectid_highlightid: {
                                     rectid: parseInt(isrect[0].id),
                                     highlightid: parseInt(args.id)
                                 }
-                            }
+                            }}
                         };
                     else
                         return {
                             create: {
                                 rects:{
-                                    connectOrCreate: {
-                                        create: {
-                                            pagenum: rect.pagenum,
-                                            x1: rect.x1,
-                                            y1: rect.y1,
-                                            x2: rect.x2,
-                                            y2: rect.y2,
-                                            width: rect.width,
-                                            height: rect.height
-                                        },
-                                        where:{
-                                            x1_y1_x2_y2_width_height_pagenum: {
-                                                x1: rect.x1,
-                                                y1: rect.y1,
-                                                x2: rect.x2,
-                                                y2: rect.y2,
-                                                width: rect.width,
-                                                height: rect.height,
-                                                pagenum: rect.pagenum}
-                                        }}}
+                                    create: {
+                                        pagenum: rect.pagenum,
+                                        x1: rect.x1,
+                                        y1: rect.y1,
+                                        x2: rect.x2,
+                                        y2: rect.y2,
+                                        width: rect.width,
+                                        height: rect.height
+                                    }
+                                }
                             },
                             where: {
                                 rectid_highlightid: {
@@ -952,7 +917,7 @@ const resolver = {
                             }
                         };                    
                 });
-                upsertParams.data.rects.connectOrCreate = await Promise.all(promises);
+                upsertParams.data.rects.create = await Promise.all(promises);
             }
             upsertParams.data.title = (args.title);
             upsertParams.data.text = (args.text);
@@ -1021,27 +986,14 @@ const resolver = {
                     console.log(isrect);
                     return {
                         rects:{
-                            connectOrCreate: {
-                                create: {
-                                    pagenum: rect.pagenum,
-                                    x1: rect.x1,
-                                    y1: rect.y1,
-                                    x2: rect.x2,
-                                    y2: rect.y2,
-                                    width: rect.width,
-                                    height: rect.height
-                                },
-                                where:{
-                                    x1_y1_x2_y2_width_height_pagenum: {
-                                        x1: rect.x1,
-                                        y1: rect.y1,
-                                        x2: rect.x2,
-                                        y2: rect.y2,
-                                        width: rect.width,
-                                        height: rect.height,
-                                        pagenum: rect.pagenum
-                                    }
-                                }
+                            create: {
+                                pagenum: rect.pagenum,
+                                x1: rect.x1,
+                                y1: rect.y1,
+                                x2: rect.x2,
+                                y2: rect.y2,
+                                width: rect.width,
+                                height: rect.height
                             }
                         }
                     };

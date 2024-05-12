@@ -58,8 +58,6 @@ model Rects {
   pagenum Int?
   highlightbr Highlights[] @relation("rectsOnHighlightsBR")
   highlightrects RectsOnHighlights[]
-
-  @@unique([x1, y1, x2, y2, width, height, pagenum])
 }
 
 model Collections {

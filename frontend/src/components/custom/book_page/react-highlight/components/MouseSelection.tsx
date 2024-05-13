@@ -68,117 +68,85 @@ class MouseSelection extends Component<Props, State> {
     if (!this.root) {
       return;
     }
-
-    const that = this;
-
+    
     const { onSelection, onDragStart, onDragEnd, shouldStart } = this.props;
-
+  
     const container = asElement(this.root.parentElement);
-
+  
     if (!isHTMLElement(container)) {
       return;
     }
-
-    let containerBoundingRect: DOMRect | null = null;
-
+  
     const containerCoords = (pageX: number, pageY: number) => {
-      if (!containerBoundingRect) {
-        containerBoundingRect = container.getBoundingClientRect();
-      }
-
+      // Calculate bounding rectangle dynamically
+      const containerBoundingRect = container.getBoundingClientRect();
+  
       return {
         x: pageX - containerBoundingRect.left + container.scrollLeft,
-        y:
-          pageY -
-          containerBoundingRect.top +
-          container.scrollTop -
-          window.scrollY,
+        y: pageY - containerBoundingRect.top + container.scrollTop - window.scrollY,
       };
     };
-
+  
     container.addEventListener("mousemove", (event: MouseEvent) => {
       const { start, locked } = this.state;
-
+  
       if (!start || locked) {
         return;
       }
-
-      that.setState({
-        ...this.state,
+  
+      this.setState({
         end: containerCoords(event.pageX, event.pageY),
       });
     });
-
+  
     container.addEventListener("mousedown", (event: MouseEvent) => {
       if (!shouldStart(event)) {
         this.reset();
         return;
       }
-
+  
       const startTarget = asElement(event.target);
       if (!isHTMLElement(startTarget)) {
         return;
       }
-
+  
       onDragStart();
-
+  
       this.setState({
         start: containerCoords(event.pageX, event.pageY),
         end: null,
         locked: false,
       });
-
-      const onMouseUp = (event: MouseEvent): void => {
-        // emulate listen once
-        event.currentTarget?.removeEventListener(
-          "mouseup",
-          onMouseUp as EventListener
-        );
-
+  
+      const onMouseUp = (event: MouseEvent) => {
+        container.removeEventListener("mouseup", onMouseUp);
+  
         const { start } = this.state;
-
         if (!start) {
           return;
         }
-
+  
         const end = containerCoords(event.pageX, event.pageY);
-
-        const boundingRect = that.getBoundingRect(start, end);
-
+        const boundingRect = this.getBoundingRect(start, end);
+  
         if (
           !isHTMLElement(event.target) ||
           !container.contains(asElement(event.target)) ||
-          !that.shouldRender(boundingRect)
+          !this.shouldRender(boundingRect)
         ) {
-          that.reset();
+          this.reset();
           return;
         }
-
-        that.setState(
-          {
-            end,
-            locked: true,
-          },
-          () => {
-            const { start, end } = that.state;
-
-            if (!start || !end) {
-              return;
-            }
-
-            if (isHTMLElement(event.target)) {
-              onSelection(startTarget, boundingRect, that.reset);
-
-              onDragEnd();
-            }
+  
+        this.setState({ end, locked: true }, () => {
+          if (this.state.start && this.state.end) {
+            onSelection(startTarget, boundingRect, this.reset);
+            onDragEnd();
           }
-        );
+        });
       };
-
-      const { ownerDocument: doc } = container;
-      if (doc.body) {
-        doc.body.addEventListener("mouseup", onMouseUp);
-      }
+  
+      container.addEventListener("mouseup", onMouseUp);
     });
   }
 

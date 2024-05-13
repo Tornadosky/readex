@@ -60,7 +60,7 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
     pageCount: 0,
     currentPage: 1,
     inputPage: "1",
-    color: "rgba(255, 226, 143, 1)",
+    color: localStorage.getItem('selectedColor') || "rgba(255, 226, 143, 1)",
     bookName: this.props.bookName,
     scaleValue: "auto",
   };
@@ -81,6 +81,7 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
       this.scrollToHighlightFromHash,
       false
     );
+    document.documentElement.style.setProperty("--text-selection-color", this.state.color);
   }
 
   componentDidUpdate(prevProps: any, prevState: any) {
@@ -328,6 +329,7 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
   handleColorChange = (newColor: any) => {
     const rgbColor = newColor.toRgbString();
     this.setState({ color: rgbColor });
+    localStorage.setItem('selectedColor', rgbColor);
     console.log("Color change", rgbColor);
     document.documentElement.style.setProperty("--text-selection-color", rgbColor);
   };
@@ -431,7 +433,7 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
                     hideTipAndSelection,
                     transformSelection
                   ) => {
-                    console.log("Selection is finished", { position, content });
+                    console.log("Selection is finished", { position, content }, this.state.color);
                     return (
                       <Tip
                         onOpen={transformSelection}
@@ -455,14 +457,14 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
                       highlight.content && highlight.content.image
                     );
 
-                    //isTextHighlight && console.log("isTextHighlight", highlight.color);
+                    isTextHighlight && console.log("isTextHighlight", highlight.color);
 
                     const component = isTextHighlight ? (
                       <Highlight
                         isScrolledTo={isScrolledTo}
                         position={highlight.position}
                         comment={highlight.comment}
-                        color={highlight.color}
+                        color={highlight.color ? highlight.color : this.state.color} // sometimes color is undefined
                         onDelete={() => {
                           this.deleteHighlight(highlight.id);
                           hideTip();

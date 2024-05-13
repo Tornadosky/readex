@@ -73,7 +73,7 @@ export class Highlight extends Component<Props> {
         ) : null}
         <div className="Highlight__parts">
           {rects.map((rect, index) => {
-            //console.log('color', color);
+            console.log('color', color);
 
             return (
               <div

@@ -232,7 +232,7 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
         l10n: NullL10n,
       });
 
-    console.log("Init", pdfDocument);
+    //console.log("Init", pdfDocument);
 
     this.linkService.setDocument(pdfDocument);
     this.linkService.setViewer(this.viewer);
@@ -471,7 +471,7 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
 
     scrollRef(this.scrollTo);
 
-    console.log("Document ready", this.viewer.pagesCount, "pages");
+    //console.log("Document ready", this.viewer.pagesCount, "pages");
 
     this.props.getPageCount(this.viewer.pagesCount);
   };

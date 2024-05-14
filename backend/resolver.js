@@ -1218,11 +1218,30 @@ const resolver = {
         return answer;
     },
     delHighlight: async (args, context) => {
+        // First, delete all related RectsOnHighlights entries
+        await prisma.rectsOnHighlights.deleteMany({
+            where: {
+                highlightid: parseInt(args.id)
+            }
+        });
+
+        // Now, delete the actual Highlight
         let answer = await prisma.Highlights.delete({
             where: {
                 id: parseInt(args.id)
             }
         });
+
+        // Optionally, you can also clean up any Rects that are no longer used
+        await prisma.rects.deleteMany({
+            where: {
+                AND: [
+                    { highlightbr: { none: {} } },
+                    { highlightrects: { none: {} } }
+                ]
+            }
+        });
+
         console.log(answer);
         return answer;
     },

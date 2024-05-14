@@ -193,7 +193,7 @@ export default function highlightsList({ bookId, resetHighlights, highlights }: 
           >
             <div>
               <strong>{highlight.comment.text}</strong>
-              {highlight.content.text ? (
+              {highlight.content.text && !highlight.content.image ? (
                 <blockquote style={{ marginTop: "0.5rem" }}>
                   {`${highlight.content.text.slice(0, 90).trim()}…`}
                 </blockquote>

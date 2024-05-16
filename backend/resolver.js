@@ -232,7 +232,8 @@ const resolver = {
                    y2: args.y2,
                    width: args.width,
                    height: args.height,
-                   pagenum: args.pagenum
+                   pagenum: args.pagenum,
+                   scaleFactor: args.scaleFactor
                } 
            });
         }
@@ -730,7 +731,8 @@ const resolver = {
                     x2: args.x2,
                     y2: args.y2,
                     width: args.width,
-                    height: args.height
+                    height: args.height,
+                    scaleFactor: args.scaleFactor
                 } : null;
             upsertParams.where = {
                 id: args.id
@@ -747,7 +749,8 @@ const resolver = {
                 x2: args.x2,
                 y2: args.y2,
                 width: args.width,
-                height: args.height
+                height: args.height,
+                scaleFactor: args.scaleFactor
             } : null;
             answer = await prisma.Rects.create(upsertParams);
         }
@@ -857,7 +860,8 @@ const resolver = {
                     x2: args.boundingRect.x2,
                     y2: args.boundingRect.y2,
                     width: args.boundingRect.width,
-                    height: args.boundingRect.height
+                    height: args.boundingRect.height,
+                    scaleFactor: args.boundingRect.scaleFactor
                 };
             }
             if (args.rects) {
@@ -870,7 +874,8 @@ const resolver = {
                             x2: rect.x2,
                             y2: rect.y2,
                             width: rect.width,
-                            height: rect.height
+                            height: rect.height,
+                            scaleFactor: rect.scaleFactor
                         }});
                     console.log(isrect);
                     if (isrect.length > 0)
@@ -884,7 +889,8 @@ const resolver = {
                                         x2: rect.x2,
                                         y2: rect.y2,
                                         width: rect.width,
-                                        height: rect.height
+                                        height: rect.height,
+                                        scaleFactor: rect.scaleFactor
                                     }
                             },
                             where: {
@@ -905,7 +911,8 @@ const resolver = {
                                         x2: rect.x2,
                                         y2: rect.y2,
                                         width: rect.width,
-                                        height: rect.height
+                                        height: rect.height,
+                                        scaleFactor: rect.scaleFactor
                                     }
                                 }
                             },
@@ -968,7 +975,8 @@ const resolver = {
                     x2: args.boundingRect.x2,
                     y2: args.boundingRect.y2,
                     width: args.boundingRect.width,
-                    height: args.boundingRect.height
+                    height: args.boundingRect.height,
+                    scaleFactor: args.boundingRect.scaleFactor
                 };
             }
             if (args.rects) {
@@ -981,7 +989,8 @@ const resolver = {
                             x2: rect.x2,
                             y2: rect.y2,
                             width: rect.width,
-                            height: rect.height
+                            height: rect.height,
+                            scaleFactor: rect.scaleFactor
                         }});
                     console.log(isrect);
                     return {
@@ -993,7 +1002,8 @@ const resolver = {
                                 x2: rect.x2,
                                 y2: rect.y2,
                                 width: rect.width,
-                                height: rect.height
+                                height: rect.height,
+                                scaleFactor: rect.scaleFactor
                             }
                         }
                     };

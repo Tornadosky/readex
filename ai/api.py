@@ -4,6 +4,8 @@ from pydantic import BaseModel
 import uvicorn
 from typing import List, Dict, Any
 from generate_questions import generate_and_parse_questions
+from pdf_to_quizz import pdf_to_quizz, generate_quiz_from_highlights
+import logging
 
 app = FastAPI()
 
@@ -34,13 +36,26 @@ class Question(BaseModel):
     option_4: str
     answer: str
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Create a logger object
+logger = logging.getLogger(__name__)
+
 @app.post("/generate-questions/", response_model=List[Dict[str, Any]])
 async def generate_questions(request: TextRequest):
     try:
         # You might need to adjust the call to `generate_and_parse_questions` to be async
-        questions = generate_and_parse_questions(request.text, request.question_number, request.difficulty)
+        #questions = generate_and_parse_questions(request.text, request.question_number, request.difficulty)
+        logger.info(f"Generating questions for text:")
+        #questions = await pdf_to_quizz("../backend/uploads/1/Andrey_Kalenik_cv.pdf")
+        questions = await generate_quiz_from_highlights([24], {24: "../backend/uploads/1/Andrey_Kalenik_cv.pdf"}, 2)
+        if not isinstance(questions, list):
+            raise TypeError("Expected a list of questions, got something else")
         return questions
     except Exception as e:
+        logger.error(f"Error generating questions: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

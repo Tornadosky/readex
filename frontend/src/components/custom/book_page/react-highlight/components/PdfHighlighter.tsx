@@ -104,7 +104,8 @@ interface Props<T_HT> {
     position: ScaledPosition,
     content: { text?: string; image?: string },
     hideTipAndSelection: () => void,
-    transformSelection: () => void
+    transformSelection: () => void,
+    scaleFactor: number
   ) => JSX.Element | null;
   enableAreaSelection: (event: MouseEvent) => boolean;
   getPageCount: (pageCount: number) => void;
@@ -565,6 +566,10 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
 
     const boundingRect = getBoundingRect(rects);
 
+    const scaleFactor = parseFloat(
+      getComputedStyle(this.viewer.viewer!).getPropertyValue("--scale-factor")
+    );
+
     const viewportPosition: Position = {
       boundingRect,
       rects,
@@ -588,7 +593,8 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
               ghostHighlight: { position: scaledPosition },
             },
             () => this.renderHighlightLayers()
-          )
+          ),
+        scaleFactor
       )
     );
   };
@@ -672,6 +678,10 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
                   image: image,
                 };
 
+                const scaleFactor = parseFloat(
+                  getComputedStyle(this.viewer.viewer!).getPropertyValue("--scale-factor")
+                );
+
                 this.setTip(
                   viewportPosition,
                   onSelectionFinished(
@@ -693,7 +703,8 @@ export class PdfHighlighter<T_HT extends IHighlight> extends PureComponent<
                           this.renderHighlightLayers();
                         }
                       );
-                    }
+                    },
+                    scaleFactor
                   )
                 );
               }}

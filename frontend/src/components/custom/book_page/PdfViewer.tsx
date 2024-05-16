@@ -98,7 +98,7 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
     return this.props.highlights.find((highlight: any) => highlight.id === id);
   }
 
-  addHighlight(highlight: NewHighlight) {
+  addHighlight(highlight: NewHighlight, scaleFactor: number) {
     const { color } = this.state;
 
     console.log("Saving highlight", highlight);
@@ -121,7 +121,8 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
       x2: position.boundingRect.x2,
       y2: position.boundingRect.y2,
       width: position.boundingRect.width,
-      height: position.boundingRect.height
+      height: position.boundingRect.height,
+      scaleFactor: scaleFactor
     };
   
     const mutation = `
@@ -431,14 +432,15 @@ class PdfViewer extends Component<{ url: any, highlights: any, setHighlights: an
                     position,
                     content,
                     hideTipAndSelection,
-                    transformSelection
+                    transformSelection,
+                    scaleFactor
                   ) => {
                     console.log("Selection is finished", { position, content }, this.state.color);
                     return (
                       <Tip
                         onOpen={transformSelection}
                         onConfirm={(comment) => {
-                          this.addHighlight({ content, position, comment, color: this.state.color});
+                          this.addHighlight({ content, position, comment, color: this.state.color }, scaleFactor);
 
                           hideTipAndSelection();
                         }}

@@ -1,4 +1,4 @@
-import os, re, json
+import os, re, json, logging
 from dotenv import load_dotenv
 
 from langchain.schema import HumanMessage
@@ -7,6 +7,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from langchain.callbacks import get_openai_callback
 
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 def parse_json_like(text):
@@ -47,7 +48,7 @@ As it evolves, 3D printing technology is destined to transform almost
 every major industry and change the way we live, work, and play in the future.
 """
 
-def generate_and_parse_questions(text, question_number=2, difficulty="hard"):
+async def generate_and_parse_questions(text: str, question_number: int =2, difficulty: str ="hard"):
     response_schemas = [
         ResponseSchema(name="question", description="A multiple choice question generated from input text snippet."),
         ResponseSchema(name="option_1", description="First option for the multiple choice question. Use this format: 'a) option'"),
@@ -79,8 +80,12 @@ def generate_and_parse_questions(text, question_number=2, difficulty="hard"):
     with get_openai_callback() as cb:
         user_query_output = chat_model(user_query.to_messages())
         print(cb)
-
-    parsed_questions = parse_json_like(user_query_output.content)
+    try:
+        parsed_questions = parse_json_like(user_query_output.content)
+    except Exception as e:
+        logger.error(f"Error parsing questions: {e}")
+        return []
+    logger.info(f"Questions generated: {parsed_questions}")
     return parsed_questions
 
 #print(generate_and_parse_questions(text))

@@ -766,30 +766,41 @@ const resolver = {
                 include: {
                     books: {
                         include: {
-                            books: true
+                            books: true,
+                            collections: true
                         }
                     },
                     tests: {
                         include: {
-                            tests: true
-                        }
-                    },
-                    tests: true
-                }
-            };
-            upsertParams.data.title = (args.title);
-            args.books ? upsertParams.data.books = 
-                {
-                    connect: {
-                        books: {
-                            id: args.books
-                        },
-                        collections: {
-                            id: parseInt(args.id)
+                            tests: true,
+                            collections: true
                         }
                     }
-                 
-            } : null;            
+                }
+            };
+            args.title? upsertParams.data.title = (args.title) : null;
+            args.books ? upsertParams.data.books = 
+                {
+                    create: {
+                        books: {
+                            connect: {
+                                id: parseInt(args.books)
+                            }
+                        },
+                        position: 0
+                    }
+            } : null;
+            args.tests ? upsertParams.data.tests = 
+                {
+                    create: {
+                        tests: {
+                            connect: {
+                                id: parseInt(args.tests)
+                            }
+                        },
+                        position: 0
+                    }
+            } : null;          
             upsertParams.where = {
                 id: parseInt(args.id)
             };
@@ -1281,6 +1292,31 @@ const resolver = {
         });
         console.log(answer);
         return answer;
+    },
+
+    unlinkBook: async (args, context) => {
+        let answer = await prisma.BooksOnCollections.delete({
+            where: {
+                bookid_collectionid: {
+                    bookid: parseInt(args.bookid),
+                    collectionid: parseInt(args.collectionid)
+                }
+            }
+        });
+        console.log(answer);
+        return 1;
+    },
+    unlinkTest: async (args, context) => {
+        let answer = await prisma.TestsOnCollections.delete({
+            where: {
+                testid_collectionid: {
+                    testid: parseInt(args.testid),
+                    collectionid: parseInt(args.collectionid)
+                }
+            }
+        });
+        console.log(answer);
+        return 1;
     },
 };
 

@@ -207,8 +207,8 @@ type Mutation {
     id: ID
     title: String
     user: Int
-    books: [Int]
-    tests: [Int]
+    books: Int
+    tests: Int
   ): Collections
   setHighlight(
     id: ID
@@ -264,4 +264,7 @@ type Mutation {
   delWord(id: Int!): Words
   delTest(id: Int!): Tests
   delQuestion(id: Int!): Questions
+
+  unlinkTest(collectionid: Int! testid: Int!): Int
+  unlinkBook(collectionid: Int! bookid: Int!): Int
 }

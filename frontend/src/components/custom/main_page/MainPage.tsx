@@ -67,11 +67,11 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen }) => {
         console.log(data);
         setSections(data.map((section: any) => ({
           id: section.id,
-          section_name: section.title,
-          books: section.books.map((book: any) => ({
+          title: section.title,
+          books: section.books.map((book: any, index: number) => ({
             id: book.books.id,
             title: book.books.title,
-            index: 0,
+            index: index,
           })),
         }))
         );

@@ -5,7 +5,7 @@ import { Dropdown } from 'antd';
 import { DeleteOutlined, EditOutlined, DownloadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import type { IBook } from './LayoutWithSidebar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface BooksListProps {
   booksList: Array<IBook>;
@@ -16,6 +16,7 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
     const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
     const [editingBookId, setEditingBookId] = useState<string | null>(null);
     const [editingTitle, setEditingTitle] = useState("");
+    const { pdfId } = useParams();
     const navigate = useNavigate();
 
     const handleDotsClick = (bookId: string) => (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -25,8 +26,10 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
     };
 
     const handleMenuClick: MenuProps['onClick'] = (e) => {
+      e.domEvent.preventDefault();
+      e.domEvent.stopPropagation();
       console.log('click', e);
-      if (e.key === '3' && selectedBookId) { // If "Delete" is clicked
+      if (e.key === '3' && selectedBookId) { // If "Delete" is clicked     
         const mutation = `
           mutation delBook($id: Int!) {
             delBook(id: $id) {
@@ -50,6 +53,12 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
         })
         .then(response => {
           console.log(response.data);
+          // Navigate only if there are remaining books
+          if (pdfId && booksList.length > 1 && selectedBookId === pdfId) {
+            const bookIndex = booksList.findIndex(book => book.id === selectedBookId);
+            const nextBook = booksList[bookIndex + 1] || booksList[bookIndex - 1];
+            navigate(`/pdfs/${nextBook.id}/view`);
+          }
           setBooksList((currentBooks: any) => currentBooks.filter((book: any) => book.id !== selectedBookId));
         })
         .catch(error => {

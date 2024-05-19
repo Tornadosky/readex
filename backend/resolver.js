@@ -638,13 +638,15 @@ const resolver = {
                 fs.mkdirSync(path);
             }
 
+            console.log("setBook->create->CheckFile");
             let pathDB = CheckFile(path, args.title);
             console.log("+->"+pathDB);
+            const baseName = pathDB.split('/').pop(); 
+            console.log("+->"+baseName);
             fs.writeFileSync(pathDB, Buffer.from(args.document, 'base64'), 'binary');
-            
             upsertParams = {
                 data: {
-                    title: args.title,
+                    title: baseName,
                     author: args.author,
                     document: pathDB,
                     uploaded: moment().format('yyyy-mm-dd:hh:mm:ss'),
@@ -1203,13 +1205,47 @@ const resolver = {
         return answer;
     },
     delBook: async (args, context) => {
-        let answer = await prisma.Books.delete({
+        // Retrieve the book to get the document path
+        const book = await prisma.Books.findUnique({
             where: {
                 id: parseInt(args.id)
+            },
+            select: {
+                document: true  // Only fetch the document field
             }
         });
-        console.log(answer);
-        return answer;
+
+        if (!book) {
+            console.error("No book found with the given ID:", args.id);
+            return null;  // or throw an error based on your error handling policy
+        }
+
+        // Attempt to delete the file associated with the book
+        try {
+            if (fs.existsSync(book.document)) {
+                fs.unlinkSync(book.document);
+                console.log("File successfully deleted:", book.document);
+            } else {
+                console.warn("File not found, but will continue to delete the book record:", book.document);
+            }
+        } catch (error) {
+            console.error("Failed to delete file:", error);
+            throw new Error("Failed to delete the associated file.");
+        }
+
+        // Proceed to delete the book from the database
+        try {
+            const answer = await prisma.Books.delete({
+                where: {
+                    id: parseInt(args.id)
+                }
+            });
+            console.log("Book deleted successfully:", answer);
+            return answer;
+        } catch (error) {
+            console.error("Failed to delete the book:", error);
+            throw new Error("Failed to delete the book from the database.");
+        }
     },
     delAchievement: async (args, context) => {
         let answer = await prisma.Achievements.delete({
@@ -1320,21 +1356,36 @@ const resolver = {
     },
 };
 
-function CheckFile (path, title) {
-    if (fs.existsSync(path+title)) {
-        let array = [], c = 0;
-        title.split(/([().])/).filter(Boolean).forEach(e => e == '(' ? c++ : e == ')' ? c-- : c > 0 ? array.push(e) : array.push(e));
-        console.log("->"+array);
-        let count = 1;
-        if (array.length > 2) {
-            count = parseInt(array[1]);
-            count++;
+function CheckFile(path, title) {
+    // Regular expression to check if the title ends with a pattern (number)
+    const regex = /^(.*?)(\((\d+)\))?\.pdf$/;
+    const match = title.match(regex);
+  
+    if (!match) {
+        console.error("Filename does not match expected pattern:", title);
+        return null; // or throw an error depending on your error handling strategy
+    }
+    console.log("Match:", match);
+
+    const baseName = match[1]; // Base name without number
+    let number = parseInt(match[3], 10) || 0; // Current number in the filename, if any
+
+    let newName = title;
+    console.log("Base name:", baseName);
+    // Check if file exists and increment number until a new filename is found
+    while (true) {
+        console.log("Checking new filename:", path + newName)
+        console.log("Exists:", fs.existsSync(path + newName));
+        if (!fs.existsSync(path + newName)) {
+            break;
         }
-        return CheckFile(path, array[0]+'('+count+').pdf');
-    } else {
-        console.log("<-"+path+title);
-        return path+title;
-    }   
+        number++; // Increment the file number
+        newName = `${baseName}(${number}).pdf`;
+        console.log(`Trying new filename: ${newName}`);
+    }
+
+    console.log("New unique path:", path + newName);
+    return path + newName;
 }
 
 module.exports = resolver;

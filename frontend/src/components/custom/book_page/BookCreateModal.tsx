@@ -17,7 +17,7 @@ interface Props {
     setSelectedSection: (value: any) => void;
     sections: Array<any>;
     disabled: boolean;
-    onSubmit: (file: File, newId: string) => SetStateAction<void>;
+    onSubmit: (file: any, newId: string) => SetStateAction<void>;
 }
 
 const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selectedSection, setSelectedSection, sections, disabled , onSubmit }) => {
@@ -139,28 +139,59 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                     document: documentBase64,
                     image: null,
                     highlights: [],
-                    collections: [1],
+                    collections: [],
                     user: 1,
                 }
             });
 
-            console.log(response.data);
+            console.log('Book creation response:', response.data);
 
             if (response.data.data && !response.data.errors) {
-                message.success('File uploaded and section updated successfully');
-                onSubmit(uploadedFile ? uploadedFile : {name: new URL(pdfUrl).hostname}, response.data.data.setBook.id);
+                const bookId = response.data.data.setBook.id;
+                const bookTitle = response.data.data.setBook.title;
+                // Now, link the book to the selected collection
+                const linkResponse = await axios.post('http://localhost:3000/graphql', {
+                    query: `
+                        mutation($collectionId: ID!, $bookId: Int!) {
+                            setCollection (id: $collectionId books: $bookId) {
+                                id
+                                books {
+                                    books {
+                                        id
+                                        title
+                                    }
+                                }
+                            }
+                        }
+                    `,
+                    variables: {
+                        collectionId: parseInt(selectedSection.id),
+                        bookId: parseInt(bookId),
+                    }
+                });
+    
+                if (linkResponse.data && !linkResponse.data.errors) {
+                    message.success('Book uploaded and linked successfully');
+                    console.log('Book linked to collection:', linkResponse.data.data.setCollection);
+                    onSubmit(uploadedFile ? {name: bookTitle} : {name: new URL(pdfUrl).hostname}, bookId);
+                } else {
+                    console.error('Error during book linking:', linkResponse.data.errors);
+                    message.error('Failed to link book.');
+                }
             } else {
+                console.error('Error during book creation:', response.data.errors);
                 message.error('File upload failed.');
             }
         } catch (error) {
-            console.error('Error uploading file:', error);
-            message.error('File upload failed.');
+            console.error('Error during book creation or linking:', error);
+            message.error('Book upload and linking failed.');
+        } finally {
+            setUploading(false);
+            setPdfUrl('');
+            setUploadedFile(null);
+            setIsModalOpen(false);
         }
-        setUploading(false);
-        setPdfUrl('');
-        setUploadedFile(null);
-        setIsModalOpen(false);
-    };
+    }
 
     const handleClosed = () => {
         setUploadedFile(null);

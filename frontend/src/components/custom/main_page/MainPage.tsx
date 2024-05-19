@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useOutletContext } from 'react-router-dom';
 import { Section } from "./Sections/Section";
 import { TopBar } from "./TopBar";
 import Divider from '@mui/material/Divider';
@@ -6,6 +7,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { AlertDialog } from './AlertDialog';
 import MyCircularProgress from './Sections/MyCircularProgress.tsx';
+import { SectionType } from '../book_page/LayoutWithSidebar.tsx';
 import './style.css'
 import { MyAlert } from "./MyAlert";
 import axios from 'axios';
@@ -13,12 +15,8 @@ import axios from 'axios';
 interface MainPageProps {
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-interface SectionType {
-  id: number; 
-  title: string;
-  books: any[]; 
+  sectionIdModal: number | null;
+  setSectionIdModal: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 interface ActionConfirmationType {
@@ -26,9 +24,14 @@ interface ActionConfirmationType {
   name: string;
 }
 
-const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen }) => {
+interface OutletContextType {
+  sections: SectionType[];
+  setSections: React.Dispatch<React.SetStateAction<SectionType[]>>;
+}
+
+const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen, sectionIdModal, setSectionIdModal }) => {
   const sectionsContainerRef = useRef<HTMLDivElement>(null);
-  const [sections, setSections] = useState<SectionType[]>([]);
+  const { sections, setSections } = useOutletContext<OutletContextType>();
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -205,6 +208,10 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen }) => {
   //   );
   // }
 
+  useEffect(() => {
+    console.log("Sections Updated: ", sections);
+  }, [sections]);
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
@@ -225,6 +232,8 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen }) => {
                 setGlobalLoading={setGlobalLoading}
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
+                sectionIdModal={sectionIdModal}
+                setSectionIdModal={setSectionIdModal}
               />
             ))}
           </div>

@@ -12,15 +12,16 @@ const { Dragger } = Upload;
   
 interface Props {
     isModalOpen: boolean;
+    sectionIdModal: number | null;
     setIsModalOpen: (value: boolean) => void;
     selectedSection: any;
     setSelectedSection: (value: any) => void;
     sections: Array<any>;
-    disabled: boolean;
+    setSections: React.Dispatch<React.SetStateAction<any[]>>;
     onSubmit: (file: any, newId: string) => SetStateAction<void>;
 }
 
-const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selectedSection, setSelectedSection, sections, disabled , onSubmit }) => {
+const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selectedSection, setSelectedSection, sections, onSubmit, sectionIdModal, setSections }) => {
     const [uploadedFile, setUploadedFile] = useState<any>(null);
     const [pdfUrl, setPdfUrl] = useState('');
     const [uploading, setUploading] = useState(false);
@@ -171,7 +172,21 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                 });
     
                 if (linkResponse.data && !linkResponse.data.errors) {
-                    message.success('Book uploaded and linked successfully');
+                    console.log('Book linked to collection:', linkResponse);
+                    const newBook = {
+                            id: linkResponse.data.data.setCollection.books[0].books.id,
+                            title: linkResponse.data.data.setCollection.books[0].books.title,
+                            index: 0
+                    };
+                    console.log('New book:', newBook);
+                    console.log('Selected section:', selectedSection, sections);
+                    setSections(prevSections => [...prevSections.map(section => {
+                        if (section.id === selectedSection.id) {
+                          return { ...section, books: [...section.books, newBook] };
+                        }
+                        return section;
+                    })]);
+                    message.success('Book uploaded and added to Collection successfully');
                     console.log('Book linked to collection:', linkResponse.data.data.setCollection);
                     onSubmit(uploadedFile ? {name: bookTitle} : {name: new URL(pdfUrl).hostname}, bookId);
                 } else {
@@ -235,8 +250,8 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                             </label>
                             <Selector 
                                 options={sections.map((section) => section.title)}
-                                selected={selectedSection.title}
-                                disabled={disabled}
+                                selected={sectionIdModal ? sections.find(section => section.id === sectionIdModal)?.title : selectedSection.title}
+                                disabled={sectionIdModal ? true : false}
                                 setSelected={(value) => setSelectedSection(sections.find((section) => section.title === value) || sections[0])}
                             />
                         </div>

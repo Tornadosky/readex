@@ -25,13 +25,22 @@ export interface ITest {
 interface LayoutWithSidebarProps {
     isModalOpen: boolean;
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    sectionIdModal: number | null;
+    setSectionIdModal: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
-const LayoutWithSidebar = ({ isModalOpen, setIsModalOpen }: LayoutWithSidebarProps) => {
+export interface SectionType {
+    id: number; 
+    title: string;
+    books: any[]; 
+}
+
+const LayoutWithSidebar = ({ isModalOpen, setIsModalOpen, sectionIdModal, setSectionIdModal }: LayoutWithSidebarProps) => {
     const { pdfId } = useParams();
     const [highlights, setHighlights] = useState<IHighlight[]>([]);
     const [booksList, setBooksList] = useState<IBook[]>([]);
     const [testsList, setTestsList] = useState<ITest[]>([]);
+    const [sections, setSections] = useState<SectionType[]>([]);
 
     useEffect(() => {
         const fetchBookName = async () => {
@@ -158,8 +167,12 @@ const LayoutWithSidebar = ({ isModalOpen, setIsModalOpen }: LayoutWithSidebarPro
                     setBooksList={setBooksList}
                     testsList={testsList}
                     setTestsList={setTestsList}
+                    sectionIdModal={sectionIdModal}
+                    setSectionIdModal={setSectionIdModal}
+                    sections={sections}
+                    setSections={setSections}
                 />
-                <Outlet context={{ booksList, setBooksList, highlights, setHighlights }}/> 
+                <Outlet context={{ booksList, setBooksList, highlights, setHighlights, sections, setSections }}/> 
             </div>
         </div>
     );

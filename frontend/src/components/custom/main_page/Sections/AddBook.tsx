@@ -1,7 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import { PlusIcon } from '../../../../assets/svg';
 import "./style.css";
-import BookCreateModal from "../../book_page/BookCreateModal";
 
 interface AddBookProps {
   onFileSelect: (file: any, newId: number, coverImage: string) => void;
@@ -10,6 +9,8 @@ interface AddBookProps {
   globalLoading: number;
   setGlobalLoading: (value: React.SetStateAction<number>) => void;
   setLoading: (isLoading: boolean) => void;
+  sectionIdModal: number | null;
+  setSectionIdModal: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
 export const AddBook: React.FC<AddBookProps> = ({
@@ -19,8 +20,9 @@ export const AddBook: React.FC<AddBookProps> = ({
   globalLoading,
   setGlobalLoading,
   setLoading,
+  sectionIdModal,
+  setSectionIdModal,
 }) => {
-    //const [isModalOpen, setIsModalOpen] = useState(false);
     const fileInputRef = useRef<any>(null);
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +72,7 @@ export const AddBook: React.FC<AddBookProps> = ({
       //   fileInputRef.current.value = null;
       //   fileInputRef.current.click();
       // }
+      setSectionIdModal(sectionId as number);
       setIsModalOpen(true);
     };
 
@@ -85,19 +88,6 @@ export const AddBook: React.FC<AddBookProps> = ({
           style={{ display: "none" }}
           accept=".pdf"
         />
-
-        {/* <BookCreateModal
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
-          selectedSection={{name: 'Artificial Intelligence'}}
-          setSelectedSection={() => {}}
-          sections={[]}
-          disabled={true}
-          onSubmit={(filename) => {
-            console.log("Uploading", filename, "to section", "Artificial Intelligence");
-            setLoading(true);
-          }}
-        /> */}
       </div>
     );
 };

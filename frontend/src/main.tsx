@@ -13,6 +13,7 @@ import PdfViewerWrapper from './components/custom/book_page/PdfViewer.tsx';
 
 function AppWrapper() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sectionIdModal, setSectionIdModal] = useState<number | null>(null);
 
   return (
     <BrowserRouter>
@@ -22,8 +23,17 @@ function AppWrapper() {
         <Route element={<LayoutWithSidebar
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
+          sectionIdModal={sectionIdModal}
+          setSectionIdModal={setSectionIdModal}
         />}>
-          <Route path="/home" element={<MainPage isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />} />
+          <Route path="/home" element={
+            <MainPage 
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
+              sectionIdModal={sectionIdModal}
+              setSectionIdModal={setSectionIdModal}
+            />}
+          />
           <Route path="/pdfs/:pdfId/view" element={<PdfViewerWrapper />} />
           <Route path="/tests/:testId/edit" element={<TestPage isSolving={false} />} />
           <Route path="/tests/:testId/play" element={<TestPage isSolving={true} />} />

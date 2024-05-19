@@ -10,6 +10,7 @@ import BookCreateModal from './BookCreateModal';
 import type { IBook, ITest } from './LayoutWithSidebar';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { SectionType } from './LayoutWithSidebar';
 import './style.css';
 
 interface Props {
@@ -21,6 +22,10 @@ interface Props {
   setBooksList: (value: any) => void;
   testsList: Array<ITest>;
   setTestsList: (value: any) => void;
+  sectionIdModal: number | null;
+  setSectionIdModal: React.Dispatch<React.SetStateAction<number | null>>;
+  sections: Array<SectionType>;
+  setSections: React.Dispatch<React.SetStateAction<SectionType[]>>;
 }
 
 export function Sidebar({
@@ -32,9 +37,13 @@ export function Sidebar({
   setBooksList,
   testsList,
   setTestsList,
+  sectionIdModal,
+  setSectionIdModal,
+  sections,
+  setSections,
 }: Props) {
   const [view, setView] = useState('Books');
-  const [sections, setSections] = useState([]);
+  //const [sections, setSections] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedSection, setSelectedSection] = useState("");
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -69,9 +78,11 @@ export function Sidebar({
             Collections(user: $userId) {
               id
               title
-              user {
-                id
-                login
+              books {
+                books {
+                  id
+                  title
+                }
               }
             }
           }
@@ -93,7 +104,7 @@ export function Sidebar({
         const { data } = response.data;
         console.log(data);
         if (data && data.Collections) {
-          setSections(data.Collections);
+          //setSections(data.Collections);
           setSelectedSection(data.Collections[0]);
         }
       } catch (error) {
@@ -236,7 +247,7 @@ export function Sidebar({
               <div className="flex items-center">
                 {view === 'Books' && (
                   <>
-                    <PlusOutlined onClick={() => setIsModalOpen(true)} className="cursor-pointer text-gray-400 hover:text-gray-500 rounded" style={{ fontSize: '18px' }} />
+                    <PlusOutlined onClick={() => {setSectionIdModal(null); setIsModalOpen(true)}} className="cursor-pointer text-gray-400 hover:text-gray-500 rounded" style={{ fontSize: '18px' }} />
                     <div className="border-l mx-2 h-5" style={{ borderColor: '#d1d5db' }}></div>
                   </>
                 )}
@@ -277,11 +288,12 @@ export function Sidebar({
       
       <BookCreateModal 
         isModalOpen={isModalOpen} 
+        sectionIdModal={sectionIdModal}
         setIsModalOpen={setIsModalOpen} 
         selectedSection={selectedSection} 
         setSelectedSection={setSelectedSection}
         sections={sections}
-        disabled={false}
+        setSections={setSections}
         onSubmit={(file, newId) => {
           setBooksList((prevBooks: any) => [
             ...prevBooks,

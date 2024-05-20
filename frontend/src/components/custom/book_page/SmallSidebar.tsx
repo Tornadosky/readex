@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { HomeIcon, LogoIcon, NotesIcon, PDFIcon, TestIcon } from '@/assets/svg';
 import { MoonOutlined, SunOutlined } from '@ant-design/icons';
-import SidebarIcon from './SidebarIcon'; 
+import SidebarIcon from './SidebarIcon';
 
 interface SmallSidebarProps {
+    setIsPricingModalOpen: (isOpen: boolean) => void;
     handleViewChange: (newView: string) => () => void;
     view: string;
 }
 
-const SmallSidebar = ({ handleViewChange, view } : SmallSidebarProps) => {
+const SmallSidebar = ({ handleViewChange, view, setIsPricingModalOpen } : SmallSidebarProps) => {
     const [theme, setTheme] = useState('light' as 'light' | 'dark');
 
     const toggleTheme = () => {
@@ -32,7 +33,15 @@ const SmallSidebar = ({ handleViewChange, view } : SmallSidebarProps) => {
                     <SidebarIcon name={'Notes'} active={view === "Notes"} icon={NotesIcon} onClick={handleViewChange('Notes')} />
                     <SidebarIcon name={'Tests'} active={view === "Tests"} icon={TestIcon} onClick={handleViewChange('Tests')} />
                 </div>
-                <div className="mt-auto">
+                <div className="mt-auto flex-col">
+                    <a className="flex items-bottom justify-center w-16 h-8 cursor-pointer">
+                        <button 
+                            className='px-3 rounded text-emerald-600 bg-emerald-200 dark:bg-emerald-200 hover:bg-emerald-400 dark:hover:bg-emerald-200'
+                            onClick={() => setIsPricingModalOpen(true)}
+                        > 
+                            Free
+                        </button>
+                    </a>
                     <a className="flex items-center justify-center w-16 h-16 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700" onClick={toggleTheme}>
                         {theme === 'light' ? (<SunOutlined style={{fontSize: "1.4rem"}} />) : (<MoonOutlined style={{fontSize: "1.4rem"}} />)}
                     </a>

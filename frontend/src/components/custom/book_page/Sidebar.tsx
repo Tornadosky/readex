@@ -12,6 +12,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { SectionType } from './LayoutWithSidebar';
 import './style.css';
+import PricingPlanModal from './PricingPlanModal';
 
 interface Props {
   highlights: Array<IHighlight>;
@@ -44,6 +45,7 @@ export function Sidebar({
 }: Props) {
   const [view, setView] = useState('Books');
   //const [sections, setSections] = useState([]);
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedSection, setSelectedSection] = useState("");
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -228,6 +230,7 @@ export function Sidebar({
   return (
     <>
       <SmallSidebar
+        setIsPricingModalOpen={setIsPricingModalOpen}
         handleViewChange={handleViewChange}
         view={view}
       />
@@ -302,6 +305,14 @@ export function Sidebar({
               title: file.name.replace('.pdf', ''),
             }
           ]);
+        }}
+      />
+      
+      <PricingPlanModal
+        isOpen={isPricingModalOpen}
+        setIsOpen={setIsPricingModalOpen}
+        onSubmit={(selectedPlan) => {
+          console.log(selectedPlan);
         }}
       />
     </>

@@ -6,6 +6,10 @@ import MainPage from './components/custom/main_page/MainPage.tsx';
 import TestPage from './components/custom/book_page/tests/TestsPage.tsx';
 import Page404 from './components/custom/misc/Page404.tsx';
 import LayoutWithSidebar from './components/custom/book_page/LayoutWithSidebar.tsx';
+import EmailVerification from './components/custom/login/EmailVerification.tsx';
+import Email from './components/custom/login/Email.tsx';
+import Login from './components/custom/login/Login.tsx';
+import Register from './components/custom/login/Register.tsx';
 import '../app/globals.css';
 
 import { testHighlights as _testHighlights } from "./components/custom/book_page/test-highlights";
@@ -19,6 +23,10 @@ function AppWrapper() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
+        <Route path="/verify_email/:key" element={<EmailVerification />} />
+        <Route path="/email/:encodedEmail" element={<Email />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/landing-page" element={<div>Landing Page Content Here</div>} />
         <Route element={<LayoutWithSidebar
           isModalOpen={isModalOpen}

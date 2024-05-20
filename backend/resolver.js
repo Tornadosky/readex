@@ -26,6 +26,7 @@ const prisma = new PrismaClient({ /// TODO: remove prisma logging!
 
 const path = require('path');
 const fs = require('fs');
+const pdfPoppler = require('pdf-poppler');
 
 const resolver = {
     Books: async (args, context) => {
@@ -632,10 +633,14 @@ const resolver = {
             answer = await prisma.Books.update(upsertParams);
         } else {
             console.log("setBook->create");
-            let path = "./uploads/"+args.user+"/";
+            const path = "./uploads/" + args.user + "/";
+            const imagePath = "./uploads/" + args.user + "/images/";
 
             if (!fs.existsSync(path)) {
                 fs.mkdirSync(path);
+            }
+            if (!fs.existsSync(imagePath)) {
+                fs.mkdirSync(imagePath);
             }
 
             console.log("setBook->create->CheckFile");
@@ -644,11 +649,14 @@ const resolver = {
             const baseName = pathDB.split('/').pop(); 
             console.log("+->"+baseName);
             fs.writeFileSync(pathDB, Buffer.from(args.document, 'base64'), 'binary');
+            console.log("+->"+imagePath);
+            const coverImagePath = await convertPdfToImage(pathDB, imagePath);
             upsertParams = {
                 data: {
                     title: baseName,
                     author: args.author,
                     document: pathDB,
+                    image: imagePath + baseName.replace('.pdf', '') + '-001.jpg',
                     uploaded: moment().format('yyyy-mm-dd:hh:mm:ss'),
                     user: {
                         connect: {
@@ -671,7 +679,7 @@ const resolver = {
                     user: true
                 }
             };
-            upsertParams.data.image = (args.image);
+            //upsertParams.data.image = (args.image);
             
             answer = await prisma.Books.create(upsertParams);
         }
@@ -1205,13 +1213,14 @@ const resolver = {
         return answer;
     },
     delBook: async (args, context) => {
-        // Retrieve the book to get the document path
+        // Retrieve the book to get the document and image path
         const book = await prisma.Books.findUnique({
             where: {
                 id: parseInt(args.id)
             },
             select: {
-                document: true  // Only fetch the document field
+                document: true,  // Fetch the document field
+                image: true      // Fetch the image field
             }
         });
 
@@ -1220,17 +1229,24 @@ const resolver = {
             return null;  // or throw an error based on your error handling policy
         }
 
-        // Attempt to delete the file associated with the book
+        // Attempt to delete the document and image files associated with the book
         try {
-            if (fs.existsSync(book.document)) {
+            if (book.document && fs.existsSync(book.document)) {
                 fs.unlinkSync(book.document);
-                console.log("File successfully deleted:", book.document);
+                console.log("Document file successfully deleted:", book.document);
             } else {
-                console.warn("File not found, but will continue to delete the book record:", book.document);
+                console.warn("Document file not found, but will continue to delete the book record:", book.document);
+            }
+
+            if (book.image && fs.existsSync(book.image)) {
+                fs.unlinkSync(book.image);
+                console.log("Cover image successfully deleted:", book.image);
+            } else {
+                console.warn("Cover image not found, but will continue to delete the book record:", book.image);
             }
         } catch (error) {
-            console.error("Failed to delete file:", error);
-            throw new Error("Failed to delete the associated file.");
+            console.error("Failed to delete files:", error);
+            throw new Error("Failed to delete the associated files.");
         }
 
         // Proceed to delete the book from the database
@@ -1386,6 +1402,30 @@ function CheckFile(path, title) {
 
     console.log("New unique path:", path + newName);
     return path + newName;
+}
+
+async function convertPdfToImage(pdfPath, outputDir) {
+    let opts = {
+        format: 'jpeg',
+        out_dir: outputDir,
+        out_prefix: path.basename(pdfPath, path.extname(pdfPath)),
+        page: 1
+    };
+
+    try {
+        // Ensure output directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
+
+        // Convert PDF to an image
+        await pdfPoppler.convert(pdfPath, opts);
+        const outputFilePath = path.join(outputDir, `${opts.out_prefix}.jpg`); // Adjust file naming as needed
+        return outputFilePath;
+    } catch (error) {
+        console.error('Error converting PDF to image:', error);
+        throw error;
+    }
 }
 
 module.exports = resolver;

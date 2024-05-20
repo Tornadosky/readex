@@ -59,6 +59,7 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen, sectio
                   books {
                     id
                     title
+                    image
                   }
                 }
               }
@@ -75,6 +76,7 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen, sectio
             id: book.books.id,
             title: book.books.title,
             index: index,
+            cover_image: book.books.image.replace("./uploads/", ''),
           })),
         }))
         );

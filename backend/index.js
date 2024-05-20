@@ -12,6 +12,7 @@ const cors = require('@koa/cors');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const session = require('koa-session');
+const serve = require('koa-static')
 
 const dotenv = require('dotenv');
 //dotenv.config();
@@ -23,6 +24,8 @@ app.use(cors({
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST'],
 }));
+
+app.use(serve(__dirname + '/uploads'))
 
 /*app.keys = ['nohornyplease'];
 const sessionConfig = {

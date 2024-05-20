@@ -94,10 +94,10 @@ export const Book: React.FC<BookProps> = ({ book, sectionId, index, moveBookInsi
         {/* <Icon name="trashbin" onClick={handleDelete} src={require("../../images/icon-trashbin.png")} /> */}
         <DeleteIcon name="trashbin" style={{ cursor: 'pointer' }} onClick={handleDelete}/>
       </div>
-      <div className={`vertical-rectangle ${!book.is_processed ? 'disabled-book' : ''}`} onClick={handleBookClick}>
-        <img className="book-cover" src={`${book.cover_image ? book.cover_image : book1Cover}`} alt={book.title} />
+      <div className={'vertical-rectangle'} onClick={handleBookClick}>
+        <img className="book-cover" src={`${book.cover_image ? 'http://localhost:3000/' + book.cover_image : book1Cover}`} alt={book.title} />
       </div>
-      <div className={`name-text ${!book.is_processed ? 'disabled-book' : ''}`}>
+      <div className='name-text'>
         {isEditing ? (
           <>
             <input

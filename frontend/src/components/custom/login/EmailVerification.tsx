@@ -28,8 +28,10 @@ export default function EmailVerification( ) {
   }, [token, navigate]);
 
   return (
-    <div>
-      <p>{verificationMessage}</p>
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden py-6 sm:py-12">
+      <div className="max-w-xl px-5 text-center">
+        <p className="mb-2 text-lg text-zinc-500">{verificationMessage}</p>
+      </div>
     </div>
   );
 }

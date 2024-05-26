@@ -27,11 +27,12 @@ interface ActionConfirmationType {
 interface OutletContextType {
   sections: SectionType[];
   setSections: React.Dispatch<React.SetStateAction<SectionType[]>>;
+  setBooksList: (value: any) => void;
 }
 
 const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen, sectionIdModal, setSectionIdModal }) => {
   const sectionsContainerRef = useRef<HTMLDivElement>(null);
-  const { sections, setSections } = useOutletContext<OutletContextType>();
+  const { sections, setSections, setBooksList } = useOutletContext<OutletContextType>();
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -228,6 +229,7 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen, sectio
                 key={section.id}
                 sectionId={section.id}
                 booksList={section.books}
+                setBooksList={setBooksList}
                 name={section.title}
                 handleDeleteSection={handleActionConfirmation}
                 globalLoading={globalLoading}

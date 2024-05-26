@@ -41,24 +41,24 @@ export default function Login() {
                         />
                     </Form.Item>
                     <Form.Item>
-                        <Form.Item name="remember" valuePropName="checked" noStyle>
-                            <Checkbox>Remember me</Checkbox>
-                        </Form.Item>
+                        <div className='flex justify-between'>
+                            <Form.Item name="remember" valuePropName="checked" noStyle>
+                                <Checkbox>Remember me</Checkbox>
+                            </Form.Item>
 
-                        <a className="" href="">
-                            Forgot password
-                        </a>
+                            <a className="" href="">
+                                Forgot password
+                            </a>
+                        </div>
                     </Form.Item>
 
                     <Form.Item>
-                        {/* <Button type="primary" htmlType="submit" className="">
-                            Log in
-                        </Button> */}
-
                         <button className='p-2 w-full rounded text-blue-600 bg-blue-200 dark:bg-blue-600 hover:bg-blue-400 dark:hover:bg-blue-600'>
                             Login
                         </button>
-                        Or <div className='text-blue-500' onClick={() => navigate('/register')}>register now!</div>
+                    </Form.Item>
+                    <Form.Item>
+                        Don't have an account? <div className='text-blue-500 cursor-pointer' onClick={() => navigate('/register')}>Register now!</div>
                     </Form.Item>
                 </Form>
             </Card>

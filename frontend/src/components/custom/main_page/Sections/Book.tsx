@@ -3,7 +3,8 @@ import { useDrag, useDrop } from 'react-dnd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CreateIcon from '@mui/icons-material/Create';
 import book1Cover from '../../../../assets/book1_cover.png';
-//import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 import './style.css';
 
@@ -20,13 +21,14 @@ interface BookProps {
   index: number;
   moveBookInsideSection: (sourceIndex: number, destinationIndex: number) => void;
   handleDeleteBook: (bookId: number, bookName: string) => void;
+  setBooksList: (value: any) => void;
 }
 
-export const Book: React.FC<BookProps> = ({ book, sectionId, index, moveBookInsideSection, handleDeleteBook }) => {
+export const Book: React.FC<BookProps> = ({ book, sectionId, index, moveBookInsideSection, handleDeleteBook, setBooksList }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(book.title.replace(/\.[^/.]+$/, ""));
   const inputRef = useRef<HTMLInputElement>(null);
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
     if (isEditing && event.key === 'Enter') {
@@ -60,17 +62,47 @@ export const Book: React.FC<BookProps> = ({ book, sectionId, index, moveBookInsi
     setIsEditing(true);
   };
 
+  const updateBookTitle = (id: string, newTitle: string) => {
+    const mutation = `
+      mutation UpdateBook($id: Int!, $title: String!, $user: Int!) {
+        setBook(id: $id, title: $title, user: $user) {
+          id
+          title
+        }
+      }
+    `;
+
+    axios.post('http://localhost:3000/graphql', {
+      query: mutation,
+      variables: {
+        id: parseInt(id),
+        title: newTitle + ".pdf",
+        user: 1,
+      },
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => {
+      console.log(response.data);
+      // Update the local state to reflect the new title
+      setBooksList((currentBooks: any) =>
+        currentBooks.map((book: any) =>
+          book.id === id ? { ...book, title: newTitle } : book
+        )
+      );
+      setIsEditing(false);
+    })
+    .catch(error => {
+      console.error('Failed to update book title:', error);
+      alert('Failed to rename the book');
+    });
+  };
+
   const handleSaveEdit = async () => {
     try {
-      // const response = await client.post('api/book/change-title/', { book_id: book.id, title: editedName });
-
-      // if (response.status === 200) {
-      //   setIsEditing(false);
-      // } else {
-      //   console.error('Failed to rename the book');
-      //   alert('Failed to rename the book');
-      // }
-      setIsEditing(false);
+      updateBookTitle(book.id.toString(), editedName);
       console.log(`Change book title to ${editedName}`);
     } catch (error) {
       console.error('Error during the API call', error);
@@ -83,8 +115,8 @@ export const Book: React.FC<BookProps> = ({ book, sectionId, index, moveBookInsi
   };
   
   const handleBookClick = () => {
-    //navigate('/books-reading');
-  }
+    navigate(`/pdfs/${book.id}/view`)
+  };
 
   const displayContent = (
     <>
@@ -95,7 +127,7 @@ export const Book: React.FC<BookProps> = ({ book, sectionId, index, moveBookInsi
         <DeleteIcon name="trashbin" style={{ cursor: 'pointer' }} onClick={handleDelete}/>
       </div>
       <div className={'vertical-rectangle'} onClick={handleBookClick}>
-        <img className="book-cover" src={`${book.cover_image ? 'http://localhost:3000/' + book.cover_image : book1Cover}`} alt={book.title} />
+        <img className="book-cover" src={`${book.cover_image ? 'http://localhost:3000/' + book.cover_image.replace('uploads\\', '') : book1Cover}`} alt={book.title} />
       </div>
       <div className='name-text'>
         {isEditing ? (

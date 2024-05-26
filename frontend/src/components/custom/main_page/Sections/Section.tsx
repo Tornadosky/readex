@@ -33,6 +33,7 @@ interface SectionProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   sectionIdModal: number | null;
   setSectionIdModal: React.Dispatch<React.SetStateAction<number | null>>;
+  setBooksList: (value: any) => void;
 }
 
 export const Section: React.FC<SectionProps> = ({
@@ -46,6 +47,7 @@ export const Section: React.FC<SectionProps> = ({
   setIsModalOpen,
   sectionIdModal,
   setSectionIdModal,
+  setBooksList,
 }) => {
   const [books, setBooks] = useState<BookType[]>(booksList);
   const [loading, setLoading] = useState(false);
@@ -57,11 +59,6 @@ export const Section: React.FC<SectionProps> = ({
     id: -1,
     name: '',
   });
-
-  const removeBook = (bookId: number) => {
-    const updatedBooks = books.filter(book => book.id !== bookId);
-    setBooks(updatedBooks);
-  };
 
   const addNewBook = (file: any, newId: number, cover_image: string) => {
     console.log(file);
@@ -153,15 +150,34 @@ export const Section: React.FC<SectionProps> = ({
 
     if (confirmed) {
       try {
-        // const response = await client.post('api/book/delete/', { book_id: id });
+        const mutation = `
+          mutation delBook($id: Int!) {
+            delBook(id: $id) {
+              id
+            }
+          }
+        `;
+        console.log("Deleted Book", id, name);
         
-        // if (response.status === 200) {
-        //   removeBook(id);
-        // } else {
-        //   console.error('Failed to delete the book');
-        //   alert('Failed to delete the book');
-        // }
-        console.log(`Delete book ${id}`);
+        const variables = {
+          id: parseInt(id as any),
+        };
+
+        axios.post('http://localhost:3000/graphql', {
+          query: mutation,
+          variables: variables,
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(response => {
+          console.log(`Delete book ${id}`);
+          setBooksList((currentBooks: any) => currentBooks.filter((book: any) => book.id !== id));
+        })
+        .catch(error => {
+          console.error('Failed to delete book:', error);
+        });
       } catch (error) {
         console.error('Error during the API call', error);
         alert('Error during the API call');
@@ -187,6 +203,7 @@ export const Section: React.FC<SectionProps> = ({
               <Book
                 key={book.id}
                 book={book}
+                setBooksList={setBooksList}
                 sectionId={sectionId}
                 index={book.index}
                 moveBookInsideSection={moveBookInsideSection}

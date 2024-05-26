@@ -171,11 +171,17 @@ const BooksList: React.FC<BooksListProps> = ({ booksList, setBooksList }) => {
                 <input
                   type="text"
                   value={editingTitle}
+                  onClick={(e) => e.stopPropagation()}
                   onChange={(e) => setEditingTitle(e.target.value)}
-                  onBlur={() => updateBookTitle(book.id, editingTitle)}
+                  onBlur={(e) => {
+                    updateBookTitle(book.id, editingTitle.replace(".pdf", ""));
+                    e.stopPropagation();
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      updateBookTitle(book.id, editingTitle);
+                      updateBookTitle(book.id, editingTitle.replace(".pdf", ""));
+                      e.preventDefault();
+                      e.stopPropagation();
                     }
                   }}
                   autoFocus

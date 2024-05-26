@@ -77,7 +77,7 @@ export default function Register() {
                         </button>
                     </Form.Item>
                     <Form.Item>
-                        Already have an account? <div className='text-blue-500' onClick={() => navigate('/login')}>Log in now!</div>
+                        Already have an account? <div className='text-blue-500 cursor-pointer' onClick={() => navigate('/login')}>Log in now!</div>
                     </Form.Item>
                 </Form>
             </Card>

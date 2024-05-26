@@ -656,7 +656,7 @@ const resolver = {
                     title: baseName,
                     author: args.author,
                     document: pathDB,
-                    image: imagePath + baseName.replace('.pdf', '') + '-001.jpg',
+                    image: coverImagePath,
                     uploaded: moment().format('yyyy-mm-dd:hh:mm:ss'),
                     user: {
                         connect: {
@@ -1418,10 +1418,39 @@ async function convertPdfToImage(pdfPath, outputDir) {
             fs.mkdirSync(outputDir, { recursive: true });
         }
 
+        console.log('Converting PDF to image:', outputDir)
+        console.log('Converting PDF to image:', opts.out_prefix)
+
         // Convert PDF to an image
         await pdfPoppler.convert(pdfPath, opts);
-        const outputFilePath = path.join(outputDir, `${opts.out_prefix}.jpg`); // Adjust file naming as needed
-        return outputFilePath;
+
+        // Regex to find the file with optional numeric suffix
+        const regex = new RegExp(`^${opts.out_prefix.replace('(', '\\(').replace(')', '\\)')}(-\\d+)?\\.jpg$`);
+        const files = fs.readdirSync(outputDir);
+        console.log('Files:', files);
+
+        let actualFileName;
+        for (let file of files) {
+            if (regex.test(file)) {
+                actualFileName = file;
+                break;
+            }
+        }
+
+        if (!actualFileName) {
+            throw new Error("Converted image file not found.");
+        }
+
+        const oldFilePath = path.join(outputDir, actualFileName);
+        const newFilePath = path.join(outputDir, `${opts.out_prefix}.jpg`);
+
+        // Rename the file if necessary
+        if (oldFilePath !== newFilePath) {
+            fs.renameSync(oldFilePath, newFilePath);
+        }
+
+        console.log('PDF converted to image:', newFilePath);
+        return newFilePath;
     } catch (error) {
         console.error('Error converting PDF to image:', error);
         throw error;

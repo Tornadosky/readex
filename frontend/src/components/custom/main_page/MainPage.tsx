@@ -2,14 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { useOutletContext } from 'react-router-dom';
 import { Section } from "./Sections/Section";
 import { TopBar } from "./TopBar";
-import Divider from '@mui/material/Divider';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { AlertDialog } from './AlertDialog';
 import MyCircularProgress from './Sections/MyCircularProgress.tsx';
 import { SectionType } from '../book_page/LayoutWithSidebar.tsx';
 import './style.css'
-import { MyAlert } from "./MyAlert";
 import axios from 'axios';
 
 interface MainPageProps {
@@ -33,14 +31,11 @@ interface OutletContextType {
 const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen, sectionIdModal, setSectionIdModal }) => {
   const sectionsContainerRef = useRef<HTMLDivElement>(null);
   const { sections, setSections, setBooksList } = useOutletContext<OutletContextType>();
-  const [showSettings, setShowSettings] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [globalLoading, setGlobalLoading] = useState<number>(
     parseInt(localStorage.getItem("globalLoading") || "0")
   );
-  const [openAlert, setOpenAlert] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState<string>("");
 
   const [actionConfirmation, setActionConfirmation] = useState<ActionConfirmationType>({
     id: -1,
@@ -146,14 +141,12 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen, sectio
         setSections([...sections, newSection]);
       } else {
         console.error("Failed to create section");
-        setOpenAlert(true);
-        setAlertMessage("Failed to create section");
+        alert("Failed to create section");
       }
       console.log("Create section");
     } catch (error) {
       console.error("Error during the API call", error);
-      setOpenAlert(true);
-      setAlertMessage("Error during the API call");
+      alert("Error during the API call");
     }
   };
 
@@ -219,11 +212,9 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen, sectio
     <DndProvider backend={HTML5Backend}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
         <div className="flex flex-col w-full bg-bgColor dark:bg-slate-800 min-h-full">
-          <MyAlert open={openAlert} setOpen={setOpenAlert} severity={"error"} message={alertMessage} />
-          <TopBar handleCreateSection={handleCreateSection} setShowSettings={setShowSettings} />
+          <TopBar handleCreateSection={handleCreateSection} />
           <AlertDialog open={open} handleClose={handleClose} actionConfirmation={actionConfirmation} type={"Section"} />
-          <Divider variant="middle" className="main-divider" />
-          <div ref={sectionsContainerRef}> 
+          <div className="pt-14" ref={sectionsContainerRef} > 
             {sections.map((section) => (
               <Section 
                 key={section.id}

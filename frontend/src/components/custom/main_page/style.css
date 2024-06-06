@@ -35,9 +35,8 @@
 }
 
 .create-section-button {
-    padding: 10px 20px;
+    padding: 5px 10px;
     border: none;
-    margin-left: 40px;
     background-color: #5ba5eb;
     font-family: "Inter-Regular", Helvetica;
     font-size: 18px;

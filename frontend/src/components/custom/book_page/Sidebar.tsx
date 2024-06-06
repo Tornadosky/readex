@@ -237,13 +237,14 @@ export function Sidebar({
 
       {isSidebarOpen && (
         <div 
-          className="app-sidebar border-r" 
+          className="app-sidebar border-r dark:border-gray-600" 
           style={{ width: sidebarWidth }}
           ref={sidebarRef}
           onMouseDown={(e) => e.preventDefault()}
         >
-          <div className="app-sidebar-content">
-            <div className="submenu-header focus-visible:none border-b" style={{ backgroundColor: '#f3f3f6'}}>
+          <div className="app-sidebar-content dark:bg-slate-800">
+            {/* <div className="submenu-header focus-visible:none border-b dark:bg-gray-400">  style={{ backgroundColor: '#f3f3f6'}}> */}
+            <div className="submenu-header focus-visible:none border-b dark:border-gray-600 bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-200"> 
               <span className="ellipsis flex items-center gap-1 mx-3">
                 {view}
               </span>
@@ -251,14 +252,14 @@ export function Sidebar({
                 {view === 'Books' && (
                   <>
                     <PlusOutlined onClick={() => {setSectionIdModal(null); setIsModalOpen(true)}} className="cursor-pointer text-gray-400 hover:text-gray-500 rounded" style={{ fontSize: '18px' }} />
-                    <div className="border-l mx-2 h-5" style={{ borderColor: '#d1d5db' }}></div>
+                    <div className="border-l mx-2 h-5 border-gray-300 dark:border-gray-600"></div>
                   </>
                 )}
                 <CloseOutlined onClick={toggleSidebar} className="cursor-pointer mr-4 text-gray-400 hover:text-gray-500 rounded" />
               </div>
             </div>
             
-            <div style={{ maxHeight: 'calc(100vh - 57px)', overflowY: 'auto' }}>
+            <div className='' style={{ maxHeight: 'calc(100vh - 57px)', overflowY: 'auto' }}>
               {view === 'Notes' ? (
                 <HighlightsList 
                   bookId={pdfId}

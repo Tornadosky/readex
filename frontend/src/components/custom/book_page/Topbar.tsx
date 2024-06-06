@@ -92,8 +92,8 @@ const Topbar = ({
 
     return (
         <div
-            className='flex justify-between items-center bg-gray-100 p-2 border-gray-200'
-            style={{ width: "100%", height: "57px", border: "1px solid #e8e8e8"}}
+            className='flex justify-between items-center bg-gray-100 p-2 border-y border-gray-200 dark:border-slate-800 dark:bg-slate-800 dark:text-gray-200'
+            style={{ width: "100%", height: "57px"}}
         >
             <h1 className='m-2 flex items-center'>
                 {isEditing ? (
@@ -112,7 +112,7 @@ const Topbar = ({
                     <>
                         {newBookName}
                         <button 
-                            className='text-gray-600 mx-2'
+                            className='text-gray-600 dark:text-gray-200 mx-2'
                             onClick={toggleEditMode}
                         >
                             <EditIcon />

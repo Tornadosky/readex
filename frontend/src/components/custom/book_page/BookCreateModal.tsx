@@ -160,6 +160,7 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
                                     books {
                                         id
                                         title
+                                        image
                                     }
                                 }
                             }
@@ -173,10 +174,13 @@ const BookCreateModal: React.FC<Props> = ({ isModalOpen, setIsModalOpen, selecte
     
                 if (linkResponse.data && !linkResponse.data.errors) {
                     console.log('Book linked to collection:', linkResponse);
+                    const bookList = linkResponse.data.data.setCollection.books;
+                    // TODO: Update the section with the new book
                     const newBook = {
-                            id: linkResponse.data.data.setCollection.books[0].books.id,
-                            title: linkResponse.data.data.setCollection.books[0].books.title,
-                            index: 0
+                        id: bookList[bookList.length - 1].books.id,
+                        title: bookList[bookList.length - 1].books.title,
+                        index: 0,
+                        cover_image: bookList[bookList.length - 1].books.image,
                     };
                     console.log('New book:', newBook);
                     console.log('Selected section:', selectedSection, sections);

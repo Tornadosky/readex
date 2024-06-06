@@ -218,7 +218,7 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen, sectio
   return (
     <DndProvider backend={HTML5Backend}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
-        <div className="flex flex-col w-full bg-bgColor min-h-full">
+        <div className="flex flex-col w-full bg-bgColor dark:bg-slate-800 min-h-full">
           <MyAlert open={openAlert} setOpen={setOpenAlert} severity={"error"} message={alertMessage} />
           <TopBar handleCreateSection={handleCreateSection} setShowSettings={setShowSettings} />
           <AlertDialog open={open} handleClose={handleClose} actionConfirmation={actionConfirmation} type={"Section"} />
@@ -229,6 +229,7 @@ const MainPage: React.FC<MainPageProps> = ({ isModalOpen, setIsModalOpen, sectio
                 key={section.id}
                 sectionId={section.id}
                 booksList={section.books}
+                setSections={setSections}
                 setBooksList={setBooksList}
                 name={section.title}
                 handleDeleteSection={handleActionConfirmation}

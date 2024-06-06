@@ -34,6 +34,7 @@ interface SectionProps {
   sectionIdModal: number | null;
   setSectionIdModal: React.Dispatch<React.SetStateAction<number | null>>;
   setBooksList: (value: any) => void;
+  setSections: React.Dispatch<React.SetStateAction<any>>;
 }
 
 export const Section: React.FC<SectionProps> = ({
@@ -48,8 +49,9 @@ export const Section: React.FC<SectionProps> = ({
   sectionIdModal,
   setSectionIdModal,
   setBooksList,
+  setSections,
 }) => {
-  const [books, setBooks] = useState<BookType[]>(booksList);
+  //const [books, setBooks] = useState<BookType[]>(booksList);
   const [loading, setLoading] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const [bookActionConfirmation, setBookActionConfirmation] = useState<{
@@ -67,9 +69,9 @@ export const Section: React.FC<SectionProps> = ({
       title: file.name.replace(/\.[^/.]+$/, ""),
       is_processed: true,
       cover_image: cover_image,
-      index: books.length,
+      index: booksList.length,
     };
-    setBooks(prevBooks => [...prevBooks, newBook]);  
+    //setBooks(prevBooks => [...prevBooks, newBook]);  
     setGlobalLoading(prev => Math.max(prev - 1, 0));
   };
 
@@ -173,6 +175,17 @@ export const Section: React.FC<SectionProps> = ({
         })
         .then(response => {
           console.log(`Delete book ${id}`);
+          setSections((currentSections: any) => {
+            return currentSections.map((section: any) => {
+              if (section.id === sectionId) {
+                return {
+                  ...section,
+                  books: section.books.filter((book: any) => book.id !== id),
+                };
+              }
+              return section;
+            });
+          });
           setBooksList((currentBooks: any) => currentBooks.filter((book: any) => book.id !== id));
         })
         .catch(error => {
@@ -198,7 +211,7 @@ export const Section: React.FC<SectionProps> = ({
         </span>
       </div>
       <div className="custom-rectangle">
-        {books.map((book) => (
+        {booksList.map((book) => (
             <React.Fragment key={book.id}>
               <Book
                 key={book.id}

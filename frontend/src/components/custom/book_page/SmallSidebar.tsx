@@ -36,7 +36,7 @@ const SmallSidebar = ({ handleViewChange, view, setIsPricingModalOpen } : SmallS
                 <div className="mt-auto flex-col">
                     <a className="flex items-bottom justify-center w-16 h-8 cursor-pointer">
                         <button 
-                            className='px-3 rounded text-emerald-600 bg-emerald-200 dark:bg-emerald-200 hover:bg-emerald-400 dark:hover:bg-emerald-200'
+                            className='px-3 rounded text-emerald-600 bg-emerald-200 dark:bg-emerald-400 hover:bg-emerald-400 dark:hover:bg-emerald-600 dark:text-emerald-200'
                             onClick={() => setIsPricingModalOpen(true)}
                         > 
                             Free

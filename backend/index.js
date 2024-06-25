@@ -64,6 +64,7 @@ app.use(koaBody({
 }));
 
 router.get("/test", (ctx) => {
+    console.log('\n[GET] => /test');
     ctx.type = 'text/html';
     ctx.body = "<h3>Server online!</h3>";
 });
@@ -78,7 +79,7 @@ app.use(async (ctx, next) => {
 });
 
 router.post('/login', async (ctx) => {
-    console.log('[POST] => /login');
+    console.log('\n[POST] => /login');
     const { email, password } = ctx.request.body;
     let user = users.find(u => u.email === email);
 
@@ -86,36 +87,40 @@ router.post('/login', async (ctx) => {
         user = await resolver.Users({password: password, email: email}, {});
 
         if (user.length != 1) {
+            console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] User not found niether in temporary storage nor in database!' );
             ctx.status = 400;
             ctx.body = { message: 'User not found.' };
             return;
         }
+        user = user[0];
     } else if (!user.verified) {
+        console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] Email not verified!' );
         ctx.status = 400;
         ctx.body = { message: 'Email not verified.' };
         return;
-    }
-
-    if (password !== user.password) {
+    } else if (password !== user.password) {
+        console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] Invalid password provided!' );
         ctx.status = 400;
         ctx.body = { message: 'Invalid password.' };
         return;
     }
 
+    console.log(`\x1b[32m%s\x1b[0m`, '[OK] Logged in successfully.' );
+    console.log(user);
     ctx.session.user = {email: user.email, login: user.login };
     ctx.status = 200;
     ctx.body = { message: 'Logged in successfully.' };
 });
 
 router.post('/logout', async (ctx) => {
-    console.log('[POST] => /logout');
+    console.log('\n[POST] => /logout');
     ctx.session = null;
     ctx.status = 200;
     ctx.body = { message: 'Logged out successfully.' };
 });
 
 router.get('/login', (ctx) => {
-    console.log('[GET] => /login');
+    console.log('\n[GET] => /login');
     ctx.type = 'text/html';
     ctx.body = fs.createReadStream('./logintest.html');
 })
@@ -165,12 +170,14 @@ passport.deserializeUser(function(user, done) {
 // });
 
 router.get('/resource', (ctx, next) => {
-    console.log('[GET] => /resource');
+    console.log('\n[GET] => /resource');
     if (ctx.session && ctx.session.user){
+        console.log(`\x1b[32m%s\x1b[0m`, '[OK] User is logged in and session is active.');
         console.log(ctx.session.user);
         ctx.type = 'text/html';
         return ctx.body = `<h2>Welcome to the resource, ${ctx.session.user.login}!</h2>`;
     }
+    console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] Unauthorized!' );
     ctx.status = 401;
     ctx.type = 'application/json';
     return ctx.body = {message: 'Unauthorized.'};
@@ -184,21 +191,30 @@ const transporterEmail = process.env.TRANSPORTER_EMAIL;
 const transporterPassword = process.env.TRANSPORTER_PASS;
 
 router.post('/register', async (ctx) => {
-    console.log('[POST] => /register');
+    console.log('\n[POST] => /register');
     const { email, login, password } = ctx.request.body;
     
     if (!email || !login || !password) {
+        console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] Not all fields are provided!' );
         ctx.status = 400;
         ctx.body = { message: 'All fields are required.' };
         return;
     }
 
-    const token = jwt.sign({ email }, jwtSecret, { expiresIn: '1h' });
+    let checkUser = await resolver.Users({email: email}, {});
+    if (checkUser.length != 0) {
+        console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] User already exists!' );
+        ctx.status = 400;
+        ctx.body = { message: 'User already exists.' };
+        return;
+    }
 
+    const token = jwt.sign({ email }, jwtSecret, { expiresIn: '1h' });
 
     // Create a temporary user object and add to the temporary storage
     const newUser = { email, login, password, verified: false, token };
     users.push(newUser);
+    console.log(`\x1b[32m%s\x1b[0m`, '[OK] Temporary user created.' );
 
     const transporter = nodemailer.createTransport({
         service: 'Gmail',
@@ -212,39 +228,50 @@ router.post('/register', async (ctx) => {
         from: transporterEmail,
         to: email,
         subject: 'Email Verification',
-        text: `Click the link to verify your email: http://localhost:3000/verify/${token}`
+        text: `Click the link to verify your email:\n http://localhost:3000/verify/${token} \n\nDon't share this link with anyone else!`
     };
 
     await transporter.sendMail(mailOptions);
-
+    console.log(`\x1b[32m%s\x1b[0m`, '[OK] Email sent.' );
     ctx.status = 201;
     ctx.body = { message: 'Registration successful. Check your email to verify your account.' };
 });
 
 router.get('/verify/:token', async (ctx) => {
+    console.log('\n[GET] => /verify');
     const { token } = ctx.params;
-    console.log(ctx.session);
-
     try {
         const decoded = jwt.verify(token, jwtSecret);
         const user = users.find(u => u.email === decoded.email);
 
         if (!user) {
+            console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] Invalid token!');
             ctx.status = 400;
             ctx.body = { message: 'Invalid token.' };
             return;
         }
 
         if (user.verified) {
+            console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] Email already verified!');
             ctx.status = 400;
             ctx.body = { message: 'Email already verified.' };
             return;
         }
 
+        let createUser = await resolver.setUser({email: user.email, login: user.login, password: user.password, language: "en", theme: "dark"}, {});
+        if (!createUser) {
+            console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] Failed to add user to database!');
+            ctx.status = 400;
+            ctx.body = { message: 'Server error: Cannot remember user' };
+            return;
+        }
+        console.log(`\x1b[32m%s\x1b[0m`, '[OK] Verification successful.' );
         user.verified = true;
         ctx.status = 200;
         ctx.body = { message: 'Email verified successfully.' };
     } catch (err) {
+        console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] Server error:');
+        console.error(err);
         ctx.status = 400;
         ctx.body = { message: 'Invalid or expired token.' };
     }
@@ -264,6 +291,7 @@ router.get('/graphql', graphqlHTTP({
     graphiql: true
 }));
 router.post('/getbook', async (ctx, next) => {
+    console.log('\n[POST] => /getbook');
     let pdf = {};
     if (ctx.request.body.id){
         let book = await resolver.Books({id: ctx.request.body.id},{});
@@ -276,7 +304,7 @@ router.post('/getbook', async (ctx, next) => {
             ctx.body = pdf;
         } else {
             ctx.status = 404;
-            ctx.body = { error: "Error: file not found: " + path };
+            ctx.body = { message: "Error: file not found: " + path };
         }
     } else {
         let path = ctx.request.body.document;
@@ -289,11 +317,11 @@ router.post('/getbook', async (ctx, next) => {
         } else {
             ctx.status = 404;
             ctx.response.type = 'application/json';
-            ctx.body = { error: "Error: file not found: " + path };
+            ctx.body = { message: "Error: file not found: " + path };
     }}
 });
 
 app.use(router.routes()).use(router.allowedMethods());
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`[OK] Running on port ${PORT}`));
+app.listen(PORT, () => console.log(`\x1b[32m%s\x1b[0m`, `\n[OK] Running on port ${PORT}`));

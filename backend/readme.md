@@ -10,6 +10,7 @@
 7. [How to add Books and Tests to Collections](#wwc1)
   7.1. [How to remove them](#wwc2)
 8. [Tips](#tips)
+9. [List of endpoints](./endpoints.md "List with descriptions")
 
 
 # Database base info <a name="dbi"></a>

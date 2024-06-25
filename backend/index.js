@@ -11,9 +11,9 @@ const {
 } = require('graphql');
 const resolver = require('./resolver');
 const cors = require('@koa/cors');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-const session = require('koa-session');
+// const passport = require('passport');
+// const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const session = require('koa-session2');
 const serve = require('koa-static');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
@@ -28,14 +28,14 @@ require('dotenv').config();
 app.use(cors({
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST'],
-    credentials: true,
+    credentials: "include",
 }));
 
 app.use(serve(__dirname + '/uploads'));
 
-app.keys = ['nohornyplease'];
+app.keys = [process.env.SESSION_KEY];
 const sessionConfig = {
-  key: 'koa:sess', // the cookie key name (default is koa:sess)
+  key: process.env.COOKIE_NAME, // the cookie key name (default is koa:sess)
   maxAge: 86400000, // 1 day in milliseconds
   overwrite: true, // overwrite session if exists, default is true
   httpOnly: true, // cookie is not accessible via JavaScript, default is true
@@ -43,16 +43,16 @@ const sessionConfig = {
   rolling: false, // forces a session identifier cookie to be set on every response. 
                  // The expiration is reset to the original maxAge, resetting the expiration countdown. 
                  // Default is false.
-  renew: false, // renew session when session is nearly expired, so we can always keep user logged in. Default is false.
+  renew: true, // renew session when session is nearly expired, so we can always keep user logged in. Default is false.
 };
-app.use(session(sessionConfig, app));
-//app.use(session(app));
+app.use(session(sessionConfig));
 
-app.use(async (ctx, next) => {
+// This middleware for debugging sessions only
+/*app.use(async (ctx, next) => {
     console.log('Before:', ctx.session);
     await next();
     console.log('After:', ctx.session);
-});
+});*/
 
 app.use(koaBody({
     multipart: true, // to enable multipart/form-data
@@ -64,6 +64,7 @@ app.use(koaBody({
 }));
 
 router.get("/test", (ctx) => {
+    ctx.type = 'text/html';
     ctx.body = "<h3>Server online!</h3>";
 });
 
@@ -77,7 +78,7 @@ app.use(async (ctx, next) => {
 });
 
 router.post('/login', async (ctx) => {
-    console.log(ctx.session);
+    console.log('[POST] => /login');
     const { email, password } = ctx.request.body;
     let user = users.find(u => u.email === email);
 
@@ -101,16 +102,23 @@ router.post('/login', async (ctx) => {
         return;
     }
 
-    ctx.session.user = user;
+    ctx.session.user = {email: user.email, login: user.login };
     ctx.status = 200;
     ctx.body = { message: 'Logged in successfully.' };
 });
 
 router.post('/logout', async (ctx) => {
+    console.log('[POST] => /logout');
     ctx.session = null;
     ctx.status = 200;
     ctx.body = { message: 'Logged out successfully.' };
 });
+
+router.get('/login', (ctx) => {
+    console.log('[GET] => /login');
+    ctx.type = 'text/html';
+    ctx.body = fs.createReadStream('./logintest.html');
+})
 
 //app.use(passport.initialize());
 //app.use(passport.session());
@@ -157,10 +165,15 @@ passport.deserializeUser(function(user, done) {
 // });
 
 router.get('/resource', (ctx, next) => {
-    if (ctx.session)
-        return ctx.body = `<h2>Welcome to the resource, ${req.user.username}!</h2>`;
+    console.log('[GET] => /resource');
+    if (ctx.session && ctx.session.user){
+        console.log(ctx.session.user);
+        ctx.type = 'text/html';
+        return ctx.body = `<h2>Welcome to the resource, ${ctx.session.user.login}!</h2>`;
+    }
     ctx.status = 401;
-    return ctx.body = '[ERROR] 401: Unauthorized.';
+    ctx.type = 'application/json';
+    return ctx.body = {message: 'Unauthorized.'};
 });
 
 //------------------------------ REGISTRATION ------------------------------//
@@ -171,6 +184,7 @@ const transporterEmail = process.env.TRANSPORTER_EMAIL;
 const transporterPassword = process.env.TRANSPORTER_PASS;
 
 router.post('/register', async (ctx) => {
+    console.log('[POST] => /register');
     const { email, login, password } = ctx.request.body;
     
     if (!email || !login || !password) {
@@ -274,6 +288,7 @@ router.post('/getbook', async (ctx, next) => {
             ctx.body = pdf;
         } else {
             ctx.status = 404;
+            ctx.response.type = 'application/json';
             ctx.body = { error: "Error: file not found: " + path };
     }}
 });

@@ -80,11 +80,23 @@ app.use(async (ctx, next) => {
 
 router.post('/login', async (ctx) => {
     console.log('\n[POST] => /login');
-    const { email, password } = ctx.request.body;
-    let user = users.find(u => u.email === email);
+    if (!ctx.request.body.email && !ctx.request.body.login && !ctx.request.body.phone) {
+        console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] User identificator not provided!' );
+        ctx.status = 400;
+        ctx.body = { message: 'User identificator not provided.' };
+        return;
+    }
+    const { email, login, phone, password } = ctx.request.body;
+    let user = null;
+    email ? user = users.find(u => u.email === email) : login ? user = users.find(u => u.login === login) : null;
 
     if (!user) {
-        user = await resolver.Users({password: password, email: email}, {});
+        console.log('[INFO] User not found in temporary storage.' );
+
+        email ? user = await resolver.Users({password: password, email: email}, {})
+            : login ? user = await resolver.Users({password: password, login: login}, {})
+                : phone? user = await resolver.Users({password: password, phone: phone}, {})
+                    : user = [];
 
         if (user.length != 1) {
             console.error(`\x1b[31m%s\x1b[0m`, '[ERROR] User not found niether in temporary storage nor in database!' );

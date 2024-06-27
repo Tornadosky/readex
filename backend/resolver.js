@@ -5,7 +5,7 @@ const {
     PrismaClient
 } = require('@prisma/client');
 const prisma = new PrismaClient({ /// TODO: remove prisma logging!
-    log: [{
+    /*log: [{
             emit: 'stdout',
             level: 'query',
         },
@@ -21,7 +21,7 @@ const prisma = new PrismaClient({ /// TODO: remove prisma logging!
             emit: 'stdout',
             level: 'warn',
         },
-    ]
+    ]*/
 });
 
 const path = require('path');
@@ -225,18 +225,18 @@ const resolver = {
                 }
             });
         } else if (args.x1) {
-           answer = await prisma.Rects.findMany({
-               where: {
-                   x1: args.x1,
-                   x2: args.x2,
-                   y1: args.y1,
-                   y2: args.y2,
-                   width: args.width,
-                   height: args.height,
-                   pagenum: args.pagenum,
-                   scaleFactor: args.scaleFactor
-               } 
-           });
+            answer = await prisma.Rects.findMany({
+                where: {
+                    x1: args.x1,
+                    x2: args.x2,
+                    y1: args.y1,
+                    y2: args.y2,
+                    width: args.width,
+                    height: args.height,
+                    pagenum: args.pagenum,
+                    scaleFactor: args.scaleFactor
+                } 
+            });
         }
         console.log(answer);
         return answer;
@@ -666,14 +666,14 @@ const resolver = {
                 },
                 include: {
                     highlights: {
-                      include: {
-                         rects: {
-                             include: {
-                                 rects: true
-                             }
-                         },
-                         boundingRect: true 
-                      }  
+                        include: {
+                            rects: {
+                                include: {
+                                    rects: true
+                                }
+                            },
+                            boundingRect: true 
+                        }  
                     },
                     collections: true,
                     user: true

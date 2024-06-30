@@ -13,7 +13,12 @@ const resolver = require('./resolver');
 const cors = require('@koa/cors');
 // const passport = require('passport');
 // const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-const session = require('koa-session2');
+const session = require('koa-generic-session');
+const passport = require('./passportPreset').passport;
+
+let googleUsers = require('./passportPreset').googleUsers;
+
+const passportPatch = require('./koa-passport-patch');
 const serve = require('koa-static');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
@@ -27,7 +32,7 @@ require('dotenv').config();
 
 app.use(cors({
     origin: 'http://localhost:5173',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'OPTIONS'],
     credentials: "include",
 }));
 
@@ -63,11 +68,15 @@ app.use(koaBody({
     formLimit: '50mb', // for URL-encoded form payload
 }));
 
+app.use(passportPatch());
+
 router.get("/test", (ctx) => {
     console.log('\n[GET] => /test');
     ctx.type = 'text/html';
     ctx.body = "<h3>Server online!</h3>";
 });
+
+const users = []; // temporary storage for users
 
 //------------------------------ AUTH ------------------------------//
 
@@ -132,57 +141,57 @@ router.post('/logout', async (ctx) => {
 });
 
 router.get('/login', (ctx) => {
+    ctx.session = {};
     console.log('\n[GET] => /login');
     ctx.type = 'text/html';
     ctx.body = fs.createReadStream('./logintest.html');
 })
 
-//app.use(passport.initialize());
-//app.use(passport.session());
+//------------------------------ GOOGLE AUTH ------------------------------//
 
-/*passport.serializeUser(function(user, done) {
-    console.log('Serializing user' + user.profile.displayName);
-    done(null, user);
-});
-passport.deserializeUser(function(user, done) {
-    console.log('Deserializing user' + user.profile.displayName);
-    done(null, user);
-});*/
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 /*passport.use(
     new GoogleStrategy({
             clientID: process.env.CLIENT_ID,
             clientSecret: process.env.CLIENT_SECRET,
-            callbackURL: 'http://localhost:3000/auth/google/callback',
+            callbackURL: process.env.CALLBACK_URL,
         },
         (token, refreshToken, profile, done) => { done(null, {profile: profile, token: token}); }
     )
 );*/
 
-// router.get(
-//     '/auth/google',
-//     passport.authenticate('google', {
-//         scope: ['profile']
-//     })
-// );
-// router.get(
-//     '/auth/google/callback',
-//     passport.authenticate('google', {
-//         failureRedirect: '/login',
-//         successRedirect: '/resource',
-//     })
-// );
-// router.get('/login', (ctx, next) => {
-//     ctx.body = `<h2><a href="/auth/google">Login via Google</a></h2>`;
-// });
+/*router.get(
+    '/auth/google',
+    passport.authenticate('google', {
+        scope: ['profile', 'email']
+    })
+);
 
-// router.get('/logout', (ctx, next) => {
-//     //ctx.logout();
-//     ctx.redirect('/login');
-// });
+router.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    async (ctx) => {
+        let gUser = {
+            email: googleUsers[0].profile._json.email,
+            verified: googleUsers[0].profile.emails[0].verified,
+            password: googleUsers[0].id,
+            login: googleUsers[0].profile._json.email,
+        };
+        users.push(gUser);
+        console.log(gUser);
+//        ctx.session.user = gUser;
+        console.log(ctx.session);
+        //ctx.redirect('/resource');
+        ctx.session.user = {email: gUser.email, login: gUser.login };
+        ctx.status = 200;
+        ctx.body = { message: 'Logged in successfully.' };
+    }
+);
 
 router.get('/resource', (ctx, next) => {
     console.log('\n[GET] => /resource');
+    console.log(ctx.session);
     if (ctx.session && ctx.session.user){
         console.log(`\x1b[32m%s\x1b[0m`, '[OK] User is logged in and session is active.');
         console.log(ctx.session.user);
@@ -194,10 +203,9 @@ router.get('/resource', (ctx, next) => {
     ctx.type = 'application/json';
     return ctx.body = {message: 'Unauthorized.'};
 });
-
+*/
 //------------------------------ REGISTRATION ------------------------------//
 
-const users = []; // temporary storage for users
 const jwtSecret = process.env.JWT_SECRET;
 const transporterEmail = process.env.TRANSPORTER_EMAIL;
 const transporterPassword = process.env.TRANSPORTER_PASS;

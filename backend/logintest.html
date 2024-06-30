@@ -5,6 +5,7 @@
     </head>
     <body>
         <button onclick="sendReq()">LOGIN!</button>
+        <button onclick="sendReqGoogle()">Login via Google</button>
         <script>
             let sendReq = async () => {
                 const rawResponse = await fetch('http://localhost:3000/login', {
@@ -21,6 +22,18 @@
                 });
                 const content = await rawResponse.json();
                 console.log(content);
+            }
+
+            let sendReqGoogle = async () => {
+                console.log('click');
+                fetch('http://localhost:3000/auth/google', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    mode: 'cors',
+                }).then(response => console.log(response))
+                    .catch(error => console.error(error));
             }
         </script>
     </body>

@@ -17,6 +17,7 @@ type Users {
   language: String!
   theme: String!
   openedBooks: [Books!]!
+  type: String
 }
 
 type Books {
@@ -185,6 +186,7 @@ type Mutation {
     theme: String
     achievements: [iAchievements]
     openedBooks: [Int]
+    type: String
   ): Users
   setAchievement(
     id: ID

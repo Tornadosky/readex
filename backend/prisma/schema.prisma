@@ -24,6 +24,7 @@ model Users {
   language  String
   theme     String
   books     Books[] @relation("bookOwner")
+  type      String @default("free")
 }
 
 model Books {

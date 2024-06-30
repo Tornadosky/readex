@@ -543,6 +543,7 @@ const resolver = {
             upsertParams.data.login = (args.login);
             upsertParams.data.language = (args.language);
             upsertParams.data.theme = (args.theme);
+            upsertParams.data.type = (args.type);
             args.achievements ? upsertParams.data.achievements = {
                         connectOrCreate: {
                             where: {
@@ -571,7 +572,7 @@ const resolver = {
                     password: args.password,
                     email: args.email,
                     language: args.language,
-                    theme: args.theme
+                    theme: args.theme,
                 },
                 include: {
                     collections: true,

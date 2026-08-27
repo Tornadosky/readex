@@ -76,7 +76,7 @@ async def generate_and_parse_questions(text: str, question_number: int =2, diffi
         partial_variables={"format_instructions": format_instructions}
     )
 
-    user_query = prompt.format_prompt(user_prompt = text, question_number = 2, difficulty = "hard")
+    user_query = prompt.format_prompt(user_prompt = text, question_number = question_number, difficulty = "hard")
     with get_openai_callback() as cb:
         user_query_output = chat_model(user_query.to_messages())
         print(cb)
